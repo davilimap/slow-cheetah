@@ -2,6 +2,7 @@
 {
     using System;
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     /// <summary>
     /// Transforms JSON files according to JDT syntax

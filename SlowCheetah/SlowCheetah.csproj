@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Exceptions\TransformFailedException.cs" />
+    <Compile Include="JDT\JsonTransformation.cs" />
     <Compile Include="Logging\ITransformationLogger.cs" />
     <Compile Include="Logging\XmlShimLogger.cs" />
     <Compile Include="Transformer\ITransformer.cs" />
@@ -85,6 +86,7 @@
       <Link>stylecop.json</Link>
     </AdditionalFiles>
   </ItemGroup>
+  <ItemGroup />
   <Target Name="PackOnBuild" AfterTargets="Build" Condition="'$(Package)'=='true'">
     <CallTarget Targets="Pack" />
   </Target>
