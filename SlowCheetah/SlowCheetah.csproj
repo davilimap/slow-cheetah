@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Exceptions\TransformFailedException.cs" />
+    <Compile Include="JDT\JsonDocument.cs" />
     <Compile Include="JDT\JsonTransformation.cs" />
     <Compile Include="Logging\ITransformationLogger.cs" />
     <Compile Include="Logging\XmlShimLogger.cs" />
