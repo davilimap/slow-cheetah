@@ -1,4 +1,7 @@
-﻿namespace SlowCheetah.JDT
+﻿// Copyright (c) Sayed Ibrahim Hashimi. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See  License.md file in the project root for full license information.
+
+namespace SlowCheetah.JDT
 {
     using System;
     using System.Collections.Generic;
@@ -19,15 +22,15 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="JsonTransformation"/> class.
         /// </summary>
-        /// <param name="transform">Object that corresponds to the transformation file</param>
-        public JsonTransformation(JObject transform)
+        /// <param name="transformObject">Object that corresponds to the transformation file</param>
+        public JsonTransformation(JObject transformObject)
         {
-            if (transform == null)
+            if (transformObject == null)
             {
-                throw new ArgumentNullException(nameof(transform));
+                throw new ArgumentNullException(nameof(transformObject));
             }
 
-            this.transform = transform;
+            this.transform = transformObject;
         }
 
         /// <summary>
@@ -51,6 +54,9 @@
                 };
 
                 JObject trn = (JObject)JToken.ReadFrom(reader, loadSettings);
+
+                // TO DO: Return error if the JToken is not an object
+                // What if it's an empty object?
                 this.transform = trn;
             }
         }
@@ -59,9 +65,9 @@
         /// Apply the specified transformation
         /// </summary>
         /// <param name="document">Document to be transformed</param>
-        public void Apply(JObject document)
+        public void Apply(JsonDocument document)
         {
-            this.TransformLoop(this.transform, document);
+            this.TransformLoop(this.transform, document.GetObject());
         }
 
         private void TransformLoop(JObject transformNode, JObject originalNode)
@@ -84,7 +90,7 @@
                             }
                             else
                             {
-                                // If it exists and is not an object, it is a replace trasnformation, so queue it
+                                // If it exists and is not an object, it is a replace transformation, so queue it
                                 nodesToTransform.Enqueue(child.Name);
                             }
                         }
@@ -96,10 +102,44 @@
 
                         break;
                     default:
-                        // Any other types consitutues a non-recursive transform
+                        // Any other types consitutues a non-recursive merge
                         nodesToTransform.Enqueue(child.Name);
                         break;
                 }
+            }
+
+            while (nodesToTransform.Count() > 0)
+            {
+                // Execute the transforms in queue order
+                string nodeName = nodesToTransform.Dequeue();
+                JToken nodeToTransform;
+                if (originalNode.TryGetValue(nodeName, out nodeToTransform))
+                {
+                    if (nodeToTransform.Type == JTokenType.Array && originalNode[nodeName].Type == JTokenType.Array)
+                    {
+                        // If the original and transform are arrays, merge the contents together
+                        this.MergeArray((JArray)nodeToTransform, (JArray)originalNode[nodeName]);
+                    }
+                    else
+                    {
+                        // If the contents are different, execute the replace
+                        originalNode[nodeName] = transformNode[nodeName];
+                    }
+                }
+                else
+                {
+                    // If the node is not present in the original, add it
+                    // TO DO: Where to add this node? Does it matter?
+                    originalNode.Add(nodeName, transformNode[nodeName]);
+                }
+            }
+        }
+
+        private void MergeArray(JArray original, JArray arrayToMerge)
+        {
+            foreach (JToken token in arrayToMerge)
+            {
+                original.Add(token);
             }
         }
     }
