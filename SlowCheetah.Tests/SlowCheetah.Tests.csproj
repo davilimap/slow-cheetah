@@ -76,6 +76,8 @@
     <None Include="JDT\Inputs\Default\Array.Source.json" />
     <None Include="JDT\Inputs\Default\Object.Merge.Expected.json" />
     <None Include="JDT\Inputs\Default\Object.Merge.Transform.json" />
+    <None Include="JDT\Inputs\Default\Object.Replace.Expected.json" />
+    <None Include="JDT\Inputs\Default\Object.Replace.Transform.json" />
     <None Include="JDT\Inputs\Default\Primitive.AddPrimitive.Expected.json" />
     <None Include="JDT\Inputs\Default\Primitive.AddObject.Expected.json" />
     <None Include="JDT\Inputs\Default\Primitive.AddObject.Transform.json" />
