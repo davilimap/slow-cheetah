@@ -28,7 +28,7 @@ namespace SlowCheetah.JDT
                 throw new ArgumentNullException(nameof(transformObject));
             }
 
-            this.transform = transformObject;
+            this.transform = (JObject)transformObject.DeepClone();
         }
 
         /// <summary>
@@ -65,10 +65,10 @@ namespace SlowCheetah.JDT
         /// <param name="document">Document to be transformed</param>
         public void Apply(JsonDocument document)
         {
-            this.TransformLoop(this.transform, document.GetObject());
+            this.TransformCore(this.transform, document.GetObject());
         }
 
-        private void TransformLoop(JObject transformNode, JObject originalNode)
+        private void TransformCore(JObject transformNode, JObject originalNode)
         {
             Queue<string> nodesToTransform = new Queue<string>();
 
@@ -84,7 +84,7 @@ namespace SlowCheetah.JDT
                             if (originalChild.Type == JTokenType.Object)
                             {
                                 // If it exists and is and is also an object, the recursive transform must be executed
-                                this.TransformLoop((JObject)child.Value, (JObject)originalChild);
+                                this.TransformCore((JObject)child.Value, (JObject)originalChild);
                             }
                             else
                             {
@@ -127,7 +127,7 @@ namespace SlowCheetah.JDT
                 else
                 {
                     // If the node is not present in the original, add it
-                    originalNode.Add(nodeName, transformNode[nodeName]);
+                    originalNode.Add(nodeName, transformNode[nodeName].DeepClone());
                 }
             }
         }

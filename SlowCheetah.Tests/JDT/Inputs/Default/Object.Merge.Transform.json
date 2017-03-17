@@ -8,7 +8,11 @@
   },
   "C": {
     "C1": {
-      "C12": false
+      "C12": false,
+      "C13": [
+        { "Name": "C131" },
+        { "Name": "C132" }
+      ]
     },
     "C3": {
       "Added": true

@@ -13,8 +13,8 @@ namespace SlowCheetah.JDT
     /// </summary>
     public class JsonDocument : IEquatable<JsonDocument>
     {
-        private string documentPath;
-        private JObject documentObject;
+        private readonly string documentPath;
+        private readonly JObject documentObject;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="JsonDocument"/> class.
@@ -23,7 +23,7 @@ namespace SlowCheetah.JDT
         public JsonDocument(string filePath)
         {
             this.documentPath = filePath;
-            this.Load(this.documentPath);
+            this.documentObject = Load(this.documentPath);
         }
 
         /// <summary>
@@ -33,7 +33,13 @@ namespace SlowCheetah.JDT
         public JsonDocument(JObject docObject)
         {
             this.documentPath = string.Empty;
-            this.documentObject = docObject;
+            this.documentObject = (JObject)docObject.DeepClone();
+        }
+
+        /// <inheritdoc/>
+        public bool Equals(JsonDocument other)
+        {
+            return JToken.DeepEquals(this.documentObject, other.documentObject);
         }
 
         /// <summary>
@@ -63,7 +69,7 @@ namespace SlowCheetah.JDT
             return this.documentObject;
         }
 
-        private void Load(string filePath)
+        private static JObject Load(string filePath)
         {
             if (string.IsNullOrEmpty(filePath))
             {
@@ -82,14 +88,8 @@ namespace SlowCheetah.JDT
                 JObject dct = (JObject)JToken.ReadFrom(reader, loadSettings);
 
                 // TO DO: Return error if the JToken is not an object
-                // What if it's an empty object?
-                this.documentObject = dct;
+                return dct;
             }
-        }
-
-        public bool Equals(JsonDocument other)
-        {
-            return JToken.DeepEquals(this.documentObject, other.documentObject);
         }
     }
 }
