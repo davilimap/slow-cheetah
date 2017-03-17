@@ -3,16 +3,10 @@
 
 namespace SlowCheetah.Tests.JDT
 {
-    using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
-    using Newtonsoft.Json.Linq;
     using SlowCheetah.JDT;
     using Xunit;
-    using Xunit.Extensions;
 
     /// <summary>
     /// Test class for JDT default transforms
@@ -20,7 +14,7 @@ namespace SlowCheetah.Tests.JDT
     public class DefaultTransformTest
     {
         // Directory for test inputs, that are JSON files
-        private static readonly string TestInputDirectory = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\SlowCheetah.Tests\\JDT\\Inputs\\";
+        private static readonly string TestInputDirectory = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\SlowCheetah.Tests\\JDT\\Inputs\\Default\\";
 
         public static IEnumerable<object[]> GetInputs()
         {

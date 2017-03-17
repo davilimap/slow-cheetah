@@ -7,8 +7,6 @@ namespace SlowCheetah.JDT
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
@@ -115,21 +113,20 @@ namespace SlowCheetah.JDT
                 JToken nodeToTransform;
                 if (originalNode.TryGetValue(nodeName, out nodeToTransform))
                 {
-                    if (nodeToTransform.Type == JTokenType.Array && originalNode[nodeName].Type == JTokenType.Array)
+                    if (nodeToTransform.Type == JTokenType.Array && transformNode[nodeName].Type == JTokenType.Array)
                     {
                         // If the original and transform are arrays, merge the contents together
-                        this.MergeArray((JArray)nodeToTransform, (JArray)originalNode[nodeName]);
+                        this.MergeArray((JArray)nodeToTransform, (JArray)transformNode[nodeName]);
                     }
                     else
                     {
                         // If the contents are different, execute the replace
-                        originalNode[nodeName] = transformNode[nodeName];
+                        originalNode[nodeName] = transformNode[nodeName].DeepClone();
                     }
                 }
                 else
                 {
                     // If the node is not present in the original, add it
-                    // TO DO: Where to add this node? Does it matter?
                     originalNode.Add(nodeName, transformNode[nodeName]);
                 }
             }
@@ -139,7 +136,7 @@ namespace SlowCheetah.JDT
         {
             foreach (JToken token in arrayToMerge)
             {
-                original.Add(token);
+                original.Add(token.DeepClone());
             }
         }
     }

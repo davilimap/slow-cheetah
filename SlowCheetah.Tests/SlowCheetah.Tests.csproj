@@ -69,16 +69,21 @@
     <Compile Include="TransformTest.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="JDT\Inputs\Object.Merge.Expected.json" />
-    <None Include="JDT\Inputs\Object.Merge.Transform.json" />
-    <None Include="JDT\Inputs\Primitive.AddPrimitive.Expected.json" />
-    <None Include="JDT\Inputs\Primitive.AddObject.Expected.json" />
-    <None Include="JDT\Inputs\Primitive.AddObject.Transform.json" />
-    <None Include="JDT\Inputs\Primitive.Replace.Expected.json" />
-    <None Include="JDT\Inputs\Primitive.AddPrimitive.Transform.json" />
-    <None Include="JDT\Inputs\Primitive.Replace.Transform.json" />
-    <None Include="JDT\Inputs\Object.Source.json" />
-    <None Include="JDT\Inputs\Primitive.Source.json" />
+    <None Include="JDT\Inputs\Default\Array.Merge.Expected.json" />
+    <None Include="JDT\Inputs\Default\Array.Merge.Transform.json" />
+    <None Include="JDT\Inputs\Default\Array.Replace.Expected.json" />
+    <None Include="JDT\Inputs\Default\Array.Replace.Transform.json" />
+    <None Include="JDT\Inputs\Default\Array.Source.json" />
+    <None Include="JDT\Inputs\Default\Object.Merge.Expected.json" />
+    <None Include="JDT\Inputs\Default\Object.Merge.Transform.json" />
+    <None Include="JDT\Inputs\Default\Primitive.AddPrimitive.Expected.json" />
+    <None Include="JDT\Inputs\Default\Primitive.AddObject.Expected.json" />
+    <None Include="JDT\Inputs\Default\Primitive.AddObject.Transform.json" />
+    <None Include="JDT\Inputs\Default\Primitive.Replace.Expected.json" />
+    <None Include="JDT\Inputs\Default\Primitive.AddPrimitive.Transform.json" />
+    <None Include="JDT\Inputs\Default\Primitive.Replace.Transform.json" />
+    <None Include="JDT\Inputs\Default\Object.Source.json" />
+    <None Include="JDT\Inputs\Default\Primitive.Source.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
