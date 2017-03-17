@@ -27,7 +27,7 @@ namespace SlowCheetah.Tests.JDT
             }
         }
 
-        public static JObject GetTransformObjectWithPrimitiveSubs
+        public static JObject GetTransformWithPrimitiveReplace
         {
             get
             {
@@ -40,7 +40,7 @@ namespace SlowCheetah.Tests.JDT
             }
         }
 
-        public static JObject GetTransformObjectWithPrimitiveAdds
+        public static JObject GetTransformWithPrimitiveAdds
         {
             get
             {
@@ -53,7 +53,7 @@ namespace SlowCheetah.Tests.JDT
             }
         }
 
-        public static JObject GetExpectedResultWithPrimitiveAdds
+        public static JObject GetExpectedWithPrimitiveAdds
         {
             get
             {
@@ -71,7 +71,7 @@ namespace SlowCheetah.Tests.JDT
             }
         }
 
-        public static JObject GetTransformObjectWithObjectAdds
+        public static JObject GetTransformWithObjectAdds
         {
             get
             {
@@ -97,7 +97,7 @@ namespace SlowCheetah.Tests.JDT
             }
         }
 
-        public static JObject GetExpectedResultWithObjectAdds
+        public static JObject GetExpectedWithObjectAdds
         {
             get
             {
@@ -122,6 +122,81 @@ namespace SlowCheetah.Tests.JDT
                             ""F3"": {
                                 ""F31"": 10,
                                 ""F32"": null
+                            }
+                        }
+                    }");
+            }
+        }
+
+        public static JObject GetDocumentWithObjects
+        {
+            get
+            {
+                return JObject.Parse(
+                    @"{
+                        ""A"": {
+                        },
+                        ""B"": {
+                            ""B1"" : 1,
+                            ""B2"" : 2
+                        },
+                        ""C"": {
+                            ""C1"": {
+                                ""C11"":true
+                            },
+                            ""C2"": 2
+                        }
+                    }");
+            }
+        }
+
+        public static JObject GetTransformWithObjectMerge
+        {
+            get
+            {
+                return JObject.Parse(
+                    @"{
+                        ""A"": {
+                            ""A1"": ""New""
+                        },
+                        ""B"": {
+                            ""B1"" : 10,
+                            ""B3"" : 30
+                        },
+                        ""C"": {
+                            ""C1"": {
+                                ""C12"":false
+                            },
+                            ""C3"": {
+                                ""Added"": true
+                            }
+                        }
+                    }");
+            }
+        }
+
+        public static JObject GetExpectedWithObjectMerge
+        {
+            get
+            {
+                return JObject.Parse(
+                    @"{
+                        ""A"": {
+                            ""A1"": ""New""
+                        },
+                        ""B"": {
+                            ""B1"" : 10,
+                            ""B2"" : 2,
+                            ""B3"" : 30
+                        },
+                        ""C"": {
+                            ""C1"": {
+                                ""C11"":true,
+                                ""C12"":false
+                            },
+                            ""C2"": 2,
+                            ""C3"": {
+                                ""Added"": true
                             }
                         }
                     }");

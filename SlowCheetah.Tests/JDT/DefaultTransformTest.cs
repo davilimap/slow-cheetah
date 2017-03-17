@@ -23,8 +23,8 @@ namespace SlowCheetah.Tests.JDT
         {
             this.BaseTransformTest(
                 JdtTestUtilities.GetDocumentObjectWithPrimitives,
-                JdtTestUtilities.GetTransformObjectWithPrimitiveAdds,
-                JdtTestUtilities.GetExpectedResultWithPrimitiveAdds);
+                JdtTestUtilities.GetTransformWithPrimitiveAdds,
+                JdtTestUtilities.GetExpectedWithPrimitiveAdds);
         }
 
         [Fact]
@@ -32,8 +32,8 @@ namespace SlowCheetah.Tests.JDT
         {
             this.BaseTransformTest(
                 JdtTestUtilities.GetDocumentObjectWithPrimitives,
-                JdtTestUtilities.GetTransformObjectWithObjectAdds,
-                JdtTestUtilities.GetExpectedResultWithObjectAdds);
+                JdtTestUtilities.GetTransformWithObjectAdds,
+                JdtTestUtilities.GetExpectedWithObjectAdds);
         }
 
         [Fact]
@@ -41,12 +41,26 @@ namespace SlowCheetah.Tests.JDT
         {
             this.BaseTransformTest(
                 JdtTestUtilities.GetDocumentObjectWithPrimitives,
-                JdtTestUtilities.GetTransformObjectWithPrimitiveSubs,
-                JdtTestUtilities.GetTransformObjectWithPrimitiveSubs);
+                JdtTestUtilities.GetTransformWithPrimitiveReplace,
+                JdtTestUtilities.GetTransformWithPrimitiveReplace);
+        }
+
+        [Fact]
+        public void ObjectMerge()
+        {
+            this.BaseTransformTest(
+                JdtTestUtilities.GetDocumentWithObjects,
+                JdtTestUtilities.GetTransformWithObjectMerge,
+                JdtTestUtilities.GetExpectedWithObjectMerge);
+        }
+
+        public void ArrayMerge()
+        {
         }
 
         public void LoadFromFile()
         {
+
         }
 
         public void SaveToFile()

@@ -15,7 +15,7 @@ namespace SlowCheetah.Tests.JDT
     /// <summary>
     /// Base class for all JDT tests
     /// </summary>
-    public class BaseJdtTest
+    public class BaseJdtTest : BaseTest
     {
         public void BaseTransformTest(JObject sourceObj, JObject transformObj, JObject expectedObj)
         {
