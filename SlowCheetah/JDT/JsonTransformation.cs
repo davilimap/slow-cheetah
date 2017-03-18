@@ -37,26 +37,7 @@ namespace SlowCheetah.JDT
         /// <param name="transformFile">File that defines the trasnformation</param>
         public JsonTransformation(string transformFile)
         {
-            if (string.IsNullOrEmpty(transformFile))
-            {
-                throw new ArgumentNullException(nameof(transformFile));
-            }
-
-            using (StreamReader file = File.OpenText(transformFile))
-            using (JsonTextReader reader = new JsonTextReader(file))
-            {
-                JsonLoadSettings loadSettings = new JsonLoadSettings()
-                {
-                    CommentHandling = CommentHandling.Ignore,
-                    LineInfoHandling = LineInfoHandling.Ignore
-                };
-
-                JObject trn = (JObject)JToken.ReadFrom(reader, loadSettings);
-
-                // TO DO: Return error if the JToken is not an object
-                // What if it's an empty object?
-                this.transform = trn;
-            }
+            this.transform = JsonUtilities.LoadObjectFromFile(transformFile);
         }
 
         /// <summary>

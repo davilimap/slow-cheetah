@@ -55,6 +55,7 @@
     <Compile Include="Exceptions\TransformFailedException.cs" />
     <Compile Include="JDT\JsonDocument.cs" />
     <Compile Include="JDT\JsonTransformation.cs" />
+    <Compile Include="JDT\JsonUtilities.cs" />
     <Compile Include="Logging\ITransformationLogger.cs" />
     <Compile Include="Logging\XmlShimLogger.cs" />
     <Compile Include="Transformer\ITransformer.cs" />

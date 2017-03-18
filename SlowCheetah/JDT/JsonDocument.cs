@@ -23,7 +23,7 @@ namespace SlowCheetah.JDT
         public JsonDocument(string filePath)
         {
             this.documentPath = filePath;
-            this.documentObject = Load(this.documentPath);
+            this.documentObject = JsonUtilities.LoadObjectFromFile(this.documentPath);
         }
 
         /// <summary>
@@ -67,29 +67,6 @@ namespace SlowCheetah.JDT
         internal JObject GetObject()
         {
             return this.documentObject;
-        }
-
-        private static JObject Load(string filePath)
-        {
-            if (string.IsNullOrEmpty(filePath))
-            {
-                throw new ArgumentNullException(nameof(filePath));
-            }
-
-            using (StreamReader file = File.OpenText(filePath))
-            using (JsonTextReader reader = new JsonTextReader(file))
-            {
-                JsonLoadSettings loadSettings = new JsonLoadSettings()
-                {
-                    CommentHandling = CommentHandling.Ignore,
-                    LineInfoHandling = LineInfoHandling.Ignore
-                };
-
-                JObject dct = (JObject)JToken.ReadFrom(reader, loadSettings);
-
-                // TO DO: Return error if the JToken is not an object
-                return dct;
-            }
         }
     }
 }

@@ -64,6 +64,8 @@
     <Compile Include="BuildTests\ConsoleAppTests.cs" />
     <Compile Include="BuildTests\WebAppTests.cs" />
     <Compile Include="JDT\DefaultTransformTest.cs" />
+    <Compile Include="JDT\JsonDocumentTest.cs" />
+    <Compile Include="JDT\JsonTransformationTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestUtilities.cs" />
     <Compile Include="TransformTest.cs" />
