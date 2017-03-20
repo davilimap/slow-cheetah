@@ -66,6 +66,7 @@
     <Compile Include="JDT\DefaultTransformTest.cs" />
     <Compile Include="JDT\JsonDocumentTest.cs" />
     <Compile Include="JDT\JsonTransformationTest.cs" />
+    <Compile Include="JDT\JsonUtilitiesTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestUtilities.cs" />
     <Compile Include="TransformTest.cs" />

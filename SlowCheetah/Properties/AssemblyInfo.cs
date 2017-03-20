@@ -25,6 +25,9 @@ using System.Runtime.InteropServices;
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("6354d859-e629-49fc-b154-fc0ba42d71b0")]
 
+// Allow the test to see the internals of this class
+[assembly: InternalsVisibleTo("SlowCheetah.Tests")]
+
 // Version information for an assembly consists of the following four values:
 //
 //      Major Version

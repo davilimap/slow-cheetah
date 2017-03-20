@@ -49,76 +49,95 @@ namespace SlowCheetah.JDT
             this.TransformCore(this.transform, document.GetObject());
         }
 
-        private void TransformCore(JObject transformNode, JObject originalNode)
+        private static void ExecuteDefaultTransforms(Queue<string> nodesToTransform, JObject original, JObject transform)
         {
-            Queue<string> nodesToTransform = new Queue<string>();
-
-            foreach (JProperty child in transformNode.Properties())
-            {
-                switch (child.Value.Type)
-                {
-                    case JTokenType.Object:
-                        // If the child is an object, verifies if it exists in the original file
-                        JToken originalChild;
-                        if (originalNode.TryGetValue(child.Name, out originalChild))
-                        {
-                            if (originalChild.Type == JTokenType.Object)
-                            {
-                                // If it exists and is and is also an object, the recursive transform must be executed
-                                this.TransformCore((JObject)child.Value, (JObject)originalChild);
-                            }
-                            else
-                            {
-                                // If it exists and is not an object, it is a replace transformation, so queue it
-                                nodesToTransform.Enqueue(child.Name);
-                            }
-                        }
-                        else
-                        {
-                            // If it doesn't exist, then queue the add transform
-                            nodesToTransform.Enqueue(child.Name);
-                        }
-
-                        break;
-                    default:
-                        // Any other types consitutues a non-recursive merge
-                        nodesToTransform.Enqueue(child.Name);
-                        break;
-                }
-            }
-
             while (nodesToTransform.Count() > 0)
             {
                 // Execute the transforms in queue order
                 string nodeName = nodesToTransform.Dequeue();
                 JToken nodeToTransform;
-                if (originalNode.TryGetValue(nodeName, out nodeToTransform))
+                if (original.TryGetValue(nodeName, out nodeToTransform))
                 {
-                    if (nodeToTransform.Type == JTokenType.Array && transformNode[nodeName].Type == JTokenType.Array)
+                    if (nodeToTransform.Type == JTokenType.Array && transform[nodeName].Type == JTokenType.Array)
                     {
                         // If the original and transform are arrays, merge the contents together
-                        this.MergeArray((JArray)nodeToTransform, (JArray)transformNode[nodeName]);
+                        MergeArray((JArray)nodeToTransform, (JArray)transform[nodeName]);
                     }
                     else
                     {
                         // If the contents are different, execute the replace
-                        originalNode[nodeName] = transformNode[nodeName].DeepClone();
+                        original[nodeName] = transform[nodeName].DeepClone();
                     }
                 }
                 else
                 {
                     // If the node is not present in the original, add it
-                    originalNode.Add(nodeName, transformNode[nodeName].DeepClone());
+                    original.Add(nodeName, transform[nodeName].DeepClone());
                 }
             }
         }
 
-        private void MergeArray(JArray original, JArray arrayToMerge)
+        private static void ExecuteVerbTransforms(Queue<string> nodesToTransform, JObject original, JObject transform)
+        {
+        }
+
+        private static void MergeArray(JArray original, JArray arrayToMerge)
         {
             foreach (JToken token in arrayToMerge)
             {
                 original.Add(token.DeepClone());
             }
+        }
+
+        private void TransformCore(JObject transformNode, JObject originalNode)
+        {
+            Queue<string> nodesToTransform = new Queue<string>();
+            Queue<string> verbsToExecute = new Queue<string>();
+
+            foreach (JProperty child in transformNode.Properties())
+            {
+                if (JsonUtilities.IsJdtVerb(child.Name))
+                {
+                    // If the property is a transformation verb, add it to the queue to be executed first
+                    verbsToExecute.Enqueue(child.Name);
+                }
+                else
+                {
+                    // If it is not a transformation verb
+                    switch (child.Value.Type)
+                    {
+                        case JTokenType.Object:
+                            // If the child is an object, verifies if it exists in the original file
+                            JToken originalChild;
+                            if (originalNode.TryGetValue(child.Name, out originalChild))
+                            {
+                                if (originalChild.Type == JTokenType.Object)
+                                {
+                                    // If it exists and is and is also an object, the recursive transform must be executed
+                                    this.TransformCore((JObject)child.Value, (JObject)originalChild);
+                                }
+                                else
+                                {
+                                    // If it exists and is not an object, it is a replace transformation, so queue it
+                                    nodesToTransform.Enqueue(child.Name);
+                                }
+                            }
+                            else
+                            {
+                                // If it doesn't exist, then queue the add transform
+                                nodesToTransform.Enqueue(child.Name);
+                            }
+
+                            break;
+                        default:
+                            // Any other types consitutues a non-recursive merge
+                            nodesToTransform.Enqueue(child.Name);
+                            break;
+                    }
+                }
+            }
+
+            ExecuteDefaultTransforms(nodesToTransform, originalNode, transformNode);
         }
     }
 }

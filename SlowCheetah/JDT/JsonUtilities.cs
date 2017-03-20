@@ -17,6 +17,8 @@ namespace SlowCheetah.JDT
     /// </summary>
     internal static class JsonUtilities
     {
+        private static readonly string JdtVerbPrefix = "@JDT.";
+
         /// <summary>
         /// Loads a JSON file to a JToken
         /// </summary>
@@ -39,6 +41,23 @@ namespace SlowCheetah.JDT
                 };
 
                 return JObject.Load(reader, loadSettings);
+            }
+        }
+
+        /// <summary>
+        /// Gets the JDT verb in the key
+        /// </summary>
+        /// <param name="key">The JSON key to analyze</param>
+        /// <returns>The verb in the string. Null if the string is not a verb</returns>
+        internal static JdtVerbs GetJdtVerb(string key)
+        {
+            if (string.IsNullOrEmpty(key) || key.StartsWith(JdtVerbPrefix, StringComparison.CurrentCultureIgnoreCase))
+            {
+                return JdtVerbs.None;
+            }
+            else
+            {
+                return key.Substring(JdtVerbPrefix.Length);
             }
         }
     }
