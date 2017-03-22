@@ -63,7 +63,7 @@
     <Compile Include="BuildTests\ConfigTransformTestsBase.cs" />
     <Compile Include="BuildTests\ConsoleAppTests.cs" />
     <Compile Include="BuildTests\WebAppTests.cs" />
-    <Compile Include="JDT\DefaultTransformTest.cs" />
+    <Compile Include="JDT\TransformTest.cs" />
     <Compile Include="JDT\JsonDocumentTest.cs" />
     <Compile Include="JDT\JsonTransformationTest.cs" />
     <Compile Include="JDT\JsonUtilitiesTest.cs" />
@@ -91,6 +91,9 @@
     <None Include="JDT\Inputs\Default\Primitive.Replace.Transform.json" />
     <None Include="JDT\Inputs\Default\Object.Source.json" />
     <None Include="JDT\Inputs\Default\Primitive.Source.json" />
+    <None Include="JDT\Inputs\Remove\Primitive.FromRoot.Expected.json" />
+    <None Include="JDT\Inputs\Remove\Primitive.FromRoot.Transform.json" />
+    <None Include="JDT\Inputs\Remove\Primitive.Source.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
