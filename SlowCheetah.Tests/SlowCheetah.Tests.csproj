@@ -34,8 +34,8 @@
   <ItemGroup>
     <Reference Include="Microsoft.Build" />
     <Reference Include="Microsoft.Build.Framework" />
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -91,9 +91,28 @@
     <None Include="JDT\Inputs\Default\Primitive.Replace.Transform.json" />
     <None Include="JDT\Inputs\Default\Object.Source.json" />
     <None Include="JDT\Inputs\Default\Primitive.Source.json" />
+    <None Include="JDT\Inputs\Remove\Array.DirectPath.Expected.json" />
+    <None Include="JDT\Inputs\Remove\Array.ScriptPath.Expected.json" />
+    <None Include="JDT\Inputs\Remove\Array.ScriptPath.Transform.json" />
+    <None Include="JDT\Inputs\Remove\Array.DirectPath.Transform.json" />
+    <None Include="JDT\Inputs\Remove\Array.Source.json" />
+    <None Include="JDT\Inputs\Remove\Object.DirectPath.Expected.json" />
+    <None Include="JDT\Inputs\Remove\Object.InObject.Expected.json" />
+    <None Include="JDT\Inputs\Remove\Object.WithBool.Expected.json" />
+    <None Include="JDT\Inputs\Remove\Object.DirectPath.Transform.json" />
+    <None Include="JDT\Inputs\Remove\Object.WithBool.Transform.json" />
+    <None Include="JDT\Inputs\Remove\Object.InObject.Transform.json" />
+    <None Include="JDT\Inputs\Remove\Object.Source.json" />
     <None Include="JDT\Inputs\Remove\Primitive.FromRoot.Expected.json" />
+    <None Include="JDT\Inputs\Remove\Primitive.WithPathArray.Expected.json" />
+    <None Include="JDT\Inputs\Remove\Primitive.WithSimplePath.Expected.json" />
+    <None Include="JDT\Inputs\Remove\Primitive.WithSimpleArray.Expected.json" />
+    <None Include="JDT\Inputs\Remove\Primitive.WithPathArray.Transform.json" />
+    <None Include="JDT\Inputs\Remove\Primitive.WithSimplePath.Transform.json" />
+    <None Include="JDT\Inputs\Remove\Primitive.WithSimpleArray.Transform.json" />
     <None Include="JDT\Inputs\Remove\Primitive.FromRoot.Transform.json" />
     <None Include="JDT\Inputs\Remove\Primitive.Source.json" />
+    <None Include="JDT\Inputs\Rename\Primitive.Source.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
