@@ -73,6 +73,7 @@ namespace SlowCheetah.JDT
                         throw new JdtException("Rename value must be a string");
                     }
 
+                    // TO DO: Warning if the node is not found
                     JToken nodeToRename;
                     if (source.TryGetValue(renameOperation.Name, out nodeToRename))
                     {
@@ -82,6 +83,11 @@ namespace SlowCheetah.JDT
             }
             else if (hasPath && hasValue)
             {
+                if (renameProperties.Properties().Where(p => !JsonUtilities.IsJdtSyntax(p.Name)).Count() > 0)
+                {
+                    throw new JdtException("JDT syntax cannot be mixed with other properties");
+                }
+
                 if (pathToken.Type != JTokenType.String)
                 {
                     throw new JdtException("Path attribute must be a string");
