@@ -17,7 +17,7 @@ namespace SlowCheetah.JDT
     {
         private const string PathAttribute = "path";
 
-        private bool removedNode;
+        private bool removedThisNode;
 
         /// <inheritdoc/>
         public override string Verb { get; } = "remove";
@@ -25,7 +25,7 @@ namespace SlowCheetah.JDT
         /// <inheritdoc/>
         public override void Process(JObject source, JObject transform)
         {
-            this.removedNode = false;
+            this.removedThisNode = false;
 
             JToken removeValue;
             if (transform.TryGetValue(JsonUtilities.JdtSyntaxPrefix + this.Verb, out removeValue))
@@ -33,7 +33,7 @@ namespace SlowCheetah.JDT
                 this.Remove(source, removeValue, true);
             }
 
-            if (!this.removedNode)
+            if (!this.removedThisNode)
             {
                 // If the current node was removed, then do not perform any more transformations here
                 this.Successor.Process(source, transform);
@@ -53,7 +53,7 @@ namespace SlowCheetah.JDT
                     if (removeValue.ToObject<bool>())
                     {
                         // If the transform value is true, remove the entire node
-                        this.RemoveNode(source);
+                        this.RemoveThisNode(source);
 
                         // Stop transformations if the node was removed
                         return;
@@ -72,7 +72,7 @@ namespace SlowCheetah.JDT
                         foreach (JToken arayValue in (JArray)removeValue)
                         {
                             this.Remove(source, arayValue, false);
-                            if (this.removedNode)
+                            if (this.removedThisNode)
                             {
                                 // If a value in the array performs a remove of the current node,
                                 // Stop transformations
@@ -111,17 +111,26 @@ namespace SlowCheetah.JDT
                     var tokensToRemove = JsonUtilities.GetTokensFromPath(source, pathToken.ToString());
                     foreach (JToken token in tokensToRemove.ToList())
                     {
-                        if (token.Parent.Type == JTokenType.Property)
+                        if (token.Equals(source))
                         {
-                            // If the token is the value of a property,
-                            // the property must be removed
-                            token.Parent.Remove();
+                            // If the path specifies the current node
+                            this.RemoveThisNode(source);
+                            return;
                         }
                         else
                         {
-                            // If the token is a property or an element in an array,
-                            // it must be removed directly
-                            token.Remove();
+                            if (token.Parent.Type == JTokenType.Property)
+                            {
+                                // If the token is the value of a property,
+                                // the property must be removed
+                                token.Parent.Remove();
+                            }
+                            else
+                            {
+                                // If the token is a property or an element in an array,
+                                // it must be removed directly
+                                token.Remove();
+                            }
                         }
                     }
                 }
@@ -136,7 +145,7 @@ namespace SlowCheetah.JDT
             }
         }
 
-        private void RemoveNode(JObject nodeToRemove)
+        private void RemoveThisNode(JObject nodeToRemove)
         {
             // If the value is true, everything from the node and set it to null
             if (nodeToRemove.Root.Equals(nodeToRemove))
@@ -156,7 +165,7 @@ namespace SlowCheetah.JDT
             }
 
             // Informs not to perform any more transformations on this node
-            this.removedNode = true;
+            this.removedThisNode = true;
         }
     }
 }

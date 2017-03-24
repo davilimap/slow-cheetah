@@ -20,6 +20,7 @@ namespace SlowCheetah.JDT
                 new JdtValidator(),
                 new JdtRecurse(),
                 new JdtRemove(),
+                new JdtReplace(),
                 new JdtRename(),
                 new JdtDefault()
             };

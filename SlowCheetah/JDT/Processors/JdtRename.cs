@@ -61,8 +61,10 @@ namespace SlowCheetah.JDT
         private void RenameWithProperties(JObject source, JObject renameProperties)
         {
             JToken pathToken, valueToken;
-            bool hasPath = renameProperties.TryGetValue(JsonUtilities.JdtSyntaxPrefix + PathAttribute, out pathToken);
-            bool hasValue = renameProperties.TryGetValue(JsonUtilities.JdtSyntaxPrefix + ValueAttribute, out valueToken);
+            string pathFullAttribute = JsonUtilities.JdtSyntaxPrefix + PathAttribute;
+            bool hasPath = renameProperties.TryGetValue(pathFullAttribute, out pathToken);
+            string valueFullAttribute = JsonUtilities.JdtSyntaxPrefix + ValueAttribute;
+            bool hasValue = renameProperties.TryGetValue(valueFullAttribute, out valueToken);
 
             if (!hasPath && !hasValue)
             {
@@ -83,9 +85,9 @@ namespace SlowCheetah.JDT
             }
             else if (hasPath && hasValue)
             {
-                if (renameProperties.Properties().Where(p => !JsonUtilities.IsJdtSyntax(p.Name)).Count() > 0)
+                if (renameProperties.Properties().Where(p => !p.Name.Equals(pathFullAttribute) && !p.Name.Equals(valueFullAttribute)).Count() > 0)
                 {
-                    throw new JdtException("JDT syntax cannot be mixed with other properties");
+                    throw new JdtException("Rename only accepts path and value attributes");
                 }
 
                 if (pathToken.Type != JTokenType.String)

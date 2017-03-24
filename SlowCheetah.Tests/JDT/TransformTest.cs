@@ -25,6 +25,9 @@ namespace SlowCheetah.Tests.JDT
         // Directory for Rename transformation test
         private static readonly string RenameTestDirectory = TestInputDirectory + "Rename\\";
 
+        // Directory for Replace transformation test
+        private static readonly string ReplaceTestDirectory = TestInputDirectory + "Replace\\";
+
         public static IEnumerable<object[]> GetDefaultInputs
         {
             get
@@ -50,6 +53,14 @@ namespace SlowCheetah.Tests.JDT
             }
         }
 
+        public static IEnumerable<object[]> GetReplaceInputs
+        {
+            get
+            {
+                return GetInputs(ReplaceTestDirectory);
+            }
+        }
+
         [Theory]
         [MemberData(nameof(GetDefaultInputs))]
         public void Default(string testName)
@@ -69,6 +80,13 @@ namespace SlowCheetah.Tests.JDT
         public void Rename(string testFileName)
         {
             BaseTransformTest(RenameTestDirectory, testFileName);
+        }
+
+        [Theory]
+        [MemberData(nameof(GetReplaceInputs))]
+        public void Replace(string testFileName)
+        {
+            BaseTransformTest(ReplaceTestDirectory, testFileName);
         }
 
         private static IEnumerable<object[]> GetInputs(string testDirectory)
