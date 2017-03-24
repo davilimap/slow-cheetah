@@ -52,7 +52,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Build\TransformJson.cs" />
     <Compile Include="Exceptions\TransformFailedException.cs" />
     <Compile Include="JDT\JdtException.cs" />
     <Compile Include="JDT\Processors\JdtProcessor.cs" />
