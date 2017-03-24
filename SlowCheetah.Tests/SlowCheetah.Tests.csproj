@@ -91,6 +91,13 @@
     <None Include="JDT\Inputs\Default\Primitive.Replace.Transform.json" />
     <None Include="JDT\Inputs\Default\Object.Source.json" />
     <None Include="JDT\Inputs\Default\Primitive.Source.json" />
+    <None Include="JDT\Inputs\Merge\Primitive.MergeObjects.Expected.json" />
+    <None Include="JDT\Inputs\Merge\Primitive.MergePrimitives.Expected.json" />
+    <None Include="JDT\Inputs\Merge\Primitive.MergeObjects.Transform.json" />
+    <None Include="JDT\Inputs\Merge\Primitive.UsingSimplePath.Expected.json" />
+    <None Include="JDT\Inputs\Merge\Primitive.UsingSimplePath.Transform.json" />
+    <None Include="JDT\Inputs\Merge\Primitive.MergePrimitives.Transform.json" />
+    <None Include="JDT\Inputs\Merge\Primitive.Source.json" />
     <None Include="JDT\Inputs\Remove\Array.DirectPath.Expected.json" />
     <None Include="JDT\Inputs\Remove\Array.ScriptPath.Expected.json" />
     <None Include="JDT\Inputs\Remove\Array.ScriptPath.Transform.json" />
@@ -166,9 +173,7 @@
       <Link>stylecop.json</Link>
     </AdditionalFiles>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="JDT\Inputs\Merge\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

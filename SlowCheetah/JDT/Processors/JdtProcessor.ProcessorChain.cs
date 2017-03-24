@@ -22,6 +22,7 @@ namespace SlowCheetah.JDT
                 new JdtRemove(),
                 new JdtReplace(),
                 new JdtRename(),
+                new JdtMerge(),
                 new JdtDefault()
             };
 
