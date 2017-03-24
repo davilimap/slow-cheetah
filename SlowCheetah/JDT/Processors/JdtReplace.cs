@@ -49,7 +49,6 @@ namespace SlowCheetah.JDT
                     if (allowArray)
                     {
                         // If the value is an array, perform the replace for each object in the array
-                        // Do not allow array values from here
                         foreach (JToken arayValue in (JArray)replaceValue)
                         {
                             this.Replace(source, arayValue, false);

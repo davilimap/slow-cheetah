@@ -111,5 +111,18 @@ namespace SlowCheetah.JDT
 
             return node.SelectTokens(path, true);
         }
+
+        /// <summary>
+        /// Throws a <see cref="JdtException"/> if the given node is the root
+        /// </summary>
+        /// <param name="token">The token to verify</param>
+        /// <param name="errorMessage">Error message</param>
+        internal static void ThrowIfRoot(JToken token, string errorMessage)
+        {
+            if (token.Root.Equals(token))
+            {
+                throw new JdtException(errorMessage);
+            }
+        }
     }
 }
