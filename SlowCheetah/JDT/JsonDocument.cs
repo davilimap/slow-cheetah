@@ -56,6 +56,7 @@ namespace SlowCheetah.JDT
             using (StreamWriter file = File.CreateText(destinationFile))
             using (JsonTextWriter writer = new JsonTextWriter(file))
             {
+                writer.Formatting = Formatting.Indented;
                 this.documentObject.WriteTo(writer);
             }
         }

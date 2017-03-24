@@ -366,6 +366,12 @@ namespace SlowCheetah.VisualStudio
                 string itemFilenameExtension = Path.GetFileName(itemFullPath);
 
                 string content = this.BuildXdtContent(itemFullPath);
+
+                if (PackageUtilities.IsJsonFile(itemFullPath))
+                {
+                    content = "{ }";
+                }
+
                 IEnumerable<string> configs = ProjectUtilities.GetProjectConfigurations(selectedProjectItem.ContainingProject);
 
                 List<string> transformsToCreate = null;
@@ -390,7 +396,7 @@ namespace SlowCheetah.VisualStudio
                 {
                     uint addedFileId;
                     string itemName = string.Format(Resources.Resources.String_FormatTransformFilename, itemFilename, config, itemExtension);
-                    this.AddXdtTransformFile(selectedProjectItem, content, itemName, itemFolder);
+                    this.AddTransformFile(selectedProjectItem, content, itemName, itemFolder);
                     hierarchy.ParseCanonicalName(Path.Combine(itemFolder, itemName), out addedFileId);
                     buildPropertyStorage.SetItemAttribute(addedFileId, IsTransformFile, "True");
                     buildPropertyStorage.SetItemAttribute(addedFileId, DependentUpon, itemFilenameExtension);
@@ -652,9 +658,9 @@ namespace SlowCheetah.VisualStudio
             bool isWebConfig = string.Compare("web.config", transformFileInfo.Name, StringComparison.OrdinalIgnoreCase) == 0;
             bool isTransformFile = this.IsItemTransformItem(project, itemid);
             bool isExtensionSupportedForFile = PackageUtilities.IsExtensionSupportedForFile(itemFullPath);
-            bool isXmlFile = PackageUtilities.IsXmlFile(itemFullPath);
+            bool isSupportedFileType = PackageUtilities.IsSupportedFileType(itemFullPath);
 
-            if (!isWebConfig && !isTransformFile && isExtensionSupportedForFile && isXmlFile)
+            if (!isWebConfig && !isTransformFile && isExtensionSupportedForFile && isSupportedFileType)
             {
                 itemSupportsTransforms = true;
             }
@@ -669,7 +675,7 @@ namespace SlowCheetah.VisualStudio
         /// <param name="content">Contents to be written to the transformation file</param>
         /// <param name="itemName">Full name of the transformation file</param>
         /// <param name="projectPath">Full path to the current project</param>
-        private void AddXdtTransformFile(ProjectItem selectedProjectItem, string content, string itemName, string projectPath)
+        private void AddTransformFile(ProjectItem selectedProjectItem, string content, string itemName, string projectPath)
         {
             try
             {
@@ -813,6 +819,12 @@ namespace SlowCheetah.VisualStudio
                 this.errorListProvider.Tasks.Clear();
                 ITransformationLogger logger = new TransformationPreviewLogger(this.errorListProvider, hier);
                 ITransformer transformer = new XmlTransformer(logger, false);
+
+                if (PackageUtilities.IsJsonFile(sourceFile))
+                {
+                    transformer = new JsonTransformer();
+                }
+
                 if (!transformer.Transform(sourceFile, transformFile, destFile))
                 {
                     throw new TransformFailedException(Resources.Resources.TransformPreview_ErrorMessage);
