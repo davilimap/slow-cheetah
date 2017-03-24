@@ -72,7 +72,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Build\TransformXml.cs" />
     <Compile Include="Logging\XmlTransformationTaskLogger.cs" />
-    <Compile Include="Transformer\JsonTransformer.cs" />
     <Compile Include="Transformer\XmlTransformer.cs" />
   </ItemGroup>
   <ItemGroup>
