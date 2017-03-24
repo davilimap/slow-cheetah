@@ -91,6 +91,11 @@
     <None Include="JDT\Inputs\Default\Primitive.Replace.Transform.json" />
     <None Include="JDT\Inputs\Default\Object.Source.json" />
     <None Include="JDT\Inputs\Default\Primitive.Source.json" />
+    <None Include="JDT\Inputs\Merge\Object.MergeObjects.Expected.json" />
+    <None Include="JDT\Inputs\Merge\Object.UsingDirectPath.Expected.json" />
+    <None Include="JDT\Inputs\Merge\Object.UsingDirectPath.Transform.json" />
+    <None Include="JDT\Inputs\Merge\Object.MergeObjects.Transform.json" />
+    <None Include="JDT\Inputs\Merge\Object.Source.json" />
     <None Include="JDT\Inputs\Merge\Primitive.MergeObjects.Expected.json" />
     <None Include="JDT\Inputs\Merge\Primitive.MergePrimitives.Expected.json" />
     <None Include="JDT\Inputs\Merge\Primitive.MergeObjects.Transform.json" />
