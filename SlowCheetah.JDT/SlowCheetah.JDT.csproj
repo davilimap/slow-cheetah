@@ -45,7 +45,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="JdtException.cs" />
-    <Compile Include="JdtSyntax.cs" />
     <Compile Include="JsonDocument.cs" />
     <Compile Include="JsonTransformation.cs" />
     <Compile Include="JsonUtilities.cs" />
