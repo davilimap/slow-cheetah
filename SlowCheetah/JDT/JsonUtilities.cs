@@ -101,14 +101,6 @@ namespace SlowCheetah.JDT
         /// <returns>The corresponding tokens</returns>
         internal static IEnumerable<JToken> GetTokensFromPath(JObject node, string path)
         {
-            /* TO DO: Evaluate lower level paths that start from the root
-            JToken startingNode = node.Root;
-            if (path.StartsWith("@"))
-            {
-                path = "$" + path.Substring(1);
-                startingNode = node;
-            } */
-
             return node.SelectTokens(path, true);
         }
 

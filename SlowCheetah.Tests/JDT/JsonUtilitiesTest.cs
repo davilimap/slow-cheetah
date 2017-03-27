@@ -31,5 +31,27 @@ namespace SlowCheetah.Tests.JDT
         {
             Assert.True(JsonUtilities.IsJdtSyntax(key));
         }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("string")]
+        [InlineData("jdt.Verb")]
+        [InlineData("@jdtverb")]
+        [InlineData("@jdt")]
+        [InlineData("@JDT.WrongCase")]
+        public void GetInvalidJdtSyntax(string key)
+        {
+            Assert.Null(JsonUtilities.GetJdtSyntax(key));
+        }
+
+        [Fact]
+        public void GetValidJdtSyntax()
+        {
+            Assert.Equal(JsonUtilities.GetJdtSyntax("@jdt."), string.Empty);
+            Assert.Equal(JsonUtilities.GetJdtSyntax("@jdt. "), " ");
+            Assert.Equal(JsonUtilities.GetJdtSyntax("@jdt.verb"), "verb");
+            Assert.Equal(JsonUtilities.GetJdtSyntax("@jdt.NotAVerb"), "NotAVerb");
+        }
     }
 }
