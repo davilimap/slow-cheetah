@@ -124,8 +124,10 @@
     <None Include="JDT\Inputs\Remove\Primitive.UsingSimpleArray.Transform.json" />
     <None Include="JDT\Inputs\Remove\Primitive.FromRoot.Transform.json" />
     <None Include="JDT\Inputs\Remove\Primitive.Source.json" />
+    <None Include="JDT\Inputs\Remove\Object.PathToItself.Expected.json" />
+    <None Include="JDT\Inputs\Remove\Skipped\Object.ScriptPath.Expected.json" />
     <None Include="JDT\Inputs\Remove\Skipped\Object.ScriptPath.Transform.json" />
-    <None Include="JDT\Inputs\Remove\Skipped\Object.PathToItself.Transform.json" />
+    <None Include="JDT\Inputs\Remove\Object.PathToItself.Transform.json" />
     <None Include="JDT\Inputs\Rename\Array.DirectPath.Expected.json" />
     <None Include="JDT\Inputs\Rename\Array.ScriptPath.Expected.json" />
     <None Include="JDT\Inputs\Rename\Array.ScriptPath.Transform .json" />
