@@ -53,19 +53,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Exceptions\TransformFailedException.cs" />
-    <Compile Include="JDT\JdtException.cs" />
-    <Compile Include="JDT\Processors\JdtProcessor.cs" />
-    <Compile Include="JDT\Processors\JdtDefault.cs" />
-    <Compile Include="JDT\Processors\JdtMerge.cs" />
-    <Compile Include="JDT\Processors\JdtProcessor.ProcessorChain.cs" />
-    <Compile Include="JDT\Processors\JdtReplace.cs" />
-    <Compile Include="JDT\Processors\JdtRename.cs" />
-    <Compile Include="JDT\Processors\JdtRemove.cs" />
-    <Compile Include="JDT\Processors\JdtRecurse.cs" />
-    <Compile Include="JDT\JdtSyntax.cs" />
-    <Compile Include="JDT\JsonDocument.cs" />
-    <Compile Include="JDT\JsonTransformation.cs" />
-    <Compile Include="JDT\JsonUtilities.cs" />
     <Compile Include="Logging\ITransformationLogger.cs" />
     <Compile Include="Logging\XmlShimLogger.cs" />
     <Compile Include="Transformer\ITransformer.cs" />

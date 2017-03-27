@@ -9,12 +9,12 @@ namespace SlowCheetah.Tests.JDT
     using Xunit;
 
     /// <summary>
-    /// Test class for JDT default transforms
+    /// Test class for JDT transformations
     /// </summary>
     public class TransformTest
     {
         // Directory for test inputs, that are JSON files
-        private static readonly string TestInputDirectory = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\SlowCheetah.Tests\\JDT\\Inputs\\";
+        private static readonly string TestInputDirectory = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\SlowCheetah.JDT.Tests\\Inputs\\";
 
         // Directory for Default transformation tests
         private static readonly string DefaultTestDirectory = TestInputDirectory + "Default\\";
@@ -31,6 +31,9 @@ namespace SlowCheetah.Tests.JDT
         // Directory for Merge transformation test
         private static readonly string MergeTestDirectory = TestInputDirectory + "Merge\\";
 
+        /// <summary>
+        /// Gets inputs for the Default transformation
+        /// </summary>
         public static IEnumerable<object[]> GetDefaultInputs
         {
             get
@@ -40,6 +43,9 @@ namespace SlowCheetah.Tests.JDT
             }
         }
 
+        /// <summary>
+        /// Gets inputs for the Remove transformation
+        /// </summary>
         public static IEnumerable<object[]> GetRemoveInputs
         {
             get
@@ -48,6 +54,9 @@ namespace SlowCheetah.Tests.JDT
             }
         }
 
+        /// <summary>
+        /// Gets inputs for the Rename transformation
+        /// </summary>
         public static IEnumerable<object[]> GetRenameInputs
         {
             get
@@ -56,6 +65,9 @@ namespace SlowCheetah.Tests.JDT
             }
         }
 
+        /// <summary>
+        /// Gets inputs for the Replace transformation
+        /// </summary>
         public static IEnumerable<object[]> GetReplaceInputs
         {
             get
@@ -64,6 +76,9 @@ namespace SlowCheetah.Tests.JDT
             }
         }
 
+        /// <summary>
+        /// Gets inputs for the Merge transformation
+        /// </summary>
         public static IEnumerable<object[]> GetMergeInputs
         {
             get
@@ -72,13 +87,23 @@ namespace SlowCheetah.Tests.JDT
             }
         }
 
+        /// <summary>
+        /// Tests the Default transformation
+        /// </summary>
+        /// <param name="testFileName">Name of the test being performed.
+        /// Corresponds to a group of files in the input folder</param>
         [Theory]
         [MemberData(nameof(GetDefaultInputs))]
-        public void Default(string testName)
+        public void Default(string testFileName)
         {
-            BaseTransformTest(DefaultTestDirectory, testName);
+            BaseTransformTest(DefaultTestDirectory, testFileName);
         }
 
+        /// <summary>
+        /// Tests the Remove transformation
+        /// </summary>
+        /// <param name="testFileName">Name of the test being performed.
+        /// Corresponds to a group of files in the input folder</param>
         [Theory]
         [MemberData(nameof(GetRemoveInputs))]
         public void Remove(string testFileName)
@@ -86,6 +111,11 @@ namespace SlowCheetah.Tests.JDT
             BaseTransformTest(RemoveTestDirectory, testFileName);
         }
 
+        /// <summary>
+        /// Tests the Rename transformation
+        /// </summary>
+        /// <param name="testFileName">Name of the test being performed.
+        /// Corresponds to a group of files in the input folder</param>
         [Theory]
         [MemberData(nameof(GetRenameInputs))]
         public void Rename(string testFileName)
@@ -93,6 +123,11 @@ namespace SlowCheetah.Tests.JDT
             BaseTransformTest(RenameTestDirectory, testFileName);
         }
 
+        /// <summary>
+        /// Tests the Replace transformation
+        /// </summary>
+        /// <param name="testFileName">Name of the test being performed.
+        /// Corresponds to a group of files in the input folder</param>
         [Theory]
         [MemberData(nameof(GetReplaceInputs))]
         public void Replace(string testFileName)
@@ -100,6 +135,11 @@ namespace SlowCheetah.Tests.JDT
             BaseTransformTest(ReplaceTestDirectory, testFileName);
         }
 
+        /// <summary>
+        /// Tests the Merge transformation
+        /// </summary>
+        /// <param name="testFileName">Name of the test being performed.
+        /// Corresponds to a group of files in the input folder</param>
         [Theory]
         [MemberData(nameof(GetMergeInputs))]
         public void Merge(string testFileName)

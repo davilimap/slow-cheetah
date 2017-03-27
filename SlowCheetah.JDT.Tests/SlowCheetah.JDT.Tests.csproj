@@ -1,0 +1,171 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <!-- MSBuild 15.0 auto imports this file -->
+  <Import Project="..\Directory.Build.props" Condition="$(MSBuildToolsVersion) &lt; 15.0" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{170E0141-692B-4468-83FB-6DFE90F0D19C}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SlowCheetah.JDT.Tests</RootNamespace>
+    <AssemblyName>SlowCheetah.JDT.Tests</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>..\Stylecop.Tests.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <HintPath>..\packages\xunit.abstractions.2.0.1\lib\net35\xunit.abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="xunit.assert, Version=2.2.0.3545, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <HintPath>..\packages\xunit.assert.2.2.0\lib\netstandard1.1\xunit.assert.dll</HintPath>
+    </Reference>
+    <Reference Include="xunit.core, Version=2.2.0.3545, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <HintPath>..\packages\xunit.extensibility.core.2.2.0\lib\netstandard1.1\xunit.core.dll</HintPath>
+    </Reference>
+    <Reference Include="xunit.execution.desktop, Version=2.2.0.3545, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <HintPath>..\packages\xunit.extensibility.execution.2.2.0\lib\net452\xunit.execution.desktop.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="JsonUtilitiesTest.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TransformTest.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <AdditionalFiles Include="..\stylecop.json">
+      <Link>stylecop.json</Link>
+    </AdditionalFiles>
+    <None Include="Inputs\Default\Array.Merge.Expected.json" />
+    <None Include="Inputs\Default\Array.Merge.Transform.json" />
+    <None Include="Inputs\Default\Array.Replace.Expected.json" />
+    <None Include="Inputs\Default\Array.Replace.Transform.json" />
+    <None Include="Inputs\Default\Array.Source.json" />
+    <None Include="Inputs\Default\Object.Merge.Expected.json" />
+    <None Include="Inputs\Default\Object.Merge.Transform.json" />
+    <None Include="Inputs\Default\Object.Replace.Expected.json" />
+    <None Include="Inputs\Default\Object.Replace.Transform.json" />
+    <None Include="Inputs\Default\Object.Source.json" />
+    <None Include="Inputs\Default\Primitive.AddArray.Expected.json" />
+    <None Include="Inputs\Default\Primitive.AddArray.Transform.json" />
+    <None Include="Inputs\Default\Primitive.AddObject.Expected.json" />
+    <None Include="Inputs\Default\Primitive.AddObject.Transform.json" />
+    <None Include="Inputs\Default\Primitive.AddPrimitive.Expected.json" />
+    <None Include="Inputs\Default\Primitive.AddPrimitive.Transform.json" />
+    <None Include="Inputs\Default\Primitive.Replace.Expected.json" />
+    <None Include="Inputs\Default\Primitive.Replace.Transform.json" />
+    <None Include="Inputs\Default\Primitive.Source.json" />
+    <None Include="Inputs\Merge\Object.MergeObjects.Expected.json" />
+    <None Include="Inputs\Merge\Object.MergeObjects.Transform.json" />
+    <None Include="Inputs\Merge\Object.Source.json" />
+    <None Include="Inputs\Merge\Object.UsingDirectPath.Expected.json" />
+    <None Include="Inputs\Merge\Object.UsingDirectPath.Transform.json" />
+    <None Include="Inputs\Merge\Primitive.MergeObjects.Expected.json" />
+    <None Include="Inputs\Merge\Primitive.MergeObjects.Transform.json" />
+    <None Include="Inputs\Merge\Primitive.MergePrimitives.Expected.json" />
+    <None Include="Inputs\Merge\Primitive.MergePrimitives.Transform.json" />
+    <None Include="Inputs\Merge\Primitive.Source.json" />
+    <None Include="Inputs\Merge\Primitive.UsingSimplePath.Expected.json" />
+    <None Include="Inputs\Merge\Primitive.UsingSimplePath.Transform.json" />
+    <None Include="Inputs\Remove\Array.DirectPath.Expected.json" />
+    <None Include="Inputs\Remove\Array.DirectPath.Transform.json" />
+    <None Include="Inputs\Remove\Array.ScriptPath.Expected.json" />
+    <None Include="Inputs\Remove\Array.ScriptPath.Transform.json" />
+    <None Include="Inputs\Remove\Array.Source.json" />
+    <None Include="Inputs\Remove\Object.DirectPath.Expected.json" />
+    <None Include="Inputs\Remove\Object.DirectPath.Transform.json" />
+    <None Include="Inputs\Remove\Object.InObject.Expected.json" />
+    <None Include="Inputs\Remove\Object.InObject.Transform.json" />
+    <None Include="Inputs\Remove\Object.PathToItself.Expected.json" />
+    <None Include="Inputs\Remove\Object.PathToItself.Transform.json" />
+    <None Include="Inputs\Remove\Object.Source.json" />
+    <None Include="Inputs\Remove\Object.WithBool.Expected.json" />
+    <None Include="Inputs\Remove\Object.WithBool.Transform.json" />
+    <None Include="Inputs\Remove\Primitive.FromRoot.Expected.json" />
+    <None Include="Inputs\Remove\Primitive.FromRoot.Transform.json" />
+    <None Include="Inputs\Remove\Primitive.Source.json" />
+    <None Include="Inputs\Remove\Primitive.UsingPathArray.Expected.json" />
+    <None Include="Inputs\Remove\Primitive.UsingPathArray.Transform.json" />
+    <None Include="Inputs\Remove\Primitive.UsingSimpleArray.Expected.json" />
+    <None Include="Inputs\Remove\Primitive.UsingSimpleArray.Transform.json" />
+    <None Include="Inputs\Remove\Primitive.UsingSimplePath.Expected.json" />
+    <None Include="Inputs\Remove\Primitive.UsingSimplePath.Transform.json" />
+    <None Include="Inputs\Remove\Skipped\Object.ScriptPath.Expected.json" />
+    <None Include="Inputs\Remove\Skipped\Object.ScriptPath.Transform.json" />
+    <None Include="Inputs\Rename\Array.DirectPath.Expected.json" />
+    <None Include="Inputs\Rename\Array.DirectPath.Transform.json" />
+    <None Include="Inputs\Rename\Array.ScriptPath.Expected.json" />
+    <None Include="Inputs\Rename\Array.ScriptPath.Transform .json" />
+    <None Include="Inputs\Rename\Array.Source.json" />
+    <None Include="Inputs\Rename\Object.InObject.Expected.json" />
+    <None Include="Inputs\Rename\Object.InObject.Transform.json" />
+    <None Include="Inputs\Rename\Object.Source.json" />
+    <None Include="Inputs\Rename\Object.UsingSimplePath.Expected.json" />
+    <None Include="Inputs\Rename\Object.UsingSimplePath.Transform.json" />
+    <None Include="Inputs\Rename\Object.WithChangingNames.Expected.json" />
+    <None Include="Inputs\Rename\Object.WithChangingNames.Transform.json" />
+    <None Include="Inputs\Rename\Primitive.FromRoot.Expected.json" />
+    <None Include="Inputs\Rename\Primitive.FromRoot.Transform.json" />
+    <None Include="Inputs\Rename\Primitive.Source.json" />
+    <None Include="Inputs\Rename\Primitive.UsingSimpleArray.Expected.json" />
+    <None Include="Inputs\Rename\Primitive.UsingSimpleArray.Transform.json" />
+    <None Include="Inputs\Rename\Primitive.UsingSimplePath.Expected.json" />
+    <None Include="Inputs\Rename\Primitive.UsingSimplePath.Transform.json" />
+    <None Include="Inputs\Replace\Array.DirectPath.Expected.json" />
+    <None Include="Inputs\Replace\Array.DirectPath.Transform.json" />
+    <None Include="Inputs\Replace\Array.ScriptPath.Expected.json" />
+    <None Include="Inputs\Replace\Array.ScriptPath.Transform.json" />
+    <None Include="Inputs\Replace\Array.Source.json" />
+    <None Include="Inputs\Replace\Object.Source.json" />
+    <None Include="Inputs\Replace\Object.WithArray.Expected.json" />
+    <None Include="Inputs\Replace\Object.WithArray.Transform.json" />
+    <None Include="Inputs\Replace\Object.WithObject.Expected.json" />
+    <None Include="Inputs\Replace\Object.WithObject.Transform.json" />
+    <None Include="Inputs\Replace\Object.WithPrimitive.Expected.json" />
+    <None Include="Inputs\Replace\Object.WithPrimitive.Transform.json" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SlowCheetah.JDT\SlowCheetah.JDT.csproj">
+      <Project>{bb41ffd8-e2f2-4b9b-bb6b-b6c0e5cfc695}</Project>
+      <Name>SlowCheetah.JDT</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\Newtonsoft.Json.dll" />
+    <Analyzer Include="..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
+    <Analyzer Include="..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

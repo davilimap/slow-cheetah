@@ -6,8 +6,15 @@ namespace SlowCheetah.Tests.JDT
     using SlowCheetah.JDT;
     using Xunit;
 
+    /// <summary>
+    /// Test class for <see cref="JsonUtilities"/>
+    /// </summary>
     public class JsonUtilitiesTest
     {
+        /// <summary>
+        /// Tests <see cref="JsonUtilities.IsJdtSyntax(string)"/> with invalid JSON syntax
+        /// </summary>
+        /// <param name="key">Key to test</param>
         [Theory]
         [InlineData(null)]
         [InlineData("")]
@@ -21,6 +28,10 @@ namespace SlowCheetah.Tests.JDT
             Assert.False(JsonUtilities.IsJdtSyntax(key));
         }
 
+        /// <summary>
+        /// Tests <see cref="JsonUtilities.IsJdtSyntax(string)"/> with valid JSON syntax
+        /// </summary>
+        /// <param name="key">Key to test</param>
         [Theory]
         [InlineData("@jdt.NotAVerb")]
         [InlineData("@jdt.Remove")]
@@ -32,6 +43,10 @@ namespace SlowCheetah.Tests.JDT
             Assert.True(JsonUtilities.IsJdtSyntax(key));
         }
 
+        /// <summary>
+        /// Tests <see cref="JsonUtilities.GetJdtSyntax(string)"/> with invalid JSON syntax
+        /// </summary>
+        /// <param name="key">Key to test</param>
         [Theory]
         [InlineData(null)]
         [InlineData("")]
@@ -45,6 +60,9 @@ namespace SlowCheetah.Tests.JDT
             Assert.Null(JsonUtilities.GetJdtSyntax(key));
         }
 
+        /// <summary>
+        /// Tests <see cref="JsonUtilities.GetJdtSyntax(string)"/> with valid JSON syntax
+        /// </summary>
         [Fact]
         public void GetValidJdtSyntax()
         {
