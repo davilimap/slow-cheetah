@@ -44,9 +44,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IJsonTransformationLogger.cs" />
     <Compile Include="JdtException.cs" />
     <Compile Include="JsonDocument.cs" />
     <Compile Include="JsonTransformation.cs" />
+    <Compile Include="JsonTransformationLogger.cs" />
     <Compile Include="JsonUtilities.cs" />
     <Compile Include="Processors\JdtDefault.cs" />
     <Compile Include="Processors\JdtMerge.cs" />

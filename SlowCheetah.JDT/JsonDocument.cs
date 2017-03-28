@@ -30,7 +30,7 @@ namespace SlowCheetah.JDT
         /// Initializes a new instance of the <see cref="JsonDocument"/> class.
         /// </summary>
         /// <param name="docObject">The object to be transformed</param>
-        public JsonDocument(JObject docObject)
+        internal JsonDocument(JObject docObject)
         {
             this.documentPath = string.Empty;
             this.documentObject = (JObject)docObject.DeepClone();

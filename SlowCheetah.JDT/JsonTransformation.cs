@@ -15,6 +15,8 @@ namespace SlowCheetah.JDT
     {
         private readonly JObject transform;
 
+        private JsonTransformationLogger logger = null;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="JsonTransformation"/> class.
         /// </summary>
@@ -32,9 +34,22 @@ namespace SlowCheetah.JDT
         /// <summary>
         /// Initializes a new instance of the <see cref="JsonTransformation"/> class.
         /// </summary>
-        /// <param name="transformFile">File that defines the trasnformation</param>
+        /// <param name="transformFile">File that defines the transformation</param>
         public JsonTransformation(string transformFile)
+            : this(transformFile, null)
         {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JsonTransformation"/> class
+        /// with an external logger
+        /// </summary>
+        /// <param name="transformFile">File that defines the transformation</param>
+        /// <param name="logger">External logger</param>
+        public JsonTransformation(string transformFile, IJsonTransformationLogger logger)
+        {
+            this.logger = new JsonTransformationLogger(logger);
+
             this.transform = JsonUtilities.LoadObjectFromFile(transformFile);
         }
 
@@ -42,9 +57,20 @@ namespace SlowCheetah.JDT
         /// Apply the specified transformation
         /// </summary>
         /// <param name="document">Document to be transformed</param>
-        public void Apply(JsonDocument document)
+        /// <returns>True if the transformation was successfully applied</returns>
+        public bool Apply(JsonDocument document)
         {
-            JdtProcessor.ProcessTransform(document.GetObject(), (JObject)this.transform.DeepClone());
+            try
+            {
+                this.logger.HasLoggedErrors = false;
+                JdtProcessor.ProcessTransform(document.GetObject(), (JObject)this.transform.DeepClone());
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogErrorFromException(ex);
+            }
+
+            return this.logger.HasLoggedErrors;
         }
     }
 }

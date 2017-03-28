@@ -20,7 +20,7 @@ namespace SlowCheetah.JDT
         /// <summary>
         /// Gets the JDT verb corresponding to this transformation.
         /// Can be null or empty.
-        /// Does not include the preffix (@jdt.)
+        /// Does not include the preffix(<see cref="JsonUtilities.JdtSyntaxPrefix"/>)
         /// </summary>
         public abstract string Verb { get; }
 
