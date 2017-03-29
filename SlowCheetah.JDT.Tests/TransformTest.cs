@@ -169,6 +169,7 @@ namespace SlowCheetah.Tests.JDT
 
             var transformation = new JsonTransformation();
 
+            // Read the resulting stream into a JObject to compare
             using (Stream result = transformation.Apply(inputsDirectory + sourceName + ".Source.json", inputsDirectory + testName + ".Transform.json"))
             using (StreamReader streamReader = new StreamReader(result))
             using (JsonTextReader jsonReader = new JsonTextReader(streamReader))
