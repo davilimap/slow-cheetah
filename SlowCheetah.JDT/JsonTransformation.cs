@@ -15,12 +15,15 @@ namespace SlowCheetah.JDT
 
         private JsonTransformationLogger logger = null;
 
+        private JsonTransformContext context;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="JsonTransformation"/> class.
         /// </summary>
         /// <param name="transformObject">Object that corresponds to the transformation file</param>
         public JsonTransformation(JObject transformObject)
         {
+            // TO DO: Evalute usefulness of this constructor. Potentially replace with constructor that takes in JSON string
             if (transformObject == null)
             {
                 throw new ArgumentNullException(nameof(transformObject));
@@ -49,6 +52,12 @@ namespace SlowCheetah.JDT
             this.logger = new JsonTransformationLogger(logger);
 
             this.transform = JsonUtilities.LoadObjectFromFile(transformFile);
+
+            this.context = new JsonTransformContext()
+            {
+                TransformFile = transformFile,
+                Logger = this.logger
+            };
         }
 
         /// <summary>
@@ -61,6 +70,7 @@ namespace SlowCheetah.JDT
             try
             {
                 this.logger.HasLoggedErrors = false;
+                // this.context.SourceFile = document
                 JdtProcessor.ProcessTransform(document.GetObject(), (JObject)this.transform.DeepClone());
             }
             catch (Exception ex)

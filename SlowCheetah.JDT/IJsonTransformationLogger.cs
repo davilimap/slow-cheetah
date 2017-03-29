@@ -17,10 +17,28 @@ namespace SlowCheetah.JDT
         void LogMessage(string message);
 
         /// <summary>
+        /// Logs a message
+        /// </summary>
+        /// <param name="message">The message</param>
+        /// <param name="fileName">The full path to the file that caused the message</param>
+        /// <param name="lineNumber">The line that caused the message</param>
+        /// <param name="linePosition">The position in the line that caused the message</param>
+        void LogMessage(string message, string fileName, int lineNumber, int linePosition);
+
+        /// <summary>
         /// Logs a warning
         /// </summary>
         /// <param name="message">The warning message</param>
         void LogWarning(string message);
+
+        /// <summary>
+        /// Logs a warning
+        /// </summary>
+        /// <param name="message">The warning message</param>
+        /// <param name="fileName">The full path to the file that caused the warning</param>
+        /// <param name="lineNumber">The line that caused the warning</param>
+        /// <param name="linePosition">The position in the line that caused the warning</param>
+        void LogWarning(string message, string fileName, int lineNumber, int linePosition);
 
         /// <summary>
         /// Logs an error

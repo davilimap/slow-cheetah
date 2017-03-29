@@ -27,34 +27,6 @@ namespace SlowCheetah.JDT
         internal bool HasLoggedErrors { get; set; }
 
         /// <summary>
-        /// Logs a message
-        /// </summary>
-        /// <param name="message">The message to log</param>
-        internal void LogMessage(string message)
-        {
-            if (this.externalLogger != null)
-            {
-                this.externalLogger.LogMessage(message);
-            }
-        }
-
-        /// <summary>
-        /// Logs a warning
-        /// </summary>
-        /// <param name="message">The warning message</param>
-        internal void LogWarning(string message)
-        {
-        }
-
-        /// <summary>
-        /// Logs an error
-        /// </summary>
-        /// <param name="message">The error message</param>
-        internal void LogError(string message)
-        {
-        }
-
-        /// <summary>
         /// Logs an error from an internal exception
         /// </summary>
         /// <param name="exception">The exception to log</param>
