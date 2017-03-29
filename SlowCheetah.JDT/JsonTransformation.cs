@@ -47,6 +47,11 @@ namespace SlowCheetah.JDT
         /// <param name="document">Document to be transformed</param>
         public void Apply(JsonDocument document)
         {
+            if (document == null)
+            {
+                throw new ArgumentNullException(nameof(document));
+            }
+
             JdtProcessor.ProcessTransform(document.DocumentObject, (JObject)this.transform.DeepClone());
         }
     }

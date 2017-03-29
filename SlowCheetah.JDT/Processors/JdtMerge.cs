@@ -3,6 +3,7 @@
 
 namespace SlowCheetah.JDT
 {
+    using System;
     using System.Linq;
     using Newtonsoft.Json.Linq;
 
@@ -20,6 +21,16 @@ namespace SlowCheetah.JDT
         /// <inheritdoc/>
         public override void Process(JObject source, JObject transform)
         {
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            if (transform == null)
+            {
+                throw new ArgumentNullException(nameof(transform));
+            }
+
             JToken mergeValue;
             if (transform.TryGetValue(JsonUtilities.JdtSyntaxPrefix + this.Verb, out mergeValue))
             {
@@ -51,14 +62,14 @@ namespace SlowCheetah.JDT
             switch (mergeValue.Type)
             {
                 case JTokenType.Array:
-                    JsonUtilities.ThrowIfRoot(source, "Cannot replace root");
+                    source.ThrowIfRoot("Cannot replace root");
                     source.Replace(mergeValue);
                     break;
                 case JTokenType.Object:
                     this.MergeWithObject(source, (JObject)mergeValue);
                     break;
                 default:
-                    JsonUtilities.ThrowIfRoot(source, "Cannot replace root");
+                    source.ThrowIfRoot("Cannot replace root");
                     source.Replace(mergeValue);
                     break;
             }
@@ -98,11 +109,11 @@ namespace SlowCheetah.JDT
                     }
                     else if (tokenToMerge.Type == JTokenType.Array && valueToken.Type == JTokenType.Array)
                     {
-                        JsonUtilities.MergeArray((JArray)tokenToMerge, (JArray)valueToken);
+                        ((JArray)tokenToMerge).MergeInto((JArray)valueToken);
                     }
                     else
                     {
-                        JsonUtilities.ThrowIfRoot(tokenToMerge, "Cannot replace root");
+                        tokenToMerge.ThrowIfRoot("Cannot replace root");
 
                         tokenToMerge.Replace(valueToken);
                     }

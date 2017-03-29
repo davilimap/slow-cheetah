@@ -3,6 +3,7 @@
 
 namespace SlowCheetah.JDT
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Newtonsoft.Json.Linq;
@@ -23,6 +24,16 @@ namespace SlowCheetah.JDT
         /// <inheritdoc/>
         public override void Process(JObject source, JObject transform)
         {
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            if (transform == null)
+            {
+                throw new ArgumentNullException(nameof(transform));
+            }
+
             foreach (JProperty transformNode in transform.Properties()
                 .Where(p => JsonUtilities.IsJdtSyntax(p.Name)))
             {

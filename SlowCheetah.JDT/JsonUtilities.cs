@@ -16,33 +16,9 @@ namespace SlowCheetah.JDT
     internal static class JsonUtilities
     {
         /// <summary>
-        /// The suffix for all JDT syntax
+        /// The preffix for all JDT syntax
         /// </summary>
         internal const string JdtSyntaxPrefix = "@jdt.";
-
-        /// <summary>
-        /// Merges an array into another.
-        /// Merges a clone of the array.
-        /// </summary>
-        /// <param name="original">Array to merge into</param>
-        /// <param name="arrayToMerge">Array to be merged</param>
-        internal static void MergeArray(JArray original, JArray arrayToMerge)
-        {
-            if (original == null)
-            {
-                throw new ArgumentNullException(nameof(original));
-            }
-
-            if (arrayToMerge == null)
-            {
-                throw new ArgumentNullException(nameof(arrayToMerge));
-            }
-
-            foreach (JToken token in arrayToMerge)
-            {
-                original.Add(token.DeepClone());
-            }
-        }
 
         /// <summary>
         /// Loads a JSON file to a JToken

@@ -3,6 +3,7 @@
 
 namespace SlowCheetah.JDT
 {
+    using System;
     using Newtonsoft.Json.Linq;
 
     /// <summary>
@@ -45,6 +46,16 @@ namespace SlowCheetah.JDT
         /// <param name="transform">Object that specifies the transformation</param>
         public static void ProcessTransform(JObject source, JObject transform)
         {
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            if (transform == null)
+            {
+                throw new ArgumentNullException(nameof(transform));
+            }
+
             ProcessorChain.Start(source, transform);
         }
 

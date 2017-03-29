@@ -3,6 +3,7 @@
 
 namespace SlowCheetah.JDT
 {
+    using System;
     using System.Linq;
     using Newtonsoft.Json.Linq;
 
@@ -17,6 +18,16 @@ namespace SlowCheetah.JDT
         /// <inheritdoc/>
         public override void Process(JObject source, JObject transform)
         {
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            if (transform == null)
+            {
+                throw new ArgumentNullException(nameof(transform));
+            }
+
             // JDT Verbs are not handled here
             foreach (JProperty transformNode in transform.Properties()
                 .Where(p => !JsonUtilities.IsJdtSyntax(p.Name)))
@@ -29,7 +40,7 @@ namespace SlowCheetah.JDT
                     if (nodeToTransform.Type == JTokenType.Array && transformNode.Value.Type == JTokenType.Array)
                     {
                         // If the original and transform are arrays, merge the contents together
-                        JsonUtilities.MergeArray((JArray)nodeToTransform, (JArray)transformNode.Value);
+                        ((JArray)nodeToTransform).MergeInto((JArray)transformNode.Value);
                     }
                     else if (nodeToTransform.Type != JTokenType.Object || transformNode.Value.Type != JTokenType.Object)
                     {

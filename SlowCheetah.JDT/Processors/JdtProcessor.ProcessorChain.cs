@@ -3,6 +3,7 @@
 
 namespace SlowCheetah.JDT
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Newtonsoft.Json.Linq;
@@ -52,6 +53,16 @@ namespace SlowCheetah.JDT
 
             public void Start(JObject source, JObject transform)
             {
+                if (source == null)
+                {
+                    throw new ArgumentNullException(nameof(source));
+                }
+
+                if (transform == null)
+                {
+                    throw new ArgumentNullException(nameof(transform));
+                }
+
                 this.processors.First().Process(source, transform);
             }
         }
