@@ -5,6 +5,8 @@ namespace SlowCheetah.Tests.JDT
 {
     using System.Collections.Generic;
     using System.IO;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
     using SlowCheetah.JDT;
     using Xunit;
 
@@ -165,15 +167,18 @@ namespace SlowCheetah.Tests.JDT
             // Removes the test name to find the source file
             string sourceName = Path.GetFileNameWithoutExtension(testName);
 
-            JsonDocument source = new JsonDocument(inputsDirectory + sourceName + ".Source.json");
+            var transformation = new JsonTransformation();
 
-            JsonTransformation transformation = new JsonTransformation(inputsDirectory + testName + ".Transform.json");
+            using (Stream result = transformation.Apply(inputsDirectory + sourceName + ".Source.json", inputsDirectory + testName + ".Transform.json"))
+            using (StreamReader streamReader = new StreamReader(result))
+            using (JsonTextReader jsonReader = new JsonTextReader(streamReader))
+            {
+                var expected = JObject.Parse(File.ReadAllText(inputsDirectory + testName + ".Expected.json"));
 
-            JsonDocument expected = new JsonDocument(inputsDirectory + testName + ".Expected.json");
+                var transformed = JObject.Load(jsonReader);
 
-            transformation.Apply(source);
-
-            Assert.True(source.Equals(expected));
+                Assert.True(JObject.DeepEquals(expected, transformed));
+            }
         }
     }
 }

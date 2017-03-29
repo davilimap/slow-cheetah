@@ -46,7 +46,6 @@
   <ItemGroup>
     <Compile Include="JdtException.cs" />
     <Compile Include="JdtExtensions.cs" />
-    <Compile Include="JsonDocument.cs" />
     <Compile Include="JsonTransformation.cs" />
     <Compile Include="JsonUtilities.cs" />
     <Compile Include="Processors\JdtArrayProcessor.cs" />
