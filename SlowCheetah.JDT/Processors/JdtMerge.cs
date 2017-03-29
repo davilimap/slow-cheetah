@@ -10,7 +10,7 @@ namespace SlowCheetah.JDT
     /// <summary>
     /// Represents the Merge transformation
     /// </summary>
-    internal class JdtMerge : JdtProcessor
+    internal class JdtMerge : JdtArrayProcessor
     {
         private const string PathAttribute = "path";
         private const string ValueAttribute = "value";
@@ -19,60 +19,25 @@ namespace SlowCheetah.JDT
         public override string Verb { get; } = "merge";
 
         /// <inheritdoc/>
-        public override void Process(JObject source, JObject transform)
+        protected override bool TransformCore(JObject source, JToken transformValue)
         {
-            if (source == null)
-            {
-                throw new ArgumentNullException(nameof(source));
-            }
-
-            if (transform == null)
-            {
-                throw new ArgumentNullException(nameof(transform));
-            }
-
-            JToken mergeValue;
-            if (transform.TryGetValue(JsonUtilities.JdtSyntaxPrefix + this.Verb, out mergeValue))
-            {
-                this.Merge(source, mergeValue);
-            }
-
-            this.Successor.Process(source, transform);
-        }
-
-        private void Merge(JObject source, JToken mergeValue)
-        {
-            if (mergeValue.Type == JTokenType.Array)
-            {
-                // If the value is an array, perform the replace for each object in the array
-                foreach (JToken arrayValue in (JArray)mergeValue)
-                {
-                    this.MergeCore(source, arrayValue);
-                }
-            }
-            else
-            {
-                // If not, perform the merge as normal
-                this.MergeCore(source, mergeValue);
-            }
-        }
-
-        private void MergeCore(JObject source, JToken mergeValue)
-        {
-            switch (mergeValue.Type)
+            switch (transformValue.Type)
             {
                 case JTokenType.Array:
                     source.ThrowIfRoot("Cannot replace root");
-                    source.Replace(mergeValue);
+                    source.Replace(transformValue);
                     break;
                 case JTokenType.Object:
-                    this.MergeWithObject(source, (JObject)mergeValue);
+                    this.MergeWithObject(source, (JObject)transformValue);
                     break;
                 default:
                     source.ThrowIfRoot("Cannot replace root");
-                    source.Replace(mergeValue);
+                    source.Replace(transformValue);
                     break;
             }
+
+            // Do not halt transformations
+            return false;
         }
 
         private void MergeWithObject(JObject source, JObject mergeObject)
@@ -121,7 +86,7 @@ namespace SlowCheetah.JDT
             }
             else
             {
-                throw new JdtException("Rename requires both path and value");
+                throw new JdtException("Merge requires both path and value");
             }
         }
     }

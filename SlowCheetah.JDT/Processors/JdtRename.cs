@@ -3,13 +3,14 @@
 
 namespace SlowCheetah.JDT
 {
+    using System;
     using System.Linq;
     using Newtonsoft.Json.Linq;
 
     /// <summary>
     /// Represents a recursive JDT transformation
     /// </summary>
-    internal class JdtRename : JdtProcessor
+    internal class JdtRename : JdtArrayProcessor
     {
         private const string PathAttribute = "path";
         private const string ValueAttribute = "value";
@@ -18,55 +19,16 @@ namespace SlowCheetah.JDT
         public override string Verb { get; } = "rename";
 
         /// <inheritdoc/>
-        public override void Process(JObject source, JObject transform)
+        protected override bool TransformCore(JObject source, JToken transformValue)
         {
-            if (source == null)
-            {
-                throw new ArgumentNullException(nameof(source));
-            }
-
-            if (transform == null)
-            {
-                throw new ArgumentNullException(nameof(transform));
-            }
-
-            JToken renameValue;
-            if (transform.TryGetValue(JsonUtilities.JdtSyntaxPrefix + this.Verb, out renameValue))
-            {
-                this.Rename(source, renameValue);
-            }
-
-            this.Successor.Process(source, transform);
-        }
-
-        private void Rename(JObject source, JToken renameValue)
-        {
-            if (renameValue.Type == JTokenType.Array)
-            {
-                // If the value is an array, perform the replace for each object in the array
-                // Do not allow array values from here
-                foreach (JToken arrayValue in (JArray)renameValue)
-                {
-                    this.RenameCore(source, arrayValue);
-                }
-            }
-            else
-            {
-                // If the value is not an array, perform the transform normally
-                this.RenameCore(source, renameValue);
-            }
-        }
-
-        private void RenameCore(JObject source, JToken renameValue)
-        {
-            if (renameValue.Type != JTokenType.Object)
+            if (transformValue.Type != JTokenType.Object)
             {
                 // Rename only accepts objects, either with properties or direct renames
-                throw new JdtException(renameValue.Type.ToString() + " is not a valid transform value for Rename");
+                throw new JdtException(transformValue.Type.ToString() + " is not a valid transform value for Rename");
             }
             else
             {
-                var renameProperties = (JObject)renameValue;
+                var renameProperties = (JObject)transformValue;
                 JToken pathToken, valueToken;
                 string pathFullAttribute = JsonUtilities.JdtSyntaxPrefix + PathAttribute;
                 bool hasPath = renameProperties.TryGetValue(pathFullAttribute, out pathToken);
@@ -117,6 +79,9 @@ namespace SlowCheetah.JDT
                     throw new JdtException("Rename requires both path and value");
                 }
             }
+
+            // Do not halt transformations
+            return false;
         }
 
         private void RenameNode(JToken nodeToRename, string newName)

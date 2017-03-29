@@ -19,9 +19,6 @@ namespace SlowCheetah.JDT
             // It is in order of execution
             private readonly List<JdtProcessor> processors = new List<JdtProcessor>()
             {
-                // Validates the JDT verbs in the file
-                new JdtValidator(),
-
                 // Supported transformations
                 new JdtRecurse(),
                 new JdtRemove(),
@@ -33,7 +30,10 @@ namespace SlowCheetah.JDT
 
             public JdtProcessorChain()
             {
-                var validator = this.processors.First() as JdtValidator;
+                var validator = new JdtValidator();
+
+                // The first step of a transformation is validating the verbs
+                this.processors.Insert(0, validator);
 
                 // The successor of each transform processor should be the next one on the list
                 // The last processor defaults to the end of chain processor

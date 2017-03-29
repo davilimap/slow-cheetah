@@ -49,6 +49,7 @@
     <Compile Include="JsonDocument.cs" />
     <Compile Include="JsonTransformation.cs" />
     <Compile Include="JsonUtilities.cs" />
+    <Compile Include="Processors\JdtArrayProcessor.cs" />
     <Compile Include="Processors\JdtDefault.cs" />
     <Compile Include="Processors\JdtMerge.cs" />
     <Compile Include="Processors\JdtProcessor.cs" />

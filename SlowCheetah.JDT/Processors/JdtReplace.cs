@@ -10,7 +10,7 @@ namespace SlowCheetah.JDT
     /// <summary>
     /// Represents a recursive JDT transformation
     /// </summary>
-    internal class JdtReplace : JdtProcessor
+    internal class JdtReplace : JdtArrayProcessor
     {
         private const string PathAttribute = "path";
         private const string ValueAttribute = "value";
@@ -19,62 +19,14 @@ namespace SlowCheetah.JDT
         public override string Verb { get; } = "replace";
 
         /// <inheritdoc/>
-        public override void Process(JObject source, JObject transform)
+        protected override bool TransformCore(JObject source, JToken transformValue)
         {
-            if (source == null)
-            {
-                throw new ArgumentNullException(nameof(source));
-            }
-
-            if (transform == null)
-            {
-                throw new ArgumentNullException(nameof(transform));
-            }
-
-            JToken replaceValue;
-            if (transform.TryGetValue(JsonUtilities.JdtSyntaxPrefix + this.Verb, out replaceValue))
-            {
-                if (this.Replace(source, replaceValue))
-                {
-                    // If the current node was replaced, then do not perform any more transformations here
-                    return;
-                }
-            }
-
-            this.Successor.Process(source, transform);
-        }
-
-        private bool Replace(JObject source, JToken replaceValue)
-        {
-            if (replaceValue.Type == JTokenType.Array)
-            {
-                // If the value is an array, perform the replace for each object in the array
-                foreach (JToken arrayValue in (JArray)replaceValue)
-                {
-                    if (this.ReplaceCore(source, arrayValue))
-                    {
-                        // If a value in the array performs a remove of the current node,
-                        // Stop transformations
-                        return true;
-                    }
-                }
-
-                return false;
-            }
-            else
-            {
-                return this.ReplaceCore(source, replaceValue);
-            }
-        }
-
-        private bool ReplaceCore(JObject source, JToken replaceValue)
-        {
-            switch (replaceValue.Type)
+            switch (transformValue.Type)
             {
                 case JTokenType.Object:
-                    return this.ReplaceWithProperties(source, (JObject)replaceValue);
+                    return this.ReplaceWithProperties(source, (JObject)transformValue);
                 default:
-                    source.Replace(replaceValue);
+                    source.Replace(transformValue);
                     return true;
             }
         }
@@ -111,7 +63,7 @@ namespace SlowCheetah.JDT
 
                     if (nodeToReplace.Equals(source))
                     {
-                        // If the specified is to the current
+                        // If the specified path is to the current node
                         replacedThisNode = true;
                     }
 
