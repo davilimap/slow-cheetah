@@ -18,7 +18,7 @@ namespace SlowCheetah.JDT
         public override string Verb { get; } = "remove";
 
         /// <inheritdoc/>
-        protected override bool TransformCore(JObject source, JToken transformValue)
+        protected override bool ProcessCore(JObject source, JToken transformValue)
         {
             switch (transformValue.Type)
             {
@@ -33,20 +33,19 @@ namespace SlowCheetah.JDT
                         // If the transform value is true, remove the entire node
                         if (this.RemoveThisNode(source))
                         {
-                            return true;
+                            return false;
                         }
                     }
 
                     break;
                 case JTokenType.Object:
                     // If the value is an object, verify the attributes within and perform the remove
-                    this.RemoveWithAttributes(source, (JObject)transformValue);
-                    break;
+                    return this.RemoveWithAttributes(source, (JObject)transformValue);
                 default:
                     throw new JdtException(transformValue.Type.ToString() + " is not a valid transform value for Remove");
             }
 
-            return false;
+            return true;
         }
 
         private bool RemoveWithAttributes(JObject source, JObject removeObject)
@@ -64,14 +63,15 @@ namespace SlowCheetah.JDT
                 if (pathToken.Type == JTokenType.String)
                 {
                     // Removes all of the tokens specified by the path
-                    foreach (JToken token in JsonUtilities.GetTokensFromPath(source, pathToken.ToString()))
+                    foreach (JToken token in source.SelectTokens(pathToken.ToString()).ToList())
                     {
                         if (token.Equals(source))
                         {
                             // If the path specifies the current node
-                            if (this.RemoveThisNode(source))
+                            if (!this.RemoveThisNode(source))
                             {
-                                return true;
+                                // Halt transformations
+                                return false;
                             }
                         }
                         else
@@ -101,7 +101,7 @@ namespace SlowCheetah.JDT
                 throw new JdtException("Remove transformation requires the path attribute");
             }
 
-            return false;
+            return true;
         }
 
         private bool RemoveThisNode(JObject nodeToRemove)
@@ -120,7 +120,7 @@ namespace SlowCheetah.JDT
             }
 
             // Informs not to perform any more transformations on this node
-            return true;
+            return false;
         }
     }
 }

@@ -19,7 +19,7 @@ namespace SlowCheetah.JDT
         public override string Verb { get; } = "rename";
 
         /// <inheritdoc/>
-        protected override bool TransformCore(JObject source, JToken transformValue)
+        protected override bool ProcessCore(JObject source, JToken transformValue)
         {
             if (transformValue.Type != JTokenType.Object)
             {
@@ -69,7 +69,7 @@ namespace SlowCheetah.JDT
                         throw new JdtException("Value attribute must be a string");
                     }
 
-                    foreach (JToken nodeToRename in JsonUtilities.GetTokensFromPath(source, pathToken.ToString()))
+                    foreach (JToken nodeToRename in source.SelectTokens(pathToken.ToString()).ToList())
                     {
                         this.RenameNode(nodeToRename, valueToken.ToString());
                     }
@@ -81,7 +81,7 @@ namespace SlowCheetah.JDT
             }
 
             // Do not halt transformations
-            return false;
+            return true;
         }
 
         private void RenameNode(JToken nodeToRename, string newName)

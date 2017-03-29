@@ -19,7 +19,7 @@ namespace SlowCheetah.JDT
         public override string Verb { get; } = "merge";
 
         /// <inheritdoc/>
-        protected override bool TransformCore(JObject source, JToken transformValue)
+        protected override bool ProcessCore(JObject source, JToken transformValue)
         {
             switch (transformValue.Type)
             {
@@ -37,7 +37,7 @@ namespace SlowCheetah.JDT
             }
 
             // Do not halt transformations
-            return false;
+            return true;
         }
 
         private void MergeWithObject(JObject source, JObject mergeObject)
@@ -66,7 +66,7 @@ namespace SlowCheetah.JDT
                     throw new JdtException("Path attribute must be a string");
                 }
 
-                foreach (JToken tokenToMerge in JsonUtilities.GetTokensFromPath(source, pathToken.ToString()))
+                foreach (JToken tokenToMerge in source.SelectTokens(pathToken.ToString()).ToList())
                 {
                     if (tokenToMerge.Type == JTokenType.Object && valueToken.Type == JTokenType.Object)
                     {
@@ -74,7 +74,7 @@ namespace SlowCheetah.JDT
                     }
                     else if (tokenToMerge.Type == JTokenType.Array && valueToken.Type == JTokenType.Array)
                     {
-                        ((JArray)tokenToMerge).MergeInto((JArray)valueToken);
+                        ((JArray)tokenToMerge).Merge(valueToken.DeepClone());
                     }
                     else
                     {

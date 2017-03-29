@@ -40,7 +40,7 @@ namespace SlowCheetah.JDT
                     if (nodeToTransform.Type == JTokenType.Array && transformNode.Value.Type == JTokenType.Array)
                     {
                         // If the original and transform are arrays, merge the contents together
-                        ((JArray)nodeToTransform).MergeInto((JArray)transformNode.Value);
+                        ((JArray)nodeToTransform).Merge(transformNode.Value.DeepClone());
                     }
                     else if (nodeToTransform.Type != JTokenType.Object || transformNode.Value.Type != JTokenType.Object)
                     {
