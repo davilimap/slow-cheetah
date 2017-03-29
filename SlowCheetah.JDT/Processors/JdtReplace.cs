@@ -19,7 +19,7 @@ namespace SlowCheetah.JDT
         public override string Verb { get; } = "replace";
 
         /// <inheritdoc/>
-        protected override bool TransformCore(JObject source, JToken transformValue)
+        protected override bool ProcessCore(JObject source, JToken transformValue)
         {
             switch (transformValue.Type)
             {
@@ -27,7 +27,9 @@ namespace SlowCheetah.JDT
                     return this.ReplaceWithProperties(source, (JObject)transformValue);
                 default:
                     source.Replace(transformValue);
-                    return true;
+
+                    // If the node is replaced, stop transformations on it
+                    return false;
             }
         }
 
@@ -43,7 +45,9 @@ namespace SlowCheetah.JDT
             if (!hasPath && !hasValue)
             {
                 source.Replace(replaceObject);
-                return true;
+
+                // If the node is replaced, stop transformations on it
+                return false;
             }
             else if (hasPath && hasValue)
             {
@@ -72,7 +76,7 @@ namespace SlowCheetah.JDT
                     if (replacedThisNode)
                     {
                         // If the current node was replaced, stop executing transformations on this node
-                        return true;
+                        return false;
                     }
                 }
             }
@@ -81,7 +85,7 @@ namespace SlowCheetah.JDT
                 throw new JdtException("Replace requires both path and value");
             }
 
-            return false;
+            return true;
         }
     }
 }

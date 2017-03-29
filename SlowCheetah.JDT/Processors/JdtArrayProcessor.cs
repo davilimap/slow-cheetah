@@ -27,9 +27,9 @@ namespace SlowCheetah.JDT
             JToken transformValue;
             if (transform.TryGetValue(JsonUtilities.JdtSyntaxPrefix + this.Verb, out transformValue))
             {
-                if (this.Transform(source, transformValue))
+                if (!this.Transform(source, transformValue))
                 {
-                    // If the transformation returns true,
+                    // If the transformation returns false,
                     // it performed an operation that halts transforms
                     return;
                 }
@@ -39,13 +39,21 @@ namespace SlowCheetah.JDT
         }
 
         /// <summary>
+        /// The core transformation logic. Arrays are treated as the transform values
+        /// </summary>
+        /// <param name="source">Object to be transformed</param>
+        /// <param name="transformValue">Value of the transform</param>
+        /// <returns>True if transforms should continue</returns>
+        protected abstract bool ProcessCore(JObject source, JToken transformValue);
+
+        /// <summary>
         /// Performs the initial logic of processing arrays.
         /// Arrays cause the transform to be applied to each value in them
         /// </summary>
         /// <param name="source">Object to be transformed</param>
         /// <param name="transformValue">Value of the transform</param>
-        /// <returns>True if transforms should be halted</returns>
-        protected bool Transform(JObject source, JToken transformValue)
+        /// <returns>True if transforms should continue</returns>
+        private bool Transform(JObject source, JToken transformValue)
         {
             if (transformValue.Type == JTokenType.Array)
             {
@@ -53,28 +61,20 @@ namespace SlowCheetah.JDT
                 // From here, arrays are handled as the transformation value
                 foreach (JToken arrayValue in (JArray)transformValue)
                 {
-                    if (this.TransformCore(source, arrayValue))
+                    if (!this.ProcessCore(source, arrayValue))
                     {
                         // If the core transformation indicates a halt, we halt
                         return true;
                     }
                 }
 
-                return false;
+                return true;
             }
             else
             {
                 // If it is not an array, perform the transformation as normal
-                return this.TransformCore(source, transformValue);
+                return this.ProcessCore(source, transformValue);
             }
         }
-
-        /// <summary>
-        /// The core transformation logic. Arrays are treated as the transform values
-        /// </summary>
-        /// <param name="source">Object to be transformed</param>
-        /// <param name="transformValue">Value of the transform</param>
-        /// <returns>True if transforms should be halted</returns>
-        protected abstract bool TransformCore(JObject source, JToken transformValue);
     }
 }

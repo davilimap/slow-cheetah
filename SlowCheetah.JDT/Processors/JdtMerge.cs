@@ -19,7 +19,7 @@ namespace SlowCheetah.JDT
         public override string Verb { get; } = "merge";
 
         /// <inheritdoc/>
-        protected override bool TransformCore(JObject source, JToken transformValue)
+        protected override bool ProcessCore(JObject source, JToken transformValue)
         {
             switch (transformValue.Type)
             {
@@ -37,7 +37,7 @@ namespace SlowCheetah.JDT
             }
 
             // Do not halt transformations
-            return false;
+            return true;
         }
 
         private void MergeWithObject(JObject source, JObject mergeObject)
