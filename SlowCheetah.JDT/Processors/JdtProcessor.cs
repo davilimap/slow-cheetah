@@ -9,7 +9,7 @@ namespace SlowCheetah.JDT
     /// <summary>
     /// Represents a transformation
     /// </summary>
-    public abstract partial class JdtProcessor
+    internal abstract partial class JdtProcessor
     {
         private static readonly JdtProcessorChain ProcessorChain = new JdtProcessorChain();
 
@@ -57,7 +57,7 @@ namespace SlowCheetah.JDT
                 throw new ArgumentNullException(nameof(transform));
             }
 
-            ProcessorChain.Start(source, transform);
+            ProcessorChain.Start(source, (JObject)transform.DeepClone());
         }
 
         /// <summary>

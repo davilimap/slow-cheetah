@@ -21,34 +21,6 @@ namespace SlowCheetah.JDT
         internal const string JdtSyntaxPrefix = "@jdt.";
 
         /// <summary>
-        /// Loads a JSON file to a JToken
-        /// </summary>
-        /// <param name="filePath">Full path to the JSON file</param>
-        /// <returns>JObject extracted from the file</returns>
-        internal static JObject LoadObjectFromFile(string filePath)
-        {
-            if (string.IsNullOrEmpty(filePath))
-            {
-                throw new ArgumentNullException(nameof(filePath));
-            }
-
-            using (StreamReader file = File.OpenText(filePath))
-            using (JsonTextReader reader = new JsonTextReader(file))
-            {
-                JsonLoadSettings loadSettings = new JsonLoadSettings()
-                {
-                    CommentHandling = CommentHandling.Ignore,
-
-                    // Obs: LineInfo is handled on Ignore and not Load
-                    // See https://github.com/JamesNK/Newtonsoft.Json/issues/1249
-                    LineInfoHandling = LineInfoHandling.Ignore
-                };
-
-                return JObject.Load(reader, loadSettings);
-            }
-        }
-
-        /// <summary>
         /// Wheter the given key corresponds to a JDT verb
         /// </summary>
         /// <param name="key">The JSON key to analyze</param>
