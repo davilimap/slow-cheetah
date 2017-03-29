@@ -42,7 +42,7 @@ namespace SlowCheetah.JDT
         /// <param name="document">Document to be transformed</param>
         public void Apply(JsonDocument document)
         {
-            JdtProcessor.ProcessTransform(document.GetObject(), (JObject)this.transform.DeepClone());
+            JdtProcessor.ProcessTransform(document.DocumentObject, (JObject)this.transform.DeepClone());
         }
     }
 }
