@@ -11,7 +11,7 @@ namespace SlowCheetah.JDT
     /// <summary>
     /// The JdtProcessor chain
     /// </summary>
-    public abstract partial class JdtProcessor
+    internal abstract partial class JdtProcessor
     {
         private class JdtProcessorChain
         {

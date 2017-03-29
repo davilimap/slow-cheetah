@@ -167,10 +167,10 @@ namespace SlowCheetah.Tests.JDT
             // Removes the test name to find the source file
             string sourceName = Path.GetFileNameWithoutExtension(testName);
 
-            var transformation = new JsonTransformation();
+            var transformation = new JsonTransformation(inputsDirectory + testName + ".Transform.json");
 
             // Read the resulting stream into a JObject to compare
-            using (Stream result = transformation.Apply(inputsDirectory + sourceName + ".Source.json", inputsDirectory + testName + ".Transform.json"))
+            using (Stream result = transformation.Apply(inputsDirectory + sourceName + ".Source.json"))
             using (StreamReader streamReader = new StreamReader(result))
             using (JsonTextReader jsonReader = new JsonTextReader(streamReader))
             {
