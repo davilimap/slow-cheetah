@@ -8,7 +8,7 @@ namespace SlowCheetah.JDT
     /// <summary>
     /// Represents a transformation
     /// </summary>
-    public abstract partial class JdtProcessor
+    internal abstract partial class JdtProcessor
     {
         private static readonly JdtProcessorChain ProcessorChain = new JdtProcessorChain();
 
@@ -19,7 +19,7 @@ namespace SlowCheetah.JDT
         /// Can be null or empty.
         /// Does not include the preffix(<see cref="JsonUtilities.JdtSyntaxPrefix"/>)
         /// </summary>
-        public abstract string Verb { get; }
+        internal abstract string Verb { get; }
 
         /// <summary>
         /// Gets the successor of the current transformation
@@ -43,9 +43,10 @@ namespace SlowCheetah.JDT
         /// </summary>
         /// <param name="source">Object to be transformed</param>
         /// <param name="transform">Object that specifies the transformation</param>
-        public static void ProcessTransform(JObject source, JObject transform)
+        /// <param name="context">The context of the transformation</param>
+        internal static void ProcessTransform(JObject source, JObject transform, JsonTransformContext context)
         {
-            ProcessorChain.Start(source, transform);
+            ProcessorChain.Start(source, transform, context);
         }
 
         /// <summary>
@@ -53,6 +54,7 @@ namespace SlowCheetah.JDT
         /// </summary>
         /// <param name="source">Object to be transformed</param>
         /// <param name="transform">Object specifying the transformation</param>
-        public abstract void Process(JObject source, JObject transform);
+        /// <param name="context">The context of the transformation</param>
+        internal abstract void Process(JObject source, JObject transform, JsonTransformContext context);
     }
 }

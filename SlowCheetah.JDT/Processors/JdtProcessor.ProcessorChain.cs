@@ -10,7 +10,7 @@ namespace SlowCheetah.JDT
     /// <summary>
     /// The JdtProcessor chain
     /// </summary>
-    public abstract partial class JdtProcessor
+    internal abstract partial class JdtProcessor
     {
         private class JdtProcessorChain
         {
@@ -45,9 +45,9 @@ namespace SlowCheetah.JDT
                 }
             }
 
-            public void Start(JObject source, JObject transform)
+            public void Start(JObject source, JObject transform, JsonTransformContext context)
             {
-                this.processors.First().Process(source, transform);
+                this.processors.First().Process(source, transform, context);
             }
         }
 
@@ -62,9 +62,9 @@ namespace SlowCheetah.JDT
 
             public static JdtEndOfChain Instance { get; } = new JdtEndOfChain();
 
-            public override string Verb { get; } = null;
+            internal override string Verb { get; } = null;
 
-            public override void Process(JObject source, JObject transform)
+            internal override void Process(JObject source, JObject transform, JsonTransformContext context)
             {
                 // Do nothing, the chain is done
             }
@@ -74,9 +74,9 @@ namespace SlowCheetah.JDT
         {
             public HashSet<string> ValidVerbs { get; } = new HashSet<string>();
 
-            public override string Verb { get; } = null;
+            internal override string Verb { get; } = null;
 
-            public override void Process(JObject source, JObject transform)
+            internal override void Process(JObject source, JObject transform, JsonTransformContext context)
             {
                 foreach (JProperty transformNode in transform.Properties()
                     .Where(p => JsonUtilities.IsJdtSyntax(p.Name)))
@@ -91,7 +91,7 @@ namespace SlowCheetah.JDT
                     }
                 }
 
-                this.Successor.Process(source, transform);
+                this.Successor.Process(source, transform, context);
             }
         }
     }

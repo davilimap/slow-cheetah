@@ -13,16 +13,14 @@ namespace SlowCheetah.JDT
     /// </summary>
     public class JsonDocument : IEquatable<JsonDocument>
     {
-        private readonly string documentPath;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="JsonDocument"/> class.
         /// </summary>
         /// <param name="filePath">Path to the JSON file</param>
         public JsonDocument(string filePath)
         {
-            this.documentPath = filePath;
-            this.DocumentObject = JsonUtilities.LoadObjectFromFile(this.documentPath);
+            this.DocumentPath = filePath;
+            this.DocumentObject = JsonUtilities.LoadObjectFromFile(this.DocumentPath);
         }
 
         /// <summary>
@@ -31,9 +29,14 @@ namespace SlowCheetah.JDT
         /// <param name="docObject">The object to be transformed</param>
         internal JsonDocument(JObject docObject)
         {
-            this.documentPath = string.Empty;
+            this.DocumentPath = string.Empty;
             this.DocumentObject = (JObject)docObject.DeepClone();
         }
+
+        /// <summary>
+        /// Gets the path to the document file
+        /// </summary>
+        internal string DocumentPath { get; private set; }
 
         /// <summary>
         /// Gets the JObject corresponding to the root of the document

@@ -15,10 +15,10 @@ namespace SlowCheetah.JDT
         private const string ValueAttribute = "value";
 
         /// <inheritdoc/>
-        public override string Verb { get; } = "rename";
+        internal override string Verb { get; } = "rename";
 
         /// <inheritdoc/>
-        public override void Process(JObject source, JObject transform)
+        internal override void Process(JObject source, JObject transform, JsonTransformContext context)
         {
             JToken removeValue;
             if (transform.TryGetValue(JsonUtilities.JdtSyntaxPrefix + this.Verb, out removeValue))
@@ -26,7 +26,7 @@ namespace SlowCheetah.JDT
                 this.Rename(source, removeValue, true);
             }
 
-            this.Successor.Process(source, transform);
+            this.Successor.Process(source, transform, context);
         }
 
         private void Rename(JObject source, JToken renameValue, bool allowArray)

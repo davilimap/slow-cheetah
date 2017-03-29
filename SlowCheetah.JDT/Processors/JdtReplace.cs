@@ -17,10 +17,10 @@ namespace SlowCheetah.JDT
         private bool replacedThisNode;
 
         /// <inheritdoc/>
-        public override string Verb { get; } = "replace";
+        internal override string Verb { get; } = "replace";
 
         /// <inheritdoc/>
-        public override void Process(JObject source, JObject transform)
+        internal override void Process(JObject source, JObject transform, JsonTransformContext context)
         {
             this.replacedThisNode = false;
 
@@ -33,7 +33,7 @@ namespace SlowCheetah.JDT
             if (!this.replacedThisNode)
             {
                 // If the current node was replaced, then do not perform any more transformations here
-                this.Successor.Process(source, transform);
+                this.Successor.Process(source, transform, context);
             }
         }
 

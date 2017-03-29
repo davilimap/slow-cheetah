@@ -16,10 +16,10 @@ namespace SlowCheetah.JDT
         private bool removedThisNode;
 
         /// <inheritdoc/>
-        public override string Verb { get; } = "remove";
+        internal override string Verb { get; } = "remove";
 
         /// <inheritdoc/>
-        public override void Process(JObject source, JObject transform)
+        internal override void Process(JObject source, JObject transform, JsonTransformContext context)
         {
             this.removedThisNode = false;
 
@@ -32,7 +32,7 @@ namespace SlowCheetah.JDT
             if (!this.removedThisNode)
             {
                 // If the current node was removed, then do not perform any more transformations here
-                this.Successor.Process(source, transform);
+                this.Successor.Process(source, transform, context);
             }
         }
 

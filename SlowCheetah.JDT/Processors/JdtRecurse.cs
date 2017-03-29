@@ -13,10 +13,10 @@ namespace SlowCheetah.JDT
     internal class JdtRecurse : JdtProcessor
     {
         /// <inheritdoc/>
-        public override string Verb { get; } = null;
+        internal override string Verb { get; } = null;
 
         /// <inheritdoc/>
-        public override void Process(JObject source, JObject transform)
+        internal override void Process(JObject source, JObject transform, JsonTransformContext context)
         {
             // Nodes that should be removed from the transform after they are handled
             List<string> nodesToRemove = new List<string>();
@@ -27,7 +27,7 @@ namespace SlowCheetah.JDT
                 JToken sourceChild;
                 if (source.TryGetValue(transformNode.Name, out sourceChild) && sourceChild.Type == JTokenType.Object)
                 {
-                    ProcessTransform((JObject)sourceChild, (JObject)transformNode.Value);
+                    ProcessTransform((JObject)sourceChild, (JObject)transformNode.Value, context);
 
                     // If we have already recursed into that node, it should be removed from the transform
                     nodesToRemove.Add(transformNode.Name);
@@ -38,7 +38,7 @@ namespace SlowCheetah.JDT
             nodesToRemove.ForEach(node => transform.Remove(node));
 
             // Continue to next transformation
-            this.Successor.Process(source, transform);
+            this.Successor.Process(source, transform, context);
         }
     }
 }

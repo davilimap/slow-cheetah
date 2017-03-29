@@ -12,7 +12,7 @@ namespace SlowCheetah.JDT
     [Serializable]
     public class JdtException : Exception
     {
-        private IJsonLineInfo lineInfo;
+        private IJsonLineInfo lineInfo = null;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="JdtException"/> class.

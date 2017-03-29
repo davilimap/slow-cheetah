@@ -12,10 +12,10 @@ namespace SlowCheetah.JDT
     internal class JdtDefault : JdtProcessor
     {
         /// <inheritdoc/>
-        public override string Verb { get; } = null;
+        internal override string Verb { get; } = null;
 
         /// <inheritdoc/>
-        public override void Process(JObject source, JObject transform)
+        internal override void Process(JObject source, JObject transform, JsonTransformContext context)
         {
             // JDT Verbs are not handled here
             foreach (JProperty transformNode in transform.Properties()
@@ -45,7 +45,7 @@ namespace SlowCheetah.JDT
                 }
             }
 
-            this.Successor.Process(source, transform);
+            this.Successor.Process(source, transform, context);
         }
     }
 }

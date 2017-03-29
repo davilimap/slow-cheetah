@@ -70,8 +70,8 @@ namespace SlowCheetah.JDT
             try
             {
                 this.logger.HasLoggedErrors = false;
-                // this.context.SourceFile = document
-                JdtProcessor.ProcessTransform(document.DocumentObject, (JObject)this.transform.DeepClone());
+                this.context.SourceFile = document.DocumentPath;
+                JdtProcessor.ProcessTransform(document.DocumentObject, (JObject)this.transform.DeepClone(), this.context);
             }
             catch (Exception ex)
             {

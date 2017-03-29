@@ -15,21 +15,21 @@ namespace SlowCheetah.JDT
         private const string ValueAttribute = "value";
 
         /// <inheritdoc/>
-        public override string Verb { get; } = "merge";
+        internal override string Verb { get; } = "merge";
 
         /// <inheritdoc/>
-        public override void Process(JObject source, JObject transform)
+        internal override void Process(JObject source, JObject transform, JsonTransformContext context)
         {
             JToken mergeValue;
             if (transform.TryGetValue(JsonUtilities.JdtSyntaxPrefix + this.Verb, out mergeValue))
             {
-                this.Merge(source, mergeValue, true);
+                this.Merge(source, mergeValue, context, true);
             }
 
-            this.Successor.Process(source, transform);
+            this.Successor.Process(source, transform, context);
         }
 
-        private void Merge(JObject source, JToken mergeValue, bool allowArray)
+        private void Merge(JObject source, JToken mergeValue, JsonTransformContext context, bool allowArray)
         {
             switch (mergeValue.Type)
             {
@@ -39,7 +39,7 @@ namespace SlowCheetah.JDT
                         // If the value is an array, perform the replace for each object in the array
                         foreach (JToken arrayValue in (JArray)mergeValue)
                         {
-                            this.Merge(source, arrayValue, false);
+                            this.Merge(source, arrayValue, context, false);
                         }
                     }
                     else
@@ -50,7 +50,7 @@ namespace SlowCheetah.JDT
 
                     break;
                 case JTokenType.Object:
-                    this.MergeWithObject(source, (JObject)mergeValue);
+                    this.MergeWithObject(source, (JObject)mergeValue, context);
                     break;
                 default:
                     JsonUtilities.ThrowIfRoot(source, "Cannot replace root");
@@ -59,7 +59,7 @@ namespace SlowCheetah.JDT
             }
         }
 
-        private void MergeWithObject(JObject source, JObject mergeObject)
+        private void MergeWithObject(JObject source, JObject mergeObject, JsonTransformContext context)
         {
             JToken pathToken, valueToken;
             string pathFullAttribute = JsonUtilities.JdtSyntaxPrefix + PathAttribute;
@@ -71,7 +71,7 @@ namespace SlowCheetah.JDT
             {
                 // If the merge object does not contain attributes,
                 // simply execute the transform with that object
-                ProcessTransform(source, mergeObject);
+                ProcessTransform(source, mergeObject, context);
             }
             else if (hasPath && hasValue)
             {
@@ -90,7 +90,7 @@ namespace SlowCheetah.JDT
                 {
                     if (tokenToMerge.Type == JTokenType.Object && valueToken.Type == JTokenType.Object)
                     {
-                        ProcessTransform((JObject)tokenToMerge, (JObject)valueToken);
+                        ProcessTransform((JObject)tokenToMerge, (JObject)valueToken, context);
                     }
                     else if (tokenToMerge.Type == JTokenType.Array && valueToken.Type == JTokenType.Array)
                     {
