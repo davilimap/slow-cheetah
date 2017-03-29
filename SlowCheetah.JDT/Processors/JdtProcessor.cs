@@ -41,6 +41,7 @@ namespace SlowCheetah.JDT
 
         /// <summary>
         /// Executes the entire transformation with the given objects
+        /// Mutates the source object
         /// </summary>
         /// <param name="source">Object to be transformed</param>
         /// <param name="transform">Object that specifies the transformation</param>

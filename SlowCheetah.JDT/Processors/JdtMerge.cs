@@ -74,7 +74,7 @@ namespace SlowCheetah.JDT
                     }
                     else if (tokenToMerge.Type == JTokenType.Array && valueToken.Type == JTokenType.Array)
                     {
-                        ((JArray)tokenToMerge).MergeInto((JArray)valueToken);
+                        ((JArray)tokenToMerge).Merge(valueToken.DeepClone());
                     }
                     else
                     {
