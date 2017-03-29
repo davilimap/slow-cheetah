@@ -66,7 +66,7 @@ namespace SlowCheetah.JDT
                     throw new JdtException("Path attribute must be a string");
                 }
 
-                foreach (JToken tokenToMerge in JsonUtilities.GetTokensFromPath(source, pathToken.ToString()))
+                foreach (JToken tokenToMerge in source.SelectTokens(pathToken.ToString()).ToList())
                 {
                     if (tokenToMerge.Type == JTokenType.Object && valueToken.Type == JTokenType.Object)
                     {

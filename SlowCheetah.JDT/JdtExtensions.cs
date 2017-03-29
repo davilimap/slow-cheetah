@@ -42,6 +42,11 @@ namespace SlowCheetah.JDT
         /// <param name="errorMessage">Error message</param>
         internal static void ThrowIfRoot(this JToken token, string errorMessage)
         {
+            if (token == null)
+            {
+                throw new ArgumentNullException(nameof(token));
+            }
+
             if (token.Root.Equals(token))
             {
                 throw new JdtException(errorMessage);

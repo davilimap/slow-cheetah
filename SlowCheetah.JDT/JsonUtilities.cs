@@ -16,7 +16,7 @@ namespace SlowCheetah.JDT
     internal static class JsonUtilities
     {
         /// <summary>
-        /// The preffix for all JDT syntax
+        /// The prefix for all JDT syntax
         /// </summary>
         internal const string JdtSyntaxPrefix = "@jdt.";
 
@@ -70,17 +70,6 @@ namespace SlowCheetah.JDT
             // If the key does not start with the correct prefix, it is not a JDT verb
             // If it is a JDT verb, remove the prefix
             return IsJdtSyntax(key) ? key.Substring(JdtSyntaxPrefix.Length) : null;
-        }
-
-        /// <summary>
-        /// Gets tokens from a node or its root using JSONPath
-        /// </summary>
-        /// <param name="node">The node to base the search on</param>
-        /// <param name="path">The JSONPath to find nodes.</param>
-        /// <returns>The corresponding tokens</returns>
-        internal static List<JToken> GetTokensFromPath(JObject node, string path)
-        {
-            return node.SelectTokens(path, true).ToList();
         }
 
         /// <summary>

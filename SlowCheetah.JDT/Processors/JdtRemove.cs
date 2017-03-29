@@ -63,7 +63,7 @@ namespace SlowCheetah.JDT
                 if (pathToken.Type == JTokenType.String)
                 {
                     // Removes all of the tokens specified by the path
-                    foreach (JToken token in JsonUtilities.GetTokensFromPath(source, pathToken.ToString()))
+                    foreach (JToken token in source.SelectTokens(pathToken.ToString()).ToList())
                     {
                         if (token.Equals(source))
                         {

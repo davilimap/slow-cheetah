@@ -61,7 +61,7 @@ namespace SlowCheetah.JDT
                     throw new JdtException("Path attribute must be a string");
                 }
 
-                foreach (JToken nodeToReplace in JsonUtilities.GetTokensFromPath(source, pathToken.ToString()))
+                foreach (JToken nodeToReplace in source.SelectTokens(pathToken.ToString()).ToList())
                 {
                     bool replacedThisNode = false;
 
