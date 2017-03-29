@@ -23,6 +23,16 @@ namespace SlowCheetah.JDT
         /// <returns>A stream containing the results of the transforms</returns>
         public Stream Apply(string sourceFile, string transformFile)
         {
+            if (string.IsNullOrEmpty(sourceFile))
+            {
+                throw new ArgumentNullException(nameof(sourceFile));
+            }
+
+            if (string.IsNullOrEmpty(transformFile))
+            {
+                throw new ArgumentNullException(nameof(transformFile));
+            }
+
             // Open the file as streams and apply the transforms
             // TO DO: Save the source and transform file to the context for logging
             Stream sourceStream = File.Open(sourceFile, FileMode.Open);
