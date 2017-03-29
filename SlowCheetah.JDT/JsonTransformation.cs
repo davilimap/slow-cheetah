@@ -16,20 +16,6 @@ namespace SlowCheetah.JDT
         /// <summary>
         /// Initializes a new instance of the <see cref="JsonTransformation"/> class.
         /// </summary>
-        /// <param name="transformObject">Object that corresponds to the transformation file</param>
-        public JsonTransformation(JObject transformObject)
-        {
-            if (transformObject == null)
-            {
-                throw new ArgumentNullException(nameof(transformObject));
-            }
-
-            this.transform = (JObject)transformObject.DeepClone();
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="JsonTransformation"/> class.
-        /// </summary>
         /// <param name="transformFile">File that defines the trasnformation</param>
         public JsonTransformation(string transformFile)
         {

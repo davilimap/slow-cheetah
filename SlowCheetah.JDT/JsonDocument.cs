@@ -31,21 +31,6 @@ namespace SlowCheetah.JDT
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="JsonDocument"/> class.
-        /// </summary>
-        /// <param name="docObject">The object to be transformed</param>
-        internal JsonDocument(JObject docObject)
-        {
-            if (docObject == null)
-            {
-                throw new ArgumentNullException(nameof(docObject));
-            }
-
-            this.documentPath = string.Empty;
-            this.DocumentObject = (JObject)docObject.DeepClone();
-        }
-
-        /// <summary>
         /// Gets the JObject corresponding to the root of the document
         /// </summary>
         internal JObject DocumentObject { get; private set; }
