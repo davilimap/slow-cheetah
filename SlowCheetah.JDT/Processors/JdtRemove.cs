@@ -13,46 +13,67 @@ namespace SlowCheetah.JDT
     {
         private const string PathAttribute = "path";
 
-        private bool removedThisNode;
-
         /// <inheritdoc/>
         public override string Verb { get; } = "remove";
 
         /// <inheritdoc/>
         public override void Process(JObject source, JObject transform)
         {
-            this.removedThisNode = false;
-
             JToken removeValue;
             if (transform.TryGetValue(JsonUtilities.JdtSyntaxPrefix + this.Verb, out removeValue))
             {
-                this.Remove(source, removeValue, true);
+                if (this.Remove(source, removeValue))
+                {
+                    // If the current node was removed, then do not perform any more transformations here
+                    return;
+                }
             }
 
-            if (!this.removedThisNode)
+            this.Successor.Process(source, transform);
+        }
+
+        private bool Remove(JObject source, JToken removeValue)
+        {
+            if (removeValue.Type == JTokenType.Array)
             {
-                // If the current node was removed, then do not perform any more transformations here
-                this.Successor.Process(source, transform);
+                // If the value is an array, perform the remove for each object in the array
+                // Do not allow array values from here
+                foreach (JToken arrayValue in (JArray)removeValue)
+                {
+                    if (this.RemoveCore(source, arrayValue))
+                    {
+                        // If a value in the array performs a remove of the current node,
+                        // stop transformations
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+            else
+            {
+                // If it is not an array, perform the merge as normal
+                return this.RemoveCore(source, removeValue);
             }
         }
 
-        private void Remove(JObject source, JToken removeValue, bool allowArray)
+        private bool RemoveCore(JObject source, JToken removeValue)
         {
             switch (removeValue.Type)
             {
                 case JTokenType.String:
                     // TO DO: warning if unable to remove
                     // If the value is just a string, remove that node
-                    source.Remove(removeValue.ToObject<string>());
+                    source.Remove(removeValue.ToString());
                     break;
                 case JTokenType.Boolean:
-                    if (removeValue.ToObject<bool>())
+                    if ((bool)removeValue)
                     {
                         // If the transform value is true, remove the entire node
-                        this.RemoveThisNode(source);
-
-                        // Stop transformations if the node was removed
-                        return;
+                        if (this.RemoveThisNode(source))
+                        {
+                            return true;
+                        }
                     }
 
                     break;
@@ -60,38 +81,17 @@ namespace SlowCheetah.JDT
                     // If the value is an object, verify the attributes within and perform the remove
                     this.RemoveWithAttributes(source, (JObject)removeValue);
                     break;
-                case JTokenType.Array:
-                    if (allowArray)
-                    {
-                        // If the value is an array, perform the remove for each object in the array
-                        // Do not allow array values from here
-                        foreach (JToken arayValue in (JArray)removeValue)
-                        {
-                            this.Remove(source, arayValue, false);
-                            if (this.removedThisNode)
-                            {
-                                // If a value in the array performs a remove of the current node,
-                                // Stop transformations
-                                return;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        // TO DO: Clarify error
-                        throw new JdtException(removeValue.Type.ToString() + " is not a valid transform value");
-                    }
-
-                    break;
                 default:
                     throw new JdtException(removeValue.Type.ToString() + " is not a valid transform value for Remove");
             }
+
+            return false;
         }
 
-        private void RemoveWithAttributes(JObject source, JObject removeObject)
+        private bool RemoveWithAttributes(JObject source, JObject removeObject)
         {
             string pathFullAttribute = JsonUtilities.JdtSyntaxPrefix + PathAttribute;
-            if (removeObject.Properties().Where(p => !p.Name.Equals(pathFullAttribute)).Count() > 0)
+            if (removeObject.Properties().Any(p => !p.Name.Equals(pathFullAttribute)))
             {
                 // If any properties other than the path attribute are found
                 throw new JdtException("Invalid remove attributes");
@@ -102,16 +102,16 @@ namespace SlowCheetah.JDT
             {
                 if (pathToken.Type == JTokenType.String)
                 {
-                    // Gets the tokens to be removed and converts to a list
-                    // so that the tokens may be removed
-                    var tokensToRemove = JsonUtilities.GetTokensFromPath(source, pathToken.ToString());
-                    foreach (JToken token in tokensToRemove.ToList())
+                    // Removes all of the tokens specified by the path
+                    foreach (JToken token in JsonUtilities.GetTokensFromPath(source, pathToken.ToString()))
                     {
                         if (token.Equals(source))
                         {
                             // If the path specifies the current node
-                            this.RemoveThisNode(source);
-                            return;
+                            if (this.RemoveThisNode(source))
+                            {
+                                return true;
+                            }
                         }
                         else
                         {
@@ -139,20 +139,18 @@ namespace SlowCheetah.JDT
             {
                 throw new JdtException("Remove transformation requires the path attribute");
             }
+
+            return false;
         }
 
-        private void RemoveThisNode(JObject nodeToRemove)
+        private bool RemoveThisNode(JObject nodeToRemove)
         {
-            // If the value is true, everything from the node and set it to null
-            if (nodeToRemove.Root.Equals(nodeToRemove))
-            {
-                throw new JdtException("You cannot remove the root");
-            }
+            JsonUtilities.ThrowIfRoot(nodeToRemove, "You cannot remove the root");
 
-            JProperty parent = (JProperty)nodeToRemove.Parent;
+            var parent = (JProperty)nodeToRemove.Parent;
             if (parent == null)
             {
-                // TO DO: Log error line
+                // TO DO: Potentially log a warning and continue with transformations
                 throw new JdtException("Could not perform remove");
             }
             else
@@ -161,7 +159,7 @@ namespace SlowCheetah.JDT
             }
 
             // Informs not to perform any more transformations on this node
-            this.removedThisNode = true;
+            return true;
         }
     }
 }

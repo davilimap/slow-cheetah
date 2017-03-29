@@ -21,6 +21,11 @@ namespace SlowCheetah.JDT
         /// <param name="filePath">Path to the JSON file</param>
         public JsonDocument(string filePath)
         {
+            if (string.IsNullOrEmpty(filePath))
+            {
+                throw new ArgumentNullException(nameof(filePath));
+            }
+
             this.documentPath = filePath;
             this.DocumentObject = JsonUtilities.LoadObjectFromFile(this.documentPath);
         }
@@ -29,8 +34,13 @@ namespace SlowCheetah.JDT
         /// Initializes a new instance of the <see cref="JsonDocument"/> class.
         /// </summary>
         /// <param name="docObject">The object to be transformed</param>
-        public JsonDocument(JObject docObject)
+        internal JsonDocument(JObject docObject)
         {
+            if (docObject == null)
+            {
+                throw new ArgumentNullException(nameof(docObject));
+            }
+
             this.documentPath = string.Empty;
             this.DocumentObject = (JObject)docObject.DeepClone();
         }

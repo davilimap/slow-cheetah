@@ -19,7 +19,7 @@ namespace SlowCheetah.JDT
         public override void Process(JObject source, JObject transform)
         {
             // Nodes that should be removed from the transform after they are handled
-            List<string> nodesToRemove = new List<string>();
+            var nodesToRemove = new List<string>();
 
             foreach (JProperty transformNode in transform.Properties()
                 .Where(p => p.Value.Type == JTokenType.Object && !JsonUtilities.IsJdtSyntax(p.Name)))

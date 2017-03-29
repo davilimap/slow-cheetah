@@ -33,6 +33,11 @@ namespace SlowCheetah.JDT
         /// <param name="transformFile">File that defines the trasnformation</param>
         public JsonTransformation(string transformFile)
         {
+            if (string.IsNullOrEmpty(transformFile))
+            {
+                throw new ArgumentNullException(nameof(transformFile));
+            }
+
             this.transform = JsonUtilities.LoadObjectFromFile(transformFile);
         }
 

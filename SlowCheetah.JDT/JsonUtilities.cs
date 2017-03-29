@@ -6,6 +6,7 @@ namespace SlowCheetah.JDT
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
@@ -27,6 +28,16 @@ namespace SlowCheetah.JDT
         /// <param name="arrayToMerge">Array to be merged</param>
         internal static void MergeArray(JArray original, JArray arrayToMerge)
         {
+            if (original == null)
+            {
+                throw new ArgumentNullException(nameof(original));
+            }
+
+            if (arrayToMerge == null)
+            {
+                throw new ArgumentNullException(nameof(arrayToMerge));
+            }
+
             foreach (JToken token in arrayToMerge)
             {
                 original.Add(token.DeepClone());
@@ -53,6 +64,7 @@ namespace SlowCheetah.JDT
                     CommentHandling = CommentHandling.Ignore,
 
                     // Obs: LineInfo is handled on Ignore and not Load
+                    // See https://github.com/JamesNK/Newtonsoft.Json/issues/1249
                     LineInfoHandling = LineInfoHandling.Ignore
                 };
 
@@ -79,18 +91,9 @@ namespace SlowCheetah.JDT
         /// <returns>The string property. Null if the property does is not JDT syntax</returns>
         internal static string GetJdtSyntax(string key)
         {
-            if (!IsJdtSyntax(key))
-            {
-                // Empty or null strings
-                // If the key does not start with the correct prefix,
-                // it is not a JDT verb
-                return null;
-            }
-            else
-            {
-                // Remove the prefix
-                return key.Substring(JdtSyntaxPrefix.Length);
-            }
+            // If the key does not start with the correct prefix, it is not a JDT verb
+            // If it is a JDT verb, remove the prefix
+            return IsJdtSyntax(key) ? key.Substring(JdtSyntaxPrefix.Length) : null;
         }
 
         /// <summary>
@@ -99,9 +102,9 @@ namespace SlowCheetah.JDT
         /// <param name="node">The node to base the search on</param>
         /// <param name="path">The JSONPath to find nodes.</param>
         /// <returns>The corresponding tokens</returns>
-        internal static IEnumerable<JToken> GetTokensFromPath(JObject node, string path)
+        internal static List<JToken> GetTokensFromPath(JObject node, string path)
         {
-            return node.SelectTokens(path, true);
+            return node.SelectTokens(path, true).ToList();
         }
 
         /// <summary>

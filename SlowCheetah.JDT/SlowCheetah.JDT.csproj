@@ -56,6 +56,7 @@
     <Compile Include="Processors\JdtRemove.cs" />
     <Compile Include="Processors\JdtRename.cs" />
     <Compile Include="Processors\JdtReplace.cs" />
+    <Compile Include="Processors\JdtValidator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

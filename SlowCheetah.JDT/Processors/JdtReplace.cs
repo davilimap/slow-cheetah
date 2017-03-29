@@ -14,66 +14,61 @@ namespace SlowCheetah.JDT
         private const string PathAttribute = "path";
         private const string ValueAttribute = "value";
 
-        private bool replacedThisNode;
-
         /// <inheritdoc/>
         public override string Verb { get; } = "replace";
 
         /// <inheritdoc/>
         public override void Process(JObject source, JObject transform)
         {
-            this.replacedThisNode = false;
-
             JToken replaceValue;
             if (transform.TryGetValue(JsonUtilities.JdtSyntaxPrefix + this.Verb, out replaceValue))
             {
-                this.Replace(source, replaceValue, true);
+                if (this.Replace(source, replaceValue))
+                {
+                    // If the current node was replaced, then do not perform any more transformations here
+                    return;
+                }
             }
 
-            if (!this.replacedThisNode)
+            this.Successor.Process(source, transform);
+        }
+
+        private bool Replace(JObject source, JToken replaceValue)
+        {
+            if (replaceValue.Type == JTokenType.Array)
             {
-                // If the current node was replaced, then do not perform any more transformations here
-                this.Successor.Process(source, transform);
+                // If the value is an array, perform the replace for each object in the array
+                foreach (JToken arrayValue in (JArray)replaceValue)
+                {
+                    if (this.ReplaceCore(source, arrayValue))
+                    {
+                        // If a value in the array performs a remove of the current node,
+                        // Stop transformations
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+            else
+            {
+                return this.ReplaceCore(source, replaceValue);
             }
         }
 
-        private void Replace(JObject source, JToken replaceValue, bool allowArray)
+        private bool ReplaceCore(JObject source, JToken replaceValue)
         {
             switch (replaceValue.Type)
             {
-                case JTokenType.Array:
-                    if (allowArray)
-                    {
-                        // If the value is an array, perform the replace for each object in the array
-                        foreach (JToken arayValue in (JArray)replaceValue)
-                        {
-                            this.Replace(source, arayValue, false);
-                            if (this.replacedThisNode)
-                            {
-                                // If a value in the array performs a remove of the current node,
-                                // Stop transformations
-                                return;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        source.Replace(replaceValue);
-                        this.replacedThisNode = true;
-                    }
-
-                    break;
                 case JTokenType.Object:
-                    this.ReplaceWithProperties(source, (JObject)replaceValue);
-                    break;
+                    return this.ReplaceWithProperties(source, (JObject)replaceValue);
                 default:
                     source.Replace(replaceValue);
-                    this.replacedThisNode = true;
-                    break;
+                    return true;
             }
         }
 
-        private void ReplaceWithProperties(JObject source, JObject replaceObject)
+        private bool ReplaceWithProperties(JObject source, JObject replaceObject)
         {
             // TO DO: Verify if the replace value contains JDT syntax
             JToken pathToken, valueToken;
@@ -85,7 +80,7 @@ namespace SlowCheetah.JDT
             if (!hasPath && !hasValue)
             {
                 source.Replace(replaceObject);
-                this.replacedThisNode = true;
+                return true;
             }
             else if (hasPath && hasValue)
             {
@@ -99,21 +94,22 @@ namespace SlowCheetah.JDT
                     throw new JdtException("Path attribute must be a string");
                 }
 
-                var tokensToReplace = JsonUtilities.GetTokensFromPath(source, pathToken.ToString());
-                foreach (JToken nodeToReplace in tokensToReplace.ToList())
+                foreach (JToken nodeToReplace in JsonUtilities.GetTokensFromPath(source, pathToken.ToString()))
                 {
+                    bool replacedThisNode = false;
+
                     if (nodeToReplace.Equals(source))
                     {
                         // If the specified is to the current
-                        this.replacedThisNode = true;
+                        replacedThisNode = true;
                     }
 
                     nodeToReplace.Replace(valueToken);
 
-                    if (this.replacedThisNode)
+                    if (replacedThisNode)
                     {
                         // If the current node was replaced, stop executing transformations on this node
-                        return;
+                        return true;
                     }
                 }
             }
@@ -121,6 +117,8 @@ namespace SlowCheetah.JDT
             {
                 throw new JdtException("Replace requires both path and value");
             }
+
+            return false;
         }
     }
 }

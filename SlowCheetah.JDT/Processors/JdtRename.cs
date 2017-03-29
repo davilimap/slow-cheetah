@@ -20,99 +20,96 @@ namespace SlowCheetah.JDT
         /// <inheritdoc/>
         public override void Process(JObject source, JObject transform)
         {
-            JToken removeValue;
-            if (transform.TryGetValue(JsonUtilities.JdtSyntaxPrefix + this.Verb, out removeValue))
+            JToken renameValue;
+            if (transform.TryGetValue(JsonUtilities.JdtSyntaxPrefix + this.Verb, out renameValue))
             {
-                this.Rename(source, removeValue, true);
+                this.Rename(source, renameValue);
             }
 
             this.Successor.Process(source, transform);
         }
 
-        private void Rename(JObject source, JToken renameValue, bool allowArray)
+        private void Rename(JObject source, JToken renameValue)
         {
-            switch (renameValue.Type)
+            if (renameValue.Type == JTokenType.Array)
             {
-                case JTokenType.Array:
-                    if (allowArray)
-                    {
-                        // If the value is an array, perform the replace for each object in the array
-                        // Do not allow array values from here
-                        foreach (JToken arayValue in (JArray)renameValue)
-                        {
-                            this.Rename(source, arayValue, false);
-                        }
-                    }
-                    else
-                    {
-                        // TO DO: Clarify error
-                        throw new JdtException(renameValue.Type.ToString() + " is not a valid transform value");
-                    }
-
-                    break;
-                case JTokenType.Object:
-                    this.RenameWithProperties(source, (JObject)renameValue);
-                    break;
-                default:
-                    throw new JdtException(renameValue.Type.ToString() + " is not a valid transform value for Rename");
-            }
-        }
-
-        private void RenameWithProperties(JObject source, JObject renameProperties)
-        {
-            JToken pathToken, valueToken;
-            string pathFullAttribute = JsonUtilities.JdtSyntaxPrefix + PathAttribute;
-            bool hasPath = renameProperties.TryGetValue(pathFullAttribute, out pathToken);
-            string valueFullAttribute = JsonUtilities.JdtSyntaxPrefix + ValueAttribute;
-            bool hasValue = renameProperties.TryGetValue(valueFullAttribute, out valueToken);
-
-            if (!hasPath && !hasValue)
-            {
-                foreach (JProperty renameOperation in renameProperties.Properties())
+                // If the value is an array, perform the replace for each object in the array
+                // Do not allow array values from here
+                foreach (JToken arrayValue in (JArray)renameValue)
                 {
-                    if (renameOperation.Value.Type != JTokenType.String)
-                    {
-                        throw new JdtException("Rename value must be a string");
-                    }
-
-                    // TO DO: Warning if the node is not found
-                    JToken nodeToRename;
-                    if (source.TryGetValue(renameOperation.Name, out nodeToRename))
-                    {
-                        this.RenameCore(nodeToRename, renameOperation.Value.ToString());
-                    }
-                }
-            }
-            else if (hasPath && hasValue)
-            {
-                if (renameProperties.Properties().Where(p => !p.Name.Equals(pathFullAttribute) && !p.Name.Equals(valueFullAttribute)).Count() > 0)
-                {
-                    throw new JdtException("Rename only accepts path and value attributes");
-                }
-
-                if (pathToken.Type != JTokenType.String)
-                {
-                    throw new JdtException("Path attribute must be a string");
-                }
-
-                if (valueToken.Type != JTokenType.String)
-                {
-                    throw new JdtException("Value attribute must be a string");
-                }
-
-                var tokensToRename = JsonUtilities.GetTokensFromPath(source, pathToken.ToString());
-                foreach (JToken nodeToRename in tokensToRename.ToList())
-                {
-                    this.RenameCore(nodeToRename, valueToken.ToString());
+                    this.RenameCore(source, arrayValue);
                 }
             }
             else
             {
-                throw new JdtException("Rename requires both path and value");
+                // If the value is not an array, perform the transform normally
+                this.RenameCore(source, renameValue);
             }
         }
 
-        private void RenameCore(JToken nodeToRename, string newName)
+        private void RenameCore(JObject source, JToken renameValue)
+        {
+            if (renameValue.Type != JTokenType.Object)
+            {
+                // Rename only accepts objects, either with properties or direct renames
+                throw new JdtException(renameValue.Type.ToString() + " is not a valid transform value for Rename");
+            }
+            else
+            {
+                var renameProperties = (JObject)renameValue;
+                JToken pathToken, valueToken;
+                string pathFullAttribute = JsonUtilities.JdtSyntaxPrefix + PathAttribute;
+                bool hasPath = renameProperties.TryGetValue(pathFullAttribute, out pathToken);
+                string valueFullAttribute = JsonUtilities.JdtSyntaxPrefix + ValueAttribute;
+                bool hasValue = renameProperties.TryGetValue(valueFullAttribute, out valueToken);
+
+                if (!hasPath && !hasValue)
+                {
+                    foreach (JProperty renameOperation in renameProperties.Properties())
+                    {
+                        if (renameOperation.Value.Type != JTokenType.String)
+                        {
+                            throw new JdtException("Rename value must be a string");
+                        }
+
+                        // TO DO: Warning if the node is not found
+                        JToken nodeToRename;
+                        if (source.TryGetValue(renameOperation.Name, out nodeToRename))
+                        {
+                            this.RenameNode(nodeToRename, renameOperation.Value.ToString());
+                        }
+                    }
+                }
+                else if (hasPath && hasValue)
+                {
+                    if (renameProperties.Properties().Where(p => !p.Name.Equals(pathFullAttribute) && !p.Name.Equals(valueFullAttribute)).Count() > 0)
+                    {
+                        throw new JdtException("Rename only accepts path and value attributes");
+                    }
+
+                    if (pathToken.Type != JTokenType.String)
+                    {
+                        throw new JdtException("Path attribute must be a string");
+                    }
+
+                    if (valueToken.Type != JTokenType.String)
+                    {
+                        throw new JdtException("Value attribute must be a string");
+                    }
+
+                    foreach (JToken nodeToRename in JsonUtilities.GetTokensFromPath(source, pathToken.ToString()))
+                    {
+                        this.RenameNode(nodeToRename, valueToken.ToString());
+                    }
+                }
+                else
+                {
+                    throw new JdtException("Rename requires both path and value");
+                }
+            }
+        }
+
+        private void RenameNode(JToken nodeToRename, string newName)
         {
             // We can only rename tokens belonging to a property
             // This excludes objects from arrays and the root object

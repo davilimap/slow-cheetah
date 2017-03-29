@@ -7,7 +7,7 @@ namespace SlowCheetah.JDT
     using Newtonsoft.Json.Linq;
 
     /// <summary>
-    /// Represents a recursive JDT transformation
+    /// Represents the Merge transformation
     /// </summary>
     internal class JdtMerge : JdtProcessor
     {
@@ -23,31 +23,36 @@ namespace SlowCheetah.JDT
             JToken mergeValue;
             if (transform.TryGetValue(JsonUtilities.JdtSyntaxPrefix + this.Verb, out mergeValue))
             {
-                this.Merge(source, mergeValue, true);
+                this.Merge(source, mergeValue);
             }
 
             this.Successor.Process(source, transform);
         }
 
-        private void Merge(JObject source, JToken mergeValue, bool allowArray)
+        private void Merge(JObject source, JToken mergeValue)
+        {
+            if (mergeValue.Type == JTokenType.Array)
+            {
+                // If the value is an array, perform the replace for each object in the array
+                foreach (JToken arrayValue in (JArray)mergeValue)
+                {
+                    this.MergeCore(source, arrayValue);
+                }
+            }
+            else
+            {
+                // If not, perform the merge as normal
+                this.MergeCore(source, mergeValue);
+            }
+        }
+
+        private void MergeCore(JObject source, JToken mergeValue)
         {
             switch (mergeValue.Type)
             {
                 case JTokenType.Array:
-                    if (allowArray)
-                    {
-                        // If the value is an array, perform the replace for each object in the array
-                        foreach (JToken arrayValue in (JArray)mergeValue)
-                        {
-                            this.Merge(source, arrayValue, false);
-                        }
-                    }
-                    else
-                    {
-                        JsonUtilities.ThrowIfRoot(source, "Cannot replace root");
-                        source.Replace(mergeValue);
-                    }
-
+                    JsonUtilities.ThrowIfRoot(source, "Cannot replace root");
+                    source.Replace(mergeValue);
                     break;
                 case JTokenType.Object:
                     this.MergeWithObject(source, (JObject)mergeValue);
@@ -75,7 +80,7 @@ namespace SlowCheetah.JDT
             }
             else if (hasPath && hasValue)
             {
-                if (mergeObject.Properties().Where(p => !p.Name.Equals(pathFullAttribute) && !p.Name.Equals(valueFullAttribute)).Count() > 0)
+                if (mergeObject.Properties().Any(p => !p.Name.Equals(pathFullAttribute) && !p.Name.Equals(valueFullAttribute)))
                 {
                     throw new JdtException("Merge only accepts path and value attributes");
                 }
@@ -85,8 +90,7 @@ namespace SlowCheetah.JDT
                     throw new JdtException("Path attribute must be a string");
                 }
 
-                var tokensToMerge = JsonUtilities.GetTokensFromPath(source, pathToken.ToString());
-                foreach (JToken tokenToMerge in tokensToMerge.ToList())
+                foreach (JToken tokenToMerge in JsonUtilities.GetTokensFromPath(source, pathToken.ToString()))
                 {
                     if (tokenToMerge.Type == JTokenType.Object && valueToken.Type == JTokenType.Object)
                     {

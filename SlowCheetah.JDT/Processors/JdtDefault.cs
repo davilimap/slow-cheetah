@@ -7,7 +7,7 @@ namespace SlowCheetah.JDT
     using Newtonsoft.Json.Linq;
 
     /// <summary>
-    /// Represents a recursive JDT transformation
+    /// Represents the default JDT transformation
     /// </summary>
     internal class JdtDefault : JdtProcessor
     {

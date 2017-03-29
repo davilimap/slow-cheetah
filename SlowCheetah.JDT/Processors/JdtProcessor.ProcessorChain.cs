@@ -14,9 +14,14 @@ namespace SlowCheetah.JDT
     {
         private class JdtProcessorChain
         {
+            // This is a a list of supported transformations
+            // It is in order of execution
             private readonly List<JdtProcessor> processors = new List<JdtProcessor>()
             {
+                // Validates the JDT verbs in the file
                 new JdtValidator(),
+
+                // Supported transformations
                 new JdtRecurse(),
                 new JdtRemove(),
                 new JdtReplace(),
@@ -29,7 +34,7 @@ namespace SlowCheetah.JDT
             {
                 var validator = this.processors.First() as JdtValidator;
 
-                // The successor if each transform processor should be the next one on the list
+                // The successor of each transform processor should be the next one on the list
                 // The last processor defaults to the end of chain processor
                 var processorsEnumerator = this.processors.GetEnumerator();
                 processorsEnumerator.MoveNext();
@@ -67,31 +72,6 @@ namespace SlowCheetah.JDT
             public override void Process(JObject source, JObject transform)
             {
                 // Do nothing, the chain is done
-            }
-        }
-
-        private class JdtValidator : JdtProcessor
-        {
-            public HashSet<string> ValidVerbs { get; } = new HashSet<string>();
-
-            public override string Verb { get; } = null;
-
-            public override void Process(JObject source, JObject transform)
-            {
-                foreach (JProperty transformNode in transform.Properties()
-                    .Where(p => JsonUtilities.IsJdtSyntax(p.Name)))
-                {
-                    string verb = JsonUtilities.GetJdtSyntax(transformNode.Name);
-                    if (verb != null)
-                    {
-                        if (!this.ValidVerbs.Contains(verb))
-                        {
-                            throw new JdtException(verb + " is not a valid JDT verb");
-                        }
-                    }
-                }
-
-                this.Successor.Process(source, transform);
             }
         }
     }
