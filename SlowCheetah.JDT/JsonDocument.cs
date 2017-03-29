@@ -14,7 +14,6 @@ namespace SlowCheetah.JDT
     public class JsonDocument : IEquatable<JsonDocument>
     {
         private readonly string documentPath;
-        private readonly JObject documentObject;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="JsonDocument"/> class.
@@ -23,7 +22,7 @@ namespace SlowCheetah.JDT
         public JsonDocument(string filePath)
         {
             this.documentPath = filePath;
-            this.documentObject = JsonUtilities.LoadObjectFromFile(this.documentPath);
+            this.DocumentObject = JsonUtilities.LoadObjectFromFile(this.documentPath);
         }
 
         /// <summary>
@@ -33,13 +32,18 @@ namespace SlowCheetah.JDT
         internal JsonDocument(JObject docObject)
         {
             this.documentPath = string.Empty;
-            this.documentObject = (JObject)docObject.DeepClone();
+            this.DocumentObject = (JObject)docObject.DeepClone();
         }
+
+        /// <summary>
+        /// Gets the JObject corresponding to the root of the document
+        /// </summary>
+        internal JObject DocumentObject { get; private set; }
 
         /// <inheritdoc/>
         public bool Equals(JsonDocument other)
         {
-            return JToken.DeepEquals(this.documentObject, other.documentObject);
+            return JToken.DeepEquals(this.DocumentObject, other.DocumentObject);
         }
 
         /// <summary>
@@ -56,17 +60,8 @@ namespace SlowCheetah.JDT
             using (StreamWriter file = File.CreateText(destinationFile))
             using (JsonTextWriter writer = new JsonTextWriter(file))
             {
-                this.documentObject.WriteTo(writer);
+                this.DocumentObject.WriteTo(writer);
             }
-        }
-
-        /// <summary>
-        /// Gets the object corresponding to the JSON document
-        /// </summary>
-        /// <returns>The object corresponding to the root of the document</returns>
-        internal JObject GetObject()
-        {
-            return this.documentObject;
         }
     }
 }
