@@ -14,6 +14,16 @@ namespace SlowCheetah.JDT
         private const string PathAttribute = "path";
         private const string ValueAttribute = "value";
 
+        private JdtAttributeValidator attributeValidator;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JdtMerge"/> class.
+        /// </summary>
+        public JdtMerge()
+        {
+            this.attributeValidator = new JdtAttributeValidator(JdtAttributes.Path, JdtAttributes.Value);
+        }
+
         /// <inheritdoc/>
         public override string Verb { get; } = "merge";
 
@@ -41,51 +51,50 @@ namespace SlowCheetah.JDT
 
         private void MergeWithObject(JObject source, JObject mergeObject)
         {
-            JToken pathToken, valueToken;
-            string pathFullAttribute = JsonUtilities.JdtSyntaxPrefix + PathAttribute;
-            bool hasPath = mergeObject.TryGetValue(pathFullAttribute, out pathToken);
-            string valueFullAttribute = JsonUtilities.JdtSyntaxPrefix + ValueAttribute;
-            bool hasValue = mergeObject.TryGetValue(valueFullAttribute, out valueToken);
+            var attributes = this.attributeValidator.ValidateAndReturnAttributes(mergeObject);
 
-            if (!hasPath && !hasValue)
+            // If there are attributes, handle them accordingly
+            if (attributes.Any())
             {
-                // If the merge object does not contain attributes,
-                // simply execute the transform with that object
-                ProcessTransform(source, mergeObject);
-            }
-            else if (hasPath && hasValue)
-            {
-                if (mergeObject.Properties().Any(p => !p.Name.Equals(pathFullAttribute) && !p.Name.Equals(valueFullAttribute)))
+                // If the object has attributes it must have both path and value
+                // TO DO: Accept value without path
+                JToken pathToken, valueToken;
+                if (attributes.TryGetValue(JdtAttributes.Path, out pathToken) && attributes.TryGetValue(JdtAttributes.Value, out valueToken))
                 {
-                    throw new JdtException("Merge only accepts path and value attributes");
+                    if (pathToken.Type != JTokenType.String)
+                    {
+                        throw new JdtException("Path attribute must be a string");
+                    }
+
+                    foreach (JToken tokenToMerge in source.SelectTokens(pathToken.ToString()).ToList())
+                    {
+                        if (tokenToMerge.Type == JTokenType.Object && valueToken.Type == JTokenType.Object)
+                        {
+                            ProcessTransform((JObject)tokenToMerge, (JObject)valueToken);
+                        }
+                        else if (tokenToMerge.Type == JTokenType.Array && valueToken.Type == JTokenType.Array)
+                        {
+                            ((JArray)tokenToMerge).Merge(valueToken.DeepClone());
+                        }
+                        else
+                        {
+                            tokenToMerge.ThrowIfRoot("Cannot replace root");
+
+                            tokenToMerge.Replace(valueToken);
+                        }
+                    }
                 }
-
-                if (pathToken.Type != JTokenType.String)
+                else
                 {
-                    throw new JdtException("Path attribute must be a string");
-                }
-
-                foreach (JToken tokenToMerge in source.SelectTokens(pathToken.ToString()).ToList())
-                {
-                    if (tokenToMerge.Type == JTokenType.Object && valueToken.Type == JTokenType.Object)
-                    {
-                        ProcessTransform((JObject)tokenToMerge, (JObject)valueToken);
-                    }
-                    else if (tokenToMerge.Type == JTokenType.Array && valueToken.Type == JTokenType.Array)
-                    {
-                        ((JArray)tokenToMerge).Merge(valueToken.DeepClone());
-                    }
-                    else
-                    {
-                        tokenToMerge.ThrowIfRoot("Cannot replace root");
-
-                        tokenToMerge.Replace(valueToken);
-                    }
+                    // If either is not present, throw
+                    throw new JdtException("Merge requires both path and value");
                 }
             }
             else
             {
-                throw new JdtException("Merge requires both path and value");
+                // If the merge object does not contain attributes,
+                // simply execute the transform with that object
+                ProcessTransform(source, mergeObject);
             }
         }
     }

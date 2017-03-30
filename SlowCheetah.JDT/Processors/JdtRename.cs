@@ -12,9 +12,6 @@ namespace SlowCheetah.JDT
     /// </summary>
     internal class JdtRename : JdtArrayProcessor
     {
-        private const string PathAttribute = "path";
-        private const string ValueAttribute = "value";
-
         private JdtAttributeValidator attributeValidator;
 
         /// <summary>
@@ -42,7 +39,8 @@ namespace SlowCheetah.JDT
                 var renameObject = (JObject)transformValue;
                 var attributes = this.attributeValidator.ValidateAndReturnAttributes(renameObject);
 
-                if (attributes.Count > 0)
+                // If there are attributes, handle them accordingly
+                if (attributes.Any())
                 {
                     // If the object has attributes it must have both path and value
                     JToken pathToken, valueToken;
@@ -65,6 +63,7 @@ namespace SlowCheetah.JDT
                     }
                     else
                     {
+                        // If either is not present, throw
                         throw new JdtException("Rename requires both path and value");
                     }
                 }
