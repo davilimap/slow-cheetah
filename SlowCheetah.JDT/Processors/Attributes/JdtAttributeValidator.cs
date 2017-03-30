@@ -17,6 +17,12 @@ namespace SlowCheetah.JDT
     internal enum JdtAttributes
     {
         /// <summary>
+        /// Represents an non existant attribute
+        /// </summary>
+        [Description(null)]
+        None = 0,
+
+        /// <summary>
         /// The JDT path attribute
         /// </summary>
         [Description("path")]
@@ -46,16 +52,6 @@ namespace SlowCheetah.JDT
         }
 
         /// <summary>
-        /// Get the full name of an attribute, with the JDT prefix
-        /// </summary>
-        /// <param name="attribute">The attribute</param>
-        /// <returns>A string with the full name of the requested attribute</returns>
-        internal static string FullName(JdtAttributes attribute)
-        {
-            return JsonUtilities.JdtSyntaxPrefix + attribute.GetDescription();
-        }
-
-        /// <summary>
         /// Validates the object and returns the appropriate attributes contained within it
         /// </summary>
         /// <param name="transformObject">The object to validade</param>
@@ -64,18 +60,23 @@ namespace SlowCheetah.JDT
         {
             Dictionary<JdtAttributes, JToken> attributes = new Dictionary<JdtAttributes, JToken>();
 
-            foreach (JdtAttributes attribute in this.validAttributes)
+            foreach (JProperty property in transformObject.GetJdtProperties())
             {
-                JToken attributeToken;
-                if (transformObject.TryGetValue(FullName(attribute), out attributeToken))
+                JdtAttributes attribute = this.validAttributes.GetByName(property.Name);
+                if (attribute == JdtAttributes.None)
                 {
-                    attributes.Add(attribute, attributeToken);
+                    // If the attribute is not supported in this transformation, throw
+                    // TO DO: Specify the transformation in the error
+                    throw new JdtException($"{property.Name} is not a valid attribute for this transformation");
+                }
+                else
+                {
+                    attributes.Add(attribute, property.Value);
                 }
             }
 
             // If the object has attributes, it should not have any other properties in it
-            bool objectHasInvalidProperties = transformObject.Properties().Any(p => !this.validAttributes.Select(a => FullName(a)).Contains(p.Name));
-            if (attributes.Count > 0 && objectHasInvalidProperties)
+            if (attributes.Count > 0 && attributes.Count != transformObject.Properties().Count())
             {
                 throw new JdtException("Invalid transformation attributes");
             }
