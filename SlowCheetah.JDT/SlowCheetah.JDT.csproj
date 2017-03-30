@@ -49,7 +49,9 @@
     <Compile Include="JsonDocument.cs" />
     <Compile Include="JsonTransformation.cs" />
     <Compile Include="JsonUtilities.cs" />
+    <Compile Include="Processors\Attributes\AttributeExtensions.cs" />
     <Compile Include="Processors\JdtArrayProcessor.cs" />
+    <Compile Include="Processors\Attributes\JdtAttributeValidator.cs" />
     <Compile Include="Processors\JdtDefault.cs" />
     <Compile Include="Processors\JdtMerge.cs" />
     <Compile Include="Processors\JdtProcessor.cs" />
@@ -72,5 +74,6 @@
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

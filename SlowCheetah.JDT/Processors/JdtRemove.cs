@@ -12,7 +12,15 @@ namespace SlowCheetah.JDT
     /// </summary>
     internal class JdtRemove : JdtArrayProcessor
     {
-        private const string PathAttribute = "path";
+        private JdtAttributeValidator attributeValidator;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JdtRemove"/> class.
+        /// </summary>
+        public JdtRemove()
+        {
+            this.attributeValidator = new JdtAttributeValidator(JdtAttributes.Path);
+        }
 
         /// <inheritdoc/>
         public override string Verb { get; } = "remove";
@@ -31,7 +39,7 @@ namespace SlowCheetah.JDT
                     if ((bool)transformValue)
                     {
                         // If the transform value is true, remove the entire node
-                        if (this.RemoveThisNode(source))
+                        if (!this.RemoveThisNode(source))
                         {
                             return false;
                         }
@@ -50,15 +58,10 @@ namespace SlowCheetah.JDT
 
         private bool RemoveWithAttributes(JObject source, JObject removeObject)
         {
-            string pathFullAttribute = JsonUtilities.JdtSyntaxPrefix + PathAttribute;
-            if (removeObject.Properties().Any(p => !p.Name.Equals(pathFullAttribute)))
-            {
-                // If any properties other than the path attribute are found
-                throw new JdtException("Invalid remove attributes");
-            }
+            var attributes = this.attributeValidator.ValidateAndReturnAttributes(removeObject);
 
             JToken pathToken;
-            if (removeObject.TryGetValue(pathFullAttribute, out pathToken))
+            if (attributes.TryGetValue(JdtAttributes.Path, out pathToken))
             {
                 if (pathToken.Type == JTokenType.String)
                 {
