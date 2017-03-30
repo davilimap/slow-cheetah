@@ -11,9 +11,6 @@ namespace SlowCheetah.JDT
     /// </summary>
     internal class JdtMerge : JdtArrayProcessor
     {
-        private const string PathAttribute = "path";
-        private const string ValueAttribute = "value";
-
         private JdtAttributeValidator attributeValidator;
 
         /// <summary>
