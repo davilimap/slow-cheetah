@@ -1,125 +1,95 @@
-﻿// Copyright (c) Sayed Ibrahim Hashimi. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See  License.md file in the project root for full license information.
-
-namespace SlowCheetah.JDT
+﻿namespace SlowCheetah.JDT
 {
     using System.Linq;
     using Newtonsoft.Json.Linq;
 
     /// <summary>
-    /// Represents a recursive JDT transformation
+    /// Represents the Replace transformation
     /// </summary>
-    internal class JdtReplace : JdtProcessor
+    internal class JdtReplace : JdtArrayProcessor
     {
-        private const string PathAttribute = "path";
-        private const string ValueAttribute = "value";
+        private JdtAttributeValidator attributeValidator;
 
-        private bool replacedThisNode;
-
-        /// <inheritdoc/>
-        internal override string Verb { get; } = "replace";
-
-        /// <inheritdoc/>
-        internal override void Process(JObject source, JObject transform, JsonTransformContext context)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JdtReplace"/> class.
+        /// </summary>
+        public JdtReplace()
         {
-            this.replacedThisNode = false;
-
-            JToken replaceValue;
-            if (transform.TryGetValue(JsonUtilities.JdtSyntaxPrefix + this.Verb, out replaceValue))
-            {
-                this.Replace(source, replaceValue, true);
-            }
-
-            if (!this.replacedThisNode)
-            {
-                // If the current node was replaced, then do not perform any more transformations here
-                this.Successor.Process(source, transform, context);
-            }
+            this.attributeValidator = new JdtAttributeValidator(JdtAttributes.Path, JdtAttributes.Value);
         }
 
-        private void Replace(JObject source, JToken replaceValue, bool allowArray)
+        /// <inheritdoc/>
+        public override string Verb { get; } = "replace";
+
+        /// <inheritdoc/>
+        protected override bool ProcessCore(JObject source, JToken transformValue)
         {
-            switch (replaceValue.Type)
+            if (transformValue.Type == JTokenType.Object)
             {
-                case JTokenType.Array:
-                    if (allowArray)
-                    {
-                        // If the value is an array, perform the replace for each object in the array
-                        foreach (JToken arayValue in (JArray)replaceValue)
-                        {
-                            this.Replace(source, arayValue, false);
-                            if (this.replacedThisNode)
-                            {
-                                // If a value in the array performs a remove of the current node,
-                                // Stop transformations
-                                return;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        source.Replace(replaceValue);
-                        this.replacedThisNode = true;
-                    }
-
-                    break;
-                case JTokenType.Object:
-                    this.ReplaceWithProperties(source, (JObject)replaceValue);
-                    break;
-                default:
-                    source.Replace(replaceValue);
-                    this.replacedThisNode = true;
-                    break;
-            }
-        }
-
-        private void ReplaceWithProperties(JObject source, JObject replaceObject)
-        {
-            // TO DO: Verify if the replace value contains JDT syntax
-            JToken pathToken, valueToken;
-            string pathFullAttribute = JsonUtilities.JdtSyntaxPrefix + PathAttribute;
-            bool hasPath = replaceObject.TryGetValue(pathFullAttribute, out pathToken);
-            string valueFullAttribute = JsonUtilities.JdtSyntaxPrefix + ValueAttribute;
-            bool hasValue = replaceObject.TryGetValue(valueFullAttribute, out valueToken);
-
-            if (!hasPath && !hasValue)
-            {
-                source.Replace(replaceObject);
-                this.replacedThisNode = true;
-            }
-            else if (hasPath && hasValue)
-            {
-                if (replaceObject.Properties().Where(p => !p.Name.Equals(pathFullAttribute) && !p.Name.Equals(valueFullAttribute)).Count() > 0)
-                {
-                    throw new JdtException("Replace only accepts path and value attributes");
-                }
-
-                if (pathToken.Type != JTokenType.String)
-                {
-                    throw new JdtException("Path attribute must be a string");
-                }
-
-                var tokensToReplace = JsonUtilities.GetTokensFromPath(source, pathToken.ToString());
-                foreach (JToken nodeToReplace in tokensToReplace.ToList())
-                {
-                    if (nodeToReplace.Equals(source))
-                    {
-                        // If the specified is to the current
-                        this.replacedThisNode = true;
-                    }
-
-                    nodeToReplace.Replace(valueToken);
-
-                    if (this.replacedThisNode)
-                    {
-                        // If the current node was replaced, stop executing transformations on this node
-                        return;
-                    }
-                }
+                // If the value is an object, analyze the contents and perform the appropriate transform
+                return this.ReplaceWithProperties(source, (JObject)transformValue);
             }
             else
             {
-                throw new JdtException("Replace requires both path and value");
+                // If the value is not an object, simply replace the original node with the new value
+                source.Replace(transformValue);
+
+                // If the node is replaced, stop transformations on it
+                return false;
+            }
+        }
+
+        private bool ReplaceWithProperties(JObject source, JObject replaceObject)
+        {
+            var attributes = this.attributeValidator.ValidateAndReturnAttributes(replaceObject);
+
+            // If there are attributes, handle them accordingly
+            if (attributes.Any())
+            {
+                // If the object has attributes it must have both path and value
+                JToken pathToken, valueToken;
+                if (attributes.TryGetValue(JdtAttributes.Path, out pathToken) && attributes.TryGetValue(JdtAttributes.Value, out valueToken))
+                {
+                    if (pathToken.Type != JTokenType.String)
+                    {
+                        throw new JdtException("Path attribute must be a string");
+                    }
+
+                    foreach (JToken nodeToReplace in source.SelectTokens(pathToken.ToString()).ToList())
+                    {
+                        bool replacedThisNode = false;
+
+                        if (nodeToReplace.Equals(source))
+                        {
+                            // If the specified path is to the current node
+                            replacedThisNode = true;
+                        }
+
+                        nodeToReplace.Replace(valueToken);
+
+                        if (replacedThisNode)
+                        {
+                            // If the current node was replaced, stop executing transformations on this node
+                            return false;
+                        }
+                    }
+                }
+                else
+                {
+                    // If either is not present, throw
+                    throw new JdtException("Replace requires both path and value");
+                }
+
+                // If we got here, transformations should continue
+                return true;
+            }
+            else
+            {
+                // If there are no attributes, replace the current object with the given object
+                source.Replace(replaceObject);
+
+                // If the node is replaced, stop transformations on it
+                return false;
             }
         }
     }

@@ -1,8 +1,6 @@
-﻿// Copyright (c) Sayed Ibrahim Hashimi. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See  License.md file in the project root for full license information.
-
-namespace SlowCheetah.JDT
+﻿namespace SlowCheetah.JDT
 {
+    using System;
     using Newtonsoft.Json.Linq;
 
     /// <summary>
@@ -17,9 +15,20 @@ namespace SlowCheetah.JDT
         /// <summary>
         /// Gets the JDT verb corresponding to this transformation.
         /// Can be null or empty.
-        /// Does not include the preffix(<see cref="JsonUtilities.JdtSyntaxPrefix"/>)
+        /// Does not include the preffix (@jdt.)
         /// </summary>
-        internal abstract string Verb { get; }
+        public abstract string Verb { get; }
+
+        /// <summary>
+        /// Gets the full verb corresponding the to the transformation
+        /// </summary>
+        protected string FullVerb
+        {
+            get
+            {
+                return this.Verb == null ? null : JsonUtilities.JdtSyntaxPrefix + this.Verb;
+            }
+        }
 
         /// <summary>
         /// Gets the successor of the current transformation
@@ -40,13 +49,25 @@ namespace SlowCheetah.JDT
 
         /// <summary>
         /// Executes the entire transformation with the given objects
+        /// Mutates the source object
         /// </summary>
         /// <param name="source">Object to be transformed</param>
         /// <param name="transform">Object that specifies the transformation</param>
         /// <param name="context">The context of the transformation</param>
         internal static void ProcessTransform(JObject source, JObject transform, JsonTransformContext context)
         {
-            ProcessorChain.Start(source, transform, context);
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            if (transform == null)
+            {
+                throw new ArgumentNullException(nameof(transform));
+            }
+
+            // Passes in a clone of the transform object because it can be altered during the transformation process
+            ProcessorChain.Start(source, (JObject)transform.DeepClone());
         }
 
         /// <summary>

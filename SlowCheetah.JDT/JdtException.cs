@@ -1,7 +1,4 @@
-﻿// Copyright (c) Sayed Ibrahim Hashimi. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See  License.md file in the project root for full license information.
-
-namespace SlowCheetah.JDT
+﻿namespace SlowCheetah.JDT
 {
     using System;
     using Newtonsoft.Json;

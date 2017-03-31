@@ -1,8 +1,6 @@
-﻿// Copyright (c) Sayed Ibrahim Hashimi. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See  License.md file in the project root for full license information.
-
-namespace SlowCheetah.JDT
+﻿namespace SlowCheetah.JDT
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Newtonsoft.Json.Linq;
@@ -14,9 +12,11 @@ namespace SlowCheetah.JDT
     {
         private class JdtProcessorChain
         {
+            // This is a a list of supported transformations
+            // It is in order of execution
             private readonly List<JdtProcessor> processors = new List<JdtProcessor>()
             {
-                new JdtValidator(),
+                // Supported transformations
                 new JdtRecurse(),
                 new JdtRemove(),
                 new JdtReplace(),
@@ -27,9 +27,12 @@ namespace SlowCheetah.JDT
 
             public JdtProcessorChain()
             {
-                var validator = this.processors.First() as JdtValidator;
+                var validator = new JdtValidator();
 
-                // The successor if each transform processor should be the next one on the list
+                // The first step of a transformation is validating the verbs
+                this.processors.Insert(0, validator);
+
+                // The successor of each transform processor should be the next one on the list
                 // The last processor defaults to the end of chain processor
                 var processorsEnumerator = this.processors.GetEnumerator();
                 processorsEnumerator.MoveNext();
@@ -37,6 +40,8 @@ namespace SlowCheetah.JDT
                 {
                     if (!string.IsNullOrEmpty(successor.Verb))
                     {
+                        // If the transformation has a corresponding verb,
+                        // add it to the list of verbs to be validated
                         validator.ValidVerbs.Add(successor.Verb);
                     }
 
@@ -47,7 +52,17 @@ namespace SlowCheetah.JDT
 
             public void Start(JObject source, JObject transform, JsonTransformContext context)
             {
-                this.processors.First().Process(source, transform, context);
+                if (source == null)
+                {
+                    throw new ArgumentNullException(nameof(source));
+                }
+
+                if (transform == null)
+                {
+                    throw new ArgumentNullException(nameof(transform));
+                }
+
+                this.processors.First().Process(source, transform);
             }
         }
 
@@ -62,36 +77,11 @@ namespace SlowCheetah.JDT
 
             public static JdtEndOfChain Instance { get; } = new JdtEndOfChain();
 
-            internal override string Verb { get; } = null;
+            public override string Verb { get; } = null;
 
             internal override void Process(JObject source, JObject transform, JsonTransformContext context)
             {
                 // Do nothing, the chain is done
-            }
-        }
-
-        private class JdtValidator : JdtProcessor
-        {
-            public HashSet<string> ValidVerbs { get; } = new HashSet<string>();
-
-            internal override string Verb { get; } = null;
-
-            internal override void Process(JObject source, JObject transform, JsonTransformContext context)
-            {
-                foreach (JProperty transformNode in transform.Properties()
-                    .Where(p => JsonUtilities.IsJdtSyntax(p.Name)))
-                {
-                    string verb = JsonUtilities.GetJdtSyntax(transformNode.Name);
-                    if (verb != null)
-                    {
-                        if (!this.ValidVerbs.Contains(verb))
-                        {
-                            throw new JdtException(verb + " is not a valid JDT verb");
-                        }
-                    }
-                }
-
-                this.Successor.Process(source, transform, context);
             }
         }
     }

@@ -1,112 +1,97 @@
-﻿// Copyright (c) Sayed Ibrahim Hashimi. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See  License.md file in the project root for full license information.
-
-namespace SlowCheetah.JDT
+﻿namespace SlowCheetah.JDT
 {
     using System.Linq;
     using Newtonsoft.Json.Linq;
 
     /// <summary>
-    /// Represents a recursive JDT transformation
+    /// Represents the Merge transformation
     /// </summary>
-    internal class JdtMerge : JdtProcessor
+    internal class JdtMerge : JdtArrayProcessor
     {
-        private const string PathAttribute = "path";
-        private const string ValueAttribute = "value";
+        private JdtAttributeValidator attributeValidator;
 
-        /// <inheritdoc/>
-        internal override string Verb { get; } = "merge";
-
-        /// <inheritdoc/>
-        internal override void Process(JObject source, JObject transform, JsonTransformContext context)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JdtMerge"/> class.
+        /// </summary>
+        public JdtMerge()
         {
-            JToken mergeValue;
-            if (transform.TryGetValue(JsonUtilities.JdtSyntaxPrefix + this.Verb, out mergeValue))
-            {
-                this.Merge(source, mergeValue, context, true);
-            }
-
-            this.Successor.Process(source, transform, context);
+            // Merge accepts path and value attributes
+            this.attributeValidator = new JdtAttributeValidator(JdtAttributes.Path, JdtAttributes.Value);
         }
 
-        private void Merge(JObject source, JToken mergeValue, JsonTransformContext context, bool allowArray)
+        /// <inheritdoc/>
+        public override string Verb { get; } = "merge";
+
+        /// <inheritdoc/>
+        protected override bool ProcessCore(JObject source, JToken transformValue)
         {
-            switch (mergeValue.Type)
+            if (transformValue.Type == JTokenType.Object)
             {
-                case JTokenType.Array:
-                    if (allowArray)
+                // If both source and transform are objects,
+                // analyze the contents and perform the appropriate transforms
+                this.MergeWithObject(source, (JObject)transformValue);
+            }
+            else
+            {
+                // If the transform value is not an object, then simply replace it with
+                source.ThrowIfRoot("Cannot replace root");
+                source.Replace(transformValue);
+            }
+
+            // Do not halt transformations
+            return true;
+        }
+
+        private void MergeWithObject(JObject source, JObject mergeObject)
+        {
+            var attributes = this.attributeValidator.ValidateAndReturnAttributes(mergeObject);
+
+            // If there are attributes, handle them accordingly
+            if (attributes.Any())
+            {
+                // If the object has attributes it must have both path and value
+                // TO DO: Accept value without path
+                JToken pathToken, valueToken;
+                if (attributes.TryGetValue(JdtAttributes.Path, out pathToken) && attributes.TryGetValue(JdtAttributes.Value, out valueToken))
+                {
+                    if (pathToken.Type != JTokenType.String)
                     {
-                        // If the value is an array, perform the replace for each object in the array
-                        foreach (JToken arrayValue in (JArray)mergeValue)
+                        throw new JdtException("Path attribute must be a string");
+                    }
+
+                    foreach (JToken tokenToMerge in source.SelectTokens(pathToken.ToString()).ToList())
+                    {
+                        // Perform the merge for each element found through the path
+                        if (tokenToMerge.Type == JTokenType.Object && valueToken.Type == JTokenType.Object)
                         {
-                            this.Merge(source, arrayValue, context, false);
+                            // If they are both objects, start a new transformation
+                            ProcessTransform((JObject)tokenToMerge, (JObject)valueToken);
+                        }
+                        else if (tokenToMerge.Type == JTokenType.Array && valueToken.Type == JTokenType.Array)
+                        {
+                            // If they are both arrays, add the new values to the original
+                            ((JArray)tokenToMerge).Merge(valueToken.DeepClone());
+                        }
+                        else
+                        {
+                            // If they are primitives or have different values,
+                            // perform a replace
+                            tokenToMerge.ThrowIfRoot("Cannot replace root");
+                            tokenToMerge.Replace(valueToken);
                         }
                     }
-                    else
-                    {
-                        JsonUtilities.ThrowIfRoot(source, "Cannot replace root");
-                        source.Replace(mergeValue);
-                    }
-
-                    break;
-                case JTokenType.Object:
-                    this.MergeWithObject(source, (JObject)mergeValue, context);
-                    break;
-                default:
-                    JsonUtilities.ThrowIfRoot(source, "Cannot replace root");
-                    source.Replace(mergeValue);
-                    break;
-            }
-        }
-
-        private void MergeWithObject(JObject source, JObject mergeObject, JsonTransformContext context)
-        {
-            JToken pathToken, valueToken;
-            string pathFullAttribute = JsonUtilities.JdtSyntaxPrefix + PathAttribute;
-            bool hasPath = mergeObject.TryGetValue(pathFullAttribute, out pathToken);
-            string valueFullAttribute = JsonUtilities.JdtSyntaxPrefix + ValueAttribute;
-            bool hasValue = mergeObject.TryGetValue(valueFullAttribute, out valueToken);
-
-            if (!hasPath && !hasValue)
-            {
-                // If the merge object does not contain attributes,
-                // simply execute the transform with that object
-                ProcessTransform(source, mergeObject, context);
-            }
-            else if (hasPath && hasValue)
-            {
-                if (mergeObject.Properties().Where(p => !p.Name.Equals(pathFullAttribute) && !p.Name.Equals(valueFullAttribute)).Count() > 0)
-                {
-                    throw new JdtException("Merge only accepts path and value attributes");
                 }
-
-                if (pathToken.Type != JTokenType.String)
+                else
                 {
-                    throw new JdtException("Path attribute must be a string");
-                }
-
-                var tokensToMerge = JsonUtilities.GetTokensFromPath(source, pathToken.ToString());
-                foreach (JToken tokenToMerge in tokensToMerge.ToList())
-                {
-                    if (tokenToMerge.Type == JTokenType.Object && valueToken.Type == JTokenType.Object)
-                    {
-                        ProcessTransform((JObject)tokenToMerge, (JObject)valueToken, context);
-                    }
-                    else if (tokenToMerge.Type == JTokenType.Array && valueToken.Type == JTokenType.Array)
-                    {
-                        JsonUtilities.MergeArray((JArray)tokenToMerge, (JArray)valueToken);
-                    }
-                    else
-                    {
-                        JsonUtilities.ThrowIfRoot(tokenToMerge, "Cannot replace root");
-
-                        tokenToMerge.Replace(valueToken);
-                    }
+                    // If either is not present, throw
+                    throw new JdtException("Merge requires both path and value");
                 }
             }
             else
             {
-                throw new JdtException("Rename requires both path and value");
+                // If the merge object does not contain attributes,
+                // simply execute the transform with that object
+                ProcessTransform(source, mergeObject);
             }
         }
     }

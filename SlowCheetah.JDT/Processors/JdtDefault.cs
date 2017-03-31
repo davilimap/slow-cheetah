@@ -1,13 +1,11 @@
-﻿// Copyright (c) Sayed Ibrahim Hashimi. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See  License.md file in the project root for full license information.
-
-namespace SlowCheetah.JDT
+﻿namespace SlowCheetah.JDT
 {
+    using System;
     using System.Linq;
     using Newtonsoft.Json.Linq;
 
     /// <summary>
-    /// Represents a recursive JDT transformation
+    /// Represents the default JDT transformation
     /// </summary>
     internal class JdtDefault : JdtProcessor
     {
@@ -17,6 +15,16 @@ namespace SlowCheetah.JDT
         /// <inheritdoc/>
         internal override void Process(JObject source, JObject transform, JsonTransformContext context)
         {
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            if (transform == null)
+            {
+                throw new ArgumentNullException(nameof(transform));
+            }
+
             // JDT Verbs are not handled here
             foreach (JProperty transformNode in transform.Properties()
                 .Where(p => !JsonUtilities.IsJdtSyntax(p.Name)))
@@ -29,11 +37,11 @@ namespace SlowCheetah.JDT
                     if (nodeToTransform.Type == JTokenType.Array && transformNode.Value.Type == JTokenType.Array)
                     {
                         // If the original and transform are arrays, merge the contents together
-                        JsonUtilities.MergeArray((JArray)nodeToTransform, (JArray)transformNode.Value);
+                        ((JArray)nodeToTransform).Merge(transformNode.Value.DeepClone());
                     }
                     else if (nodeToTransform.Type != JTokenType.Object || transformNode.Value.Type != JTokenType.Object)
                     {
-                        // TO DO: Verify if object has JDT verbs
+                        // TO DO: Verify if object has JDT verbs. They shouldn't be allowed here because they won't be processed
                         // If the contents are different, execute the replace
                         source[transformNode.Name] = transformNode.Value.DeepClone();
                     }

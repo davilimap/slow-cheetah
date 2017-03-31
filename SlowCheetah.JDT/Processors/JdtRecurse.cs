@@ -1,8 +1,6 @@
-﻿// Copyright (c) Sayed Ibrahim Hashimi. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See  License.md file in the project root for full license information.
-
-namespace SlowCheetah.JDT
+﻿namespace SlowCheetah.JDT
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Newtonsoft.Json.Linq;
@@ -18,12 +16,23 @@ namespace SlowCheetah.JDT
         /// <inheritdoc/>
         internal override void Process(JObject source, JObject transform, JsonTransformContext context)
         {
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            if (transform == null)
+            {
+                throw new ArgumentNullException(nameof(transform));
+            }
+
             // Nodes that should be removed from the transform after they are handled
-            List<string> nodesToRemove = new List<string>();
+            var nodesToRemove = new List<string>();
 
             foreach (JProperty transformNode in transform.Properties()
                 .Where(p => p.Value.Type == JTokenType.Object && !JsonUtilities.IsJdtSyntax(p.Name)))
             {
+                // We recurse into objects that do not correspond to JDT verbs and that exist in both source and transform
                 JToken sourceChild;
                 if (source.TryGetValue(transformNode.Name, out sourceChild) && sourceChild.Type == JTokenType.Object)
                 {
@@ -35,6 +44,7 @@ namespace SlowCheetah.JDT
             }
 
             // Remove all of the previously handled nodes
+            // This is necessary so that a rename does not cause a node to be hadled twice
             nodesToRemove.ForEach(node => transform.Remove(node));
 
             // Continue to next transformation
