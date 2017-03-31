@@ -10,7 +10,7 @@
     internal class JdtDefault : JdtProcessor
     {
         /// <inheritdoc/>
-        internal override string Verb { get; } = null;
+        public override string Verb { get; } = null;
 
         /// <inheritdoc/>
         internal override void Process(JObject source, JObject transform, JsonTransformContext context)

@@ -62,7 +62,7 @@
                     throw new ArgumentNullException(nameof(transform));
                 }
 
-                this.processors.First().Process(source, transform);
+                this.processors.First().Process(source, transform, context);
             }
         }
 

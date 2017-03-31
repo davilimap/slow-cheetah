@@ -23,7 +23,7 @@
         public override string Verb { get; } = "remove";
 
         /// <inheritdoc/>
-        protected override bool ProcessCore(JObject source, JToken transformValue)
+        protected override bool ProcessCore(JObject source, JToken transformValue, JsonTransformContext context)
         {
             switch (transformValue.Type)
             {

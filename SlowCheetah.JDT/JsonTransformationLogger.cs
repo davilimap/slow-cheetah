@@ -30,7 +30,8 @@ namespace SlowCheetah.JDT
         /// Logs an error from an internal exception
         /// </summary>
         /// <param name="exception">The exception to log</param>
-        internal void LogErrorFromException(Exception exception)
+        /// <returns>True if the exception was logged</returns>
+        internal bool LogErrorFromException(Exception exception)
         {
             if (this.externalLogger != null)
             {
@@ -44,10 +45,12 @@ namespace SlowCheetah.JDT
                 {
                     this.externalLogger.LogErrorFromException(exception);
                 }
+
+                return true;
             }
             else
             {
-                throw exception;
+                return false;
             }
         }
     }

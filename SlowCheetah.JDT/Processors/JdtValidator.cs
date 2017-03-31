@@ -19,7 +19,7 @@
         public override string Verb { get; } = null;
 
         /// <inheritdoc/>
-        public override void Process(JObject source, JObject transform)
+        internal override void Process(JObject source, JObject transform, JsonTransformContext context)
         {
             if (source == null)
             {
@@ -44,7 +44,7 @@
                 }
             }
 
-            this.Successor.Process(source, transform);
+            this.Successor.Process(source, transform, context);
         }
     }
 }

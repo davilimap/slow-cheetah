@@ -23,7 +23,7 @@
         public override string Verb { get; } = "rename";
 
         /// <inheritdoc/>
-        protected override bool ProcessCore(JObject source, JToken transformValue)
+        protected override bool ProcessCore(JObject source, JToken transformValue, JsonTransformContext context)
         {
             if (transformValue.Type != JTokenType.Object)
             {

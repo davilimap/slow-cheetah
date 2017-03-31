@@ -67,7 +67,7 @@
             }
 
             // Passes in a clone of the transform object because it can be altered during the transformation process
-            ProcessorChain.Start(source, (JObject)transform.DeepClone());
+            ProcessorChain.Start(source, (JObject)transform.DeepClone(), context);
         }
 
         /// <summary>
