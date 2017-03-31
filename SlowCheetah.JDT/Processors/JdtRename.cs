@@ -1,11 +1,10 @@
 ﻿namespace SlowCheetah.JDT
 {
-    using System;
     using System.Linq;
     using Newtonsoft.Json.Linq;
 
     /// <summary>
-    /// Represents a recursive JDT transformation
+    /// Represents the Rename transformation
     /// </summary>
     internal class JdtRename : JdtArrayProcessor
     {
@@ -16,6 +15,7 @@
         /// </summary>
         public JdtRename()
         {
+            // Rename accepts the path and value attributes
             this.attributeValidator = new JdtAttributeValidator(JdtAttributes.Path, JdtAttributes.Value);
         }
 
@@ -53,6 +53,7 @@
                             throw new JdtException("Value attribute must be a string");
                         }
 
+                        // If the values are correct, rename each token found with the given path
                         foreach (JToken nodeToRename in source.SelectTokens(pathToken.ToString()).ToList())
                         {
                             this.RenameNode(nodeToRename, valueToken.ToString());

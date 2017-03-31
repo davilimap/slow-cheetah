@@ -20,6 +20,17 @@
         public abstract string Verb { get; }
 
         /// <summary>
+        /// Gets the full verb corresponding the to the transformation
+        /// </summary>
+        protected string FullVerb
+        {
+            get
+            {
+                return this.Verb == null ? null : JsonUtilities.JdtSyntaxPrefix + this.Verb;
+            }
+        }
+
+        /// <summary>
         /// Gets the successor of the current transformation
         /// </summary>
         protected JdtProcessor Successor
@@ -54,6 +65,7 @@
                 throw new ArgumentNullException(nameof(transform));
             }
 
+            // Passes in a clone of the transform object because it can be altered during the transformation process
             ProcessorChain.Start(source, (JObject)transform.DeepClone());
         }
 

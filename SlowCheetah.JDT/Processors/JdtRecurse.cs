@@ -32,6 +32,7 @@
             foreach (JProperty transformNode in transform.Properties()
                 .Where(p => p.Value.Type == JTokenType.Object && !JsonUtilities.IsJdtSyntax(p.Name)))
             {
+                // We recurse into objects that do not correspond to JDT verbs and that exist in both source and transform
                 JToken sourceChild;
                 if (source.TryGetValue(transformNode.Name, out sourceChild) && sourceChild.Type == JTokenType.Object)
                 {
@@ -43,6 +44,7 @@
             }
 
             // Remove all of the previously handled nodes
+            // This is necessary so that a rename does not cause a node to be hadled twice
             nodesToRemove.ForEach(node => transform.Remove(node));
 
             // Continue to next transformation

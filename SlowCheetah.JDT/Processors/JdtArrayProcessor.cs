@@ -22,7 +22,7 @@
             }
 
             JToken transformValue;
-            if (transform.TryGetValue(JsonUtilities.JdtSyntaxPrefix + this.Verb, out transformValue))
+            if (transform.TryGetValue(this.FullVerb, out transformValue))
             {
                 if (!this.Transform(source, transformValue))
                 {
@@ -65,6 +65,7 @@
                     }
                 }
 
+                // If we are not told to stop, we continue with transformations
                 return true;
             }
             else

@@ -41,7 +41,7 @@
                     }
                     else if (nodeToTransform.Type != JTokenType.Object || transformNode.Value.Type != JTokenType.Object)
                     {
-                        // TO DO: Verify if object has JDT verbs
+                        // TO DO: Verify if object has JDT verbs. They shouldn't be allowed here because they won't be processed
                         // If the contents are different, execute the replace
                         source[transformNode.Name] = transformNode.Value.DeepClone();
                     }

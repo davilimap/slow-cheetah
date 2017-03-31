@@ -40,6 +40,8 @@
                 {
                     if (!string.IsNullOrEmpty(successor.Verb))
                     {
+                        // If the transformation has a corresponding verb,
+                        // add it to the list of verbs to be validated
                         validator.ValidVerbs.Add(successor.Verb);
                     }
 

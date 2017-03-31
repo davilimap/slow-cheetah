@@ -1,17 +1,13 @@
 ﻿namespace SlowCheetah.JDT
 {
-    using System;
     using System.Linq;
     using Newtonsoft.Json.Linq;
 
     /// <summary>
-    /// Represents a recursive JDT transformation
+    /// Represents the Replace transformation
     /// </summary>
     internal class JdtReplace : JdtArrayProcessor
     {
-        private const string PathAttribute = "path";
-        private const string ValueAttribute = "value";
-
         private JdtAttributeValidator attributeValidator;
 
         /// <summary>
@@ -28,15 +24,18 @@
         /// <inheritdoc/>
         protected override bool ProcessCore(JObject source, JToken transformValue)
         {
-            switch (transformValue.Type)
+            if (transformValue.Type == JTokenType.Object)
             {
-                case JTokenType.Object:
-                    return this.ReplaceWithProperties(source, (JObject)transformValue);
-                default:
-                    source.Replace(transformValue);
+                // If the value is an object, analyze the contents and perform the appropriate transform
+                return this.ReplaceWithProperties(source, (JObject)transformValue);
+            }
+            else
+            {
+                // If the value is not an object, simply replace the original node with the new value
+                source.Replace(transformValue);
 
-                    // If the node is replaced, stop transformations on it
-                    return false;
+                // If the node is replaced, stop transformations on it
+                return false;
             }
         }
 

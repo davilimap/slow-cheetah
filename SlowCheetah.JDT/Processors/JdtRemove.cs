@@ -1,11 +1,10 @@
 ﻿namespace SlowCheetah.JDT
 {
-    using System;
     using System.Linq;
     using Newtonsoft.Json.Linq;
 
     /// <summary>
-    /// Represents a recursive JDT transformation
+    /// Represents the Remove transformation
     /// </summary>
     internal class JdtRemove : JdtArrayProcessor
     {
@@ -16,6 +15,7 @@
         /// </summary>
         public JdtRemove()
         {
+            // Remove only accepts the path attribute
             this.attributeValidator = new JdtAttributeValidator(JdtAttributes.Path);
         }
 
@@ -36,10 +36,7 @@
                     if ((bool)transformValue)
                     {
                         // If the transform value is true, remove the entire node
-                        if (!this.RemoveThisNode(source))
-                        {
-                            return false;
-                        }
+                        return this.RemoveThisNode(source);
                     }
 
                     break;
@@ -50,6 +47,7 @@
                     throw new JdtException(transformValue.Type.ToString() + " is not a valid transform value for Remove");
             }
 
+            // If nothing indicates a halt, continue with transforms
             return true;
         }
 
@@ -57,6 +55,7 @@
         {
             var attributes = this.attributeValidator.ValidateAndReturnAttributes(removeObject);
 
+            // The remove attribute only accepts objects if they have only the path attribute
             JToken pathToken;
             if (attributes.TryGetValue(JdtAttributes.Path, out pathToken))
             {
@@ -101,12 +100,14 @@
                 throw new JdtException("Remove transformation requires the path attribute");
             }
 
+            // If nothing indicates a halt, continue transforms
             return true;
         }
 
         private bool RemoveThisNode(JObject nodeToRemove)
         {
-            JsonUtilities.ThrowIfRoot(nodeToRemove, "You cannot remove the root");
+            // Removes the give node
+            nodeToRemove.ThrowIfRoot("You cannot remove the root");
 
             var parent = (JProperty)nodeToRemove.Parent;
             if (parent == null)

@@ -15,6 +15,7 @@
         /// </summary>
         public JdtMerge()
         {
+            // Merge accepts path and value attributes
             this.attributeValidator = new JdtAttributeValidator(JdtAttributes.Path, JdtAttributes.Value);
         }
 
@@ -24,19 +25,17 @@
         /// <inheritdoc/>
         protected override bool ProcessCore(JObject source, JToken transformValue)
         {
-            switch (transformValue.Type)
+            if (transformValue.Type == JTokenType.Object)
             {
-                case JTokenType.Array:
-                    source.ThrowIfRoot("Cannot replace root");
-                    source.Replace(transformValue);
-                    break;
-                case JTokenType.Object:
-                    this.MergeWithObject(source, (JObject)transformValue);
-                    break;
-                default:
-                    source.ThrowIfRoot("Cannot replace root");
-                    source.Replace(transformValue);
-                    break;
+                // If both source and transform are objects,
+                // analyze the contents and perform the appropriate transforms
+                this.MergeWithObject(source, (JObject)transformValue);
+            }
+            else
+            {
+                // If the transform value is not an object, then simply replace it with
+                source.ThrowIfRoot("Cannot replace root");
+                source.Replace(transformValue);
             }
 
             // Do not halt transformations
@@ -62,18 +61,22 @@
 
                     foreach (JToken tokenToMerge in source.SelectTokens(pathToken.ToString()).ToList())
                     {
+                        // Perform the merge for each element found through the path
                         if (tokenToMerge.Type == JTokenType.Object && valueToken.Type == JTokenType.Object)
                         {
+                            // If they are both objects, start a new transformation
                             ProcessTransform((JObject)tokenToMerge, (JObject)valueToken);
                         }
                         else if (tokenToMerge.Type == JTokenType.Array && valueToken.Type == JTokenType.Array)
                         {
+                            // If they are both arrays, add the new values to the original
                             ((JArray)tokenToMerge).Merge(valueToken.DeepClone());
                         }
                         else
                         {
+                            // If they are primitives or have different values,
+                            // perform a replace
                             tokenToMerge.ThrowIfRoot("Cannot replace root");
-
                             tokenToMerge.Replace(valueToken);
                         }
                     }
