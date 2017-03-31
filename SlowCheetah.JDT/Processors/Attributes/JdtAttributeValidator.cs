@@ -1,5 +1,6 @@
 ﻿namespace SlowCheetah.JDT
 {
+    using System;
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Linq;
@@ -34,7 +35,7 @@
     /// </summary>
     internal class JdtAttributeValidator
     {
-        private List<JdtAttributes> validAttributes;
+        private readonly IReadOnlyCollection<JdtAttributes> validAttributes;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="JdtAttributeValidator"/> class.
@@ -42,7 +43,7 @@
         /// <param name="validAttributes">The attributes that are valid</param>
         internal JdtAttributeValidator(params JdtAttributes[] validAttributes)
         {
-            this.validAttributes = validAttributes.ToList();
+            this.validAttributes = validAttributes?.ToList() ?? new List<JdtAttributes>();
         }
 
         /// <summary>
@@ -54,6 +55,11 @@
         /// An empty dictionary is returned if no valid properties are found</returns>
         internal Dictionary<JdtAttributes, JToken> ValidateAndReturnAttributes(JObject transformObject)
         {
+            if (transformObject == null)
+            {
+                throw new ArgumentNullException(nameof(transformObject));
+            }
+
             Dictionary<JdtAttributes, JToken> attributes = new Dictionary<JdtAttributes, JToken>();
 
             // First, we look through all of the properties that have JDT syntax
