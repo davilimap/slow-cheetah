@@ -1,6 +1,8 @@
 ﻿namespace SlowCheetah.JDT
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using Newtonsoft.Json.Linq;
 
     /// <summary>
@@ -24,6 +26,16 @@
             {
                 throw new JdtException(errorMessage);
             }
+        }
+
+        /// <summary>
+        /// Gets all the properties within the object that correspond to JDT syntax
+        /// </summary>
+        /// <param name="objectToSearch">The object to search</param>
+        /// <returns>An enumerable of properties that start with the JDT prefix</returns>
+        internal static IEnumerable<JProperty> GetJdtProperties(this JObject objectToSearch)
+        {
+            return objectToSearch.Properties().Where(p => JsonUtilities.IsJdtSyntax(p.Name));
         }
     }
 }

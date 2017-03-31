@@ -12,6 +12,16 @@
         private const string PathAttribute = "path";
         private const string ValueAttribute = "value";
 
+        private JdtAttributeValidator attributeValidator;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JdtReplace"/> class.
+        /// </summary>
+        public JdtReplace()
+        {
+            this.attributeValidator = new JdtAttributeValidator(JdtAttributes.Path, JdtAttributes.Value);
+        }
+
         /// <inheritdoc/>
         public override string Verb { get; } = "replace";
 
@@ -32,57 +42,56 @@
 
         private bool ReplaceWithProperties(JObject source, JObject replaceObject)
         {
-            // TO DO: Verify if the replace value contains JDT syntax
-            JToken pathToken, valueToken;
-            string pathFullAttribute = JsonUtilities.JdtSyntaxPrefix + PathAttribute;
-            bool hasPath = replaceObject.TryGetValue(pathFullAttribute, out pathToken);
-            string valueFullAttribute = JsonUtilities.JdtSyntaxPrefix + ValueAttribute;
-            bool hasValue = replaceObject.TryGetValue(valueFullAttribute, out valueToken);
+            var attributes = this.attributeValidator.ValidateAndReturnAttributes(replaceObject);
 
-            if (!hasPath && !hasValue)
+            // If there are attributes, handle them accordingly
+            if (attributes.Any())
             {
+                // If the object has attributes it must have both path and value
+                JToken pathToken, valueToken;
+                if (attributes.TryGetValue(JdtAttributes.Path, out pathToken) && attributes.TryGetValue(JdtAttributes.Value, out valueToken))
+                {
+                    if (pathToken.Type != JTokenType.String)
+                    {
+                        throw new JdtException("Path attribute must be a string");
+                    }
+
+                    foreach (JToken nodeToReplace in source.SelectTokens(pathToken.ToString()).ToList())
+                    {
+                        bool replacedThisNode = false;
+
+                        if (nodeToReplace.Equals(source))
+                        {
+                            // If the specified path is to the current node
+                            replacedThisNode = true;
+                        }
+
+                        nodeToReplace.Replace(valueToken);
+
+                        if (replacedThisNode)
+                        {
+                            // If the current node was replaced, stop executing transformations on this node
+                            return false;
+                        }
+                    }
+                }
+                else
+                {
+                    // If either is not present, throw
+                    throw new JdtException("Replace requires both path and value");
+                }
+
+                // If we got here, transformations should continue
+                return true;
+            }
+            else
+            {
+                // If there are no attributes, replace the current object with the given object
                 source.Replace(replaceObject);
 
                 // If the node is replaced, stop transformations on it
                 return false;
             }
-            else if (hasPath && hasValue)
-            {
-                if (replaceObject.Properties().Where(p => !p.Name.Equals(pathFullAttribute) && !p.Name.Equals(valueFullAttribute)).Count() > 0)
-                {
-                    throw new JdtException("Replace only accepts path and value attributes");
-                }
-
-                if (pathToken.Type != JTokenType.String)
-                {
-                    throw new JdtException("Path attribute must be a string");
-                }
-
-                foreach (JToken nodeToReplace in source.SelectTokens(pathToken.ToString()).ToList())
-                {
-                    bool replacedThisNode = false;
-
-                    if (nodeToReplace.Equals(source))
-                    {
-                        // If the specified path is to the current node
-                        replacedThisNode = true;
-                    }
-
-                    nodeToReplace.Replace(valueToken);
-
-                    if (replacedThisNode)
-                    {
-                        // If the current node was replaced, stop executing transformations on this node
-                        return false;
-                    }
-                }
-            }
-            else
-            {
-                throw new JdtException("Replace requires both path and value");
-            }
-
-            return true;
         }
     }
 }

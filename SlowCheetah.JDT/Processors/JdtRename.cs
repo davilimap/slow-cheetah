@@ -9,8 +9,15 @@
     /// </summary>
     internal class JdtRename : JdtArrayProcessor
     {
-        private const string PathAttribute = "path";
-        private const string ValueAttribute = "value";
+        private JdtAttributeValidator attributeValidator;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JdtRename"/> class.
+        /// </summary>
+        public JdtRename()
+        {
+            this.attributeValidator = new JdtAttributeValidator(JdtAttributes.Path, JdtAttributes.Value);
+        }
 
         /// <inheritdoc/>
         public override string Verb { get; } = "rename";
@@ -25,16 +32,43 @@
             }
             else
             {
-                var renameProperties = (JObject)transformValue;
-                JToken pathToken, valueToken;
-                string pathFullAttribute = JsonUtilities.JdtSyntaxPrefix + PathAttribute;
-                bool hasPath = renameProperties.TryGetValue(pathFullAttribute, out pathToken);
-                string valueFullAttribute = JsonUtilities.JdtSyntaxPrefix + ValueAttribute;
-                bool hasValue = renameProperties.TryGetValue(valueFullAttribute, out valueToken);
+                // Try and get attributes from the object
+                var renameObject = (JObject)transformValue;
+                var attributes = this.attributeValidator.ValidateAndReturnAttributes(renameObject);
 
-                if (!hasPath && !hasValue)
+                // If there are attributes, handle them accordingly
+                if (attributes.Any())
                 {
-                    foreach (JProperty renameOperation in renameProperties.Properties())
+                    // If the object has attributes it must have both path and value
+                    JToken pathToken, valueToken;
+                    if (attributes.TryGetValue(JdtAttributes.Path, out pathToken) && attributes.TryGetValue(JdtAttributes.Value, out valueToken))
+                    {
+                        if (pathToken.Type != JTokenType.String)
+                        {
+                            throw new JdtException("Path attribute must be a string");
+                        }
+
+                        if (valueToken.Type != JTokenType.String)
+                        {
+                            throw new JdtException("Value attribute must be a string");
+                        }
+
+                        foreach (JToken nodeToRename in source.SelectTokens(pathToken.ToString()).ToList())
+                        {
+                            this.RenameNode(nodeToRename, valueToken.ToString());
+                        }
+                    }
+                    else
+                    {
+                        // If either is not present, throw
+                        throw new JdtException("Rename requires both path and value");
+                    }
+                }
+                else
+                {
+                    // If the object does not contain attributes, each property is a rename to execute
+                    // where the key is the old name and the value must be a string with the new name of the node
+                    foreach (JProperty renameOperation in renameObject.Properties())
                     {
                         if (renameOperation.Value.Type != JTokenType.String)
                         {
@@ -48,32 +82,6 @@
                             this.RenameNode(nodeToRename, renameOperation.Value.ToString());
                         }
                     }
-                }
-                else if (hasPath && hasValue)
-                {
-                    if (renameProperties.Properties().Where(p => !p.Name.Equals(pathFullAttribute) && !p.Name.Equals(valueFullAttribute)).Count() > 0)
-                    {
-                        throw new JdtException("Rename only accepts path and value attributes");
-                    }
-
-                    if (pathToken.Type != JTokenType.String)
-                    {
-                        throw new JdtException("Path attribute must be a string");
-                    }
-
-                    if (valueToken.Type != JTokenType.String)
-                    {
-                        throw new JdtException("Value attribute must be a string");
-                    }
-
-                    foreach (JToken nodeToRename in source.SelectTokens(pathToken.ToString()).ToList())
-                    {
-                        this.RenameNode(nodeToRename, valueToken.ToString());
-                    }
-                }
-                else
-                {
-                    throw new JdtException("Rename requires both path and value");
                 }
             }
 
