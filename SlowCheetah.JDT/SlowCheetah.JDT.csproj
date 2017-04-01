@@ -48,7 +48,7 @@
     <Compile Include="JdtException.cs" />
     <Compile Include="JdtExtensions.cs" />
     <Compile Include="JsonTransformation.cs" />
-    <Compile Include="JsonTransformationLogger.cs" />
+    <Compile Include="JsonTransformationContextLogger.cs" />
     <Compile Include="JsonTransformContext.cs" />
     <Compile Include="JsonUtilities.cs" />
     <Compile Include="Processors\Attributes\AttributeExtensions.cs" />

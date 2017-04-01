@@ -1,4 +1,7 @@
-﻿namespace SlowCheetah.JDT
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See  License.md file in the project root for full license information.
+
+namespace SlowCheetah.JDT
 {
     using System;
     using System.IO;
@@ -13,7 +16,7 @@
         private JObject transformObject;
         private JsonLoadSettings loadSettings;
 
-        private JsonTransformContext context;
+        private JsonTransformationContextLogger logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="JsonTransformation"/> class.
@@ -36,11 +39,7 @@
                 throw new ArgumentNullException(nameof(transformFile));
             }
 
-            this.context = new JsonTransformContext()
-            {
-                TransformFile = transformFile,
-                Logger = new JsonTransformationLogger(logger),
-            };
+            this.logger = new JsonTransformationContextLogger(transformFile, logger);
 
             using (FileStream transformStream = File.Open(transformFile, FileMode.Open))
             {
@@ -69,11 +68,7 @@
                 throw new ArgumentNullException(nameof(transform));
             }
 
-            this.context = new JsonTransformContext()
-            {
-                TransformFile = null,
-                Logger = new JsonTransformationLogger(logger),
-            };
+            this.logger = new JsonTransformationContextLogger(logger);
 
             this.SetTransform(transform);
         }
@@ -82,27 +77,29 @@
         /// Transforms a JSON object
         /// </summary>
         /// <param name="sourceFile">The path to the json file to be transformed</param>
-        /// <returns>A stream containing the results of the transforms</returns>
-        public Stream Apply(string sourceFile)
+        /// <param name="result">The stream to write the result into</param>
+        /// <returns>True if the transformations were completed</returns>
+        public bool Apply(string sourceFile, out Stream result)
         {
             if (string.IsNullOrEmpty(sourceFile))
             {
                 throw new ArgumentNullException(nameof(sourceFile));
             }
 
-            this.context.SourceFile = sourceFile;
+            this.logger.SourceFile = sourceFile;
 
             // Open the file as streams and apply the transforms
             Stream sourceStream = File.Open(sourceFile, FileMode.Open);
-            return this.Apply(sourceStream);
+            return this.Apply(sourceStream, out result);
         }
 
         /// <summary>
         /// Transforms a JSON object
         /// </summary>
         /// <param name="source">The object to be transformed</param>
-        /// <returns>A stream containing the results of the transforms. Returns null if the transformation was not completed</returns>
-        public Stream Apply(Stream source)
+        /// <param name="result">The stream to write the result into</param>
+        /// <returns>True if the transformations were completed</returns>
+        public bool Apply(Stream source, out Stream result)
         {
             if (source == null)
             {
@@ -121,7 +118,7 @@
                     LineInfoHandling = LineInfoHandling.Ignore
                 };
 
-                Stream result = null;
+                result = null;
                 JObject sourceObject = null;
 
                 try
@@ -134,14 +131,14 @@
                 }
                 catch (Exception ex)
                 {
-                    if (!this.context.Logger.LogErrorFromException(ex))
+                    if (!this.logger.LogErrorFromException(ex))
                     {
                         throw;
                     }
                 }
                 finally
                 {
-                    if (!this.context.Logger.HasLoggedErrors)
+                    if (!this.logger.HasLoggedErrors)
                     {
                         // Save the result to a memory stream
                         // Don't close the stream of the streamwriter so data isn't lost
@@ -158,7 +155,7 @@
                     }
                 }
 
-                return result;
+                return this.logger.HasLoggedErrors;
             }
         }
 

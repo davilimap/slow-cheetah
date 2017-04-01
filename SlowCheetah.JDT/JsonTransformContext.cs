@@ -5,6 +5,7 @@
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using Newtonsoft.Json;
 
     /// <summary>
     /// Context of a JSON transformation
@@ -24,6 +25,25 @@
         /// <summary>
         /// Gets or sets the logger for the current transformation
         /// </summary>
-        internal JsonTransformationLogger Logger { get; set; } = null;
+        internal JsonTransformationContextLogger Logger { get; set; } = null;
+
+        /// <summary>
+        /// Logs a warning in the current context
+        /// </summary>
+        /// <param name="message">The warning message</param>
+        /// <param name="lineInfo">The line info of the object that generated the warning</param>
+        internal void LogTransformWarning(string message, IJsonLineInfo lineInfo)
+        {
+            if (this.Logger != null)
+            {
+                if (lineInfo != null && lineInfo.HasLineInfo())
+                {
+                    
+                }
+                else
+                {
+                }
+            }
+        }
     }
 }

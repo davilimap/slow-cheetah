@@ -1,4 +1,4 @@
-﻿// Copyright (c) Sayed Ibrahim Hashimi. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See  License.md file in the project root for full license information.
 
 namespace SlowCheetah.JDT
@@ -8,18 +8,39 @@ namespace SlowCheetah.JDT
     /// <summary>
     /// Logger wrapper for JDT transformations
     /// </summary>
-    internal class JsonTransformationLogger
+    internal class JsonTransformationContextLogger
     {
         private IJsonTransformationLogger externalLogger = null;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="JsonTransformationLogger"/> class.
+        /// Initializes a new instance of the <see cref="JsonTransformationContextLogger"/> class.
         /// </summary>
         /// <param name="extLogger">External logger to be used. Can be null.</param>
-        internal JsonTransformationLogger(IJsonTransformationLogger extLogger)
+        internal JsonTransformationContextLogger(IJsonTransformationLogger extLogger)
         {
             this.externalLogger = extLogger;
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JsonTransformationContextLogger"/> class.
+        /// </summary>
+        /// <param name="transformationFile">The file that specifies the transformations</param>
+        /// <param name="extLogger">External logger to be used. Can be null.</param>
+        internal JsonTransformationContextLogger(string transformationFile, IJsonTransformationLogger extLogger)
+        {
+            this.externalLogger = extLogger;
+            this.TransformFile = transformationFile;
+        }
+
+        /// <summary>
+        /// Gets or sets the source file of the current transformation
+        /// </summary>
+        internal string SourceFile { get; set; } = "Source";
+
+        /// <summary>
+        /// Gets or sets the transformation file of the current transformation
+        /// </summary>
+        internal string TransformFile { get; set; } = "Transform";
 
         /// <summary>
         /// Gets or sets a value indicating whether the logger has logged errrors
