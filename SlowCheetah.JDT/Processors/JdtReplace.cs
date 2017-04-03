@@ -22,7 +22,7 @@
         public override string Verb { get; } = "replace";
 
         /// <inheritdoc/>
-        protected override bool ProcessCore(JObject source, JToken transformValue, JsonTransformContext context)
+        protected override bool ProcessCore(JObject source, JToken transformValue, JsonTransformationContextLogger logger)
         {
             if (transformValue.Type == JTokenType.Object)
             {
@@ -52,7 +52,7 @@
                 {
                     if (pathToken.Type != JTokenType.String)
                     {
-                        throw new JdtException("Path attribute must be a string");
+                        throw JdtException.FromLineInfo("Path attribute must be a string", ErrorLocation.Transform, pathToken);
                     }
 
                     foreach (JToken nodeToReplace in source.SelectTokens(pathToken.ToString()).ToList())
@@ -77,7 +77,7 @@
                 else
                 {
                     // If either is not present, throw
-                    throw new JdtException("Replace requires both path and value");
+                    throw JdtException.FromLineInfo("Replace requires both path and value", ErrorLocation.Transform, replaceObject);
                 }
 
                 // If we got here, transformations should continue

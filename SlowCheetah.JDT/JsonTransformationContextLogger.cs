@@ -4,6 +4,7 @@
 namespace SlowCheetah.JDT
 {
     using System;
+    using Newtonsoft.Json;
 
     /// <summary>
     /// Logger wrapper for JDT transformations
@@ -60,11 +61,19 @@ namespace SlowCheetah.JDT
                 JdtException jdtException = exception as JdtException;
                 if (jdtException != null)
                 {
-                    this.externalLogger.LogErrorFromException(jdtException, jdtException.FileName, jdtException.LineNumber, jdtException.LinePosition);
+                    this.externalLogger.LogErrorFromException(jdtException, this.TransformFile, jdtException.LineNumber, jdtException.LinePosition);
                 }
                 else
                 {
-                    this.externalLogger.LogErrorFromException(exception);
+                    JsonReaderException readerException = exception as JsonReaderException;
+                    if (readerException == null)
+                    {
+                        this.externalLogger.LogErrorFromException(exception);
+                    }
+                    else
+                    {
+                        this.externalLogger.LogErrorFromException(readerException, readerException.Path, readerException.LineNumber, readerException.LinePosition);
+                    }
                 }
 
                 return true;
@@ -73,6 +82,17 @@ namespace SlowCheetah.JDT
             {
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Logs a warning according to the lineinfo
+        /// </summary>
+        /// <param name="message">The warning message</param>
+        /// <param name="location">The file that caused the warning</param>
+        /// <param name="lineInfo">The information of the line that caused the warning</param>
+        internal void LogWarning(string message, ErrorLocation location, IJsonLineInfo lineInfo)
+        {
+
         }
     }
 }

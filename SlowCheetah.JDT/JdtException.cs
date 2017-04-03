@@ -7,6 +7,27 @@ namespace SlowCheetah.JDT
     using Newtonsoft.Json;
 
     /// <summary>
+    /// The file that caused the exception
+    /// </summary>
+    internal enum ErrorLocation
+    {
+        /// <summary>
+        /// Represents no location set
+        /// </summary>
+        None,
+
+        /// <summary>
+        /// Represents the source file
+        /// </summary>
+        Source,
+
+        /// <summary>
+        /// Represents the transform file
+        /// </summary>
+        Transform
+    }
+
+    /// <summary>
     /// Exception thrown on JDT error
     /// </summary>
     [Serializable]
@@ -25,34 +46,22 @@ namespace SlowCheetah.JDT
         /// Initializes a new instance of the <see cref="JdtException"/> class.
         /// </summary>
         /// <param name="message">The exception message</param>
-        /// <param name="filePath">The file that generated the exception</param>
-        public JdtException(string message, string filePath)
+        /// <param name="location">The file that generated the exception</param>
+        internal JdtException(string message, ErrorLocation location)
             : this(message)
         {
-            this.FileName = filePath;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="JdtException"/> class
-        /// from a <see cref="JsonReaderException"/>
-        /// </summary>
-        /// <param name="ex">The original exception</param>
-        public JdtException(JsonReaderException ex)
-            : base(ex.Message, ex)
-        {
-            this.LineNumber = ex.LineNumber;
-            this.LinePosition = ex.LinePosition;
+            this.Location = location;
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="JdtException"/> class.
         /// </summary>
         /// <param name="message">The exception message</param>
-        /// <param name="filePath">The file that generated the exception</param>
+        /// <param name="location">The file that generated the exception</param>
         /// <param name="lineNumber">The line that caused the error</param>
         /// <param name="linePosition">The position in the lite that caused the error</param>
-        public JdtException(string message, string filePath, int lineNumber, int linePosition)
-            : this(message, filePath)
+        internal JdtException(string message, ErrorLocation location, int lineNumber, int linePosition)
+            : this(message, location)
         {
             this.LineNumber = lineNumber;
             this.LinePosition = linePosition;
@@ -71,27 +80,18 @@ namespace SlowCheetah.JDT
         /// <summary>
         /// Gets the name of the file that generated the exception
         /// </summary>
-        public string FileName { get; private set; } = null;
-
-        /// <summary>
-        /// Casts a <see cref="JsonReaderException"/> to a <see cref="JdtException"/>
-        /// </summary>
-        /// <param name="ex">The <see cref="JsonReaderException"/></param>
-        public static implicit operator JdtException(JsonReaderException ex)
-        {
-            return new JdtException(ex);
-        }
+        internal ErrorLocation Location { get; private set; } = ErrorLocation.None;
 
         /// <summary>
         /// Returns a <see cref="JdtException"/> with line info
         /// </summary>
         /// <param name="message">The exception message</param>
-        /// <param name="filePath">The path to the file that generated the exception</param>
+        /// <param name="location">The file that generated the exception</param>
         /// <param name="lineInfo">The line info of the object that caused the error</param>
         /// <returns>A new instance of <see cref="JdtException"/></returns>
-        public static JdtException FromLineInfo(string message, string filePath, IJsonLineInfo lineInfo)
+        internal static JdtException FromLineInfo(string message, ErrorLocation location, IJsonLineInfo lineInfo)
         {
-            return new JdtException(message, filePath, lineInfo?.LineNumber ?? 0, lineInfo?.LinePosition ?? 0);
+            return new JdtException(message, location, lineInfo?.LineNumber ?? 0, lineInfo?.LinePosition ?? 0);
         }
     }
 }

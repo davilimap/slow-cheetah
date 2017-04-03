@@ -23,12 +23,12 @@
         public override string Verb { get; } = "rename";
 
         /// <inheritdoc/>
-        protected override bool ProcessCore(JObject source, JToken transformValue, JsonTransformContext context)
+        protected override bool ProcessCore(JObject source, JToken transformValue, JsonTransformationContextLogger logger)
         {
             if (transformValue.Type != JTokenType.Object)
             {
                 // Rename only accepts objects, either with properties or direct renames
-                throw new JdtException(transformValue.Type.ToString() + " is not a valid transform value for Rename");
+                throw JdtException.FromLineInfo($"{transformValue.Type.ToString()} is not a valid transform value for Rename", ErrorLocation.Transform, transformValue);
             }
             else
             {
@@ -45,12 +45,12 @@
                     {
                         if (pathToken.Type != JTokenType.String)
                         {
-                            throw new JdtException("Path attribute must be a string");
+                            throw JdtException.FromLineInfo("Path attribute must be a string", ErrorLocation.Transform, pathToken);
                         }
 
                         if (valueToken.Type != JTokenType.String)
                         {
-                            throw new JdtException("Value attribute must be a string");
+                            throw JdtException.FromLineInfo("Value attribute must be a string", ErrorLocation.Transform, valueToken);
                         }
 
                         // If the values are correct, rename each token found with the given path
@@ -62,7 +62,7 @@
                     else
                     {
                         // If either is not present, throw
-                        throw new JdtException("Rename requires both path and value");
+                        throw JdtException.FromLineInfo("Rename requires both path and value", ErrorLocation.Transform, renameObject);
                     }
                 }
                 else
@@ -73,7 +73,7 @@
                     {
                         if (renameOperation.Value.Type != JTokenType.String)
                         {
-                            throw new JdtException("Rename value must be a string");
+                            throw JdtException.FromLineInfo("Rename value must be a string", ErrorLocation.Transform, renameOperation);
                         }
 
                         // TO DO: Warning if the node is not found
@@ -81,6 +81,10 @@
                         if (source.TryGetValue(renameOperation.Name, out nodeToRename))
                         {
                             this.RenameNode(nodeToRename, renameOperation.Value.ToString());
+                        }
+                        else
+                        {
+                            logger.LogWarning($"Node {renameOperation.Name} was not found", ErrorLocation.Transform, renameOperation);
                         }
                     }
                 }

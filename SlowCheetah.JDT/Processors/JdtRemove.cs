@@ -27,7 +27,7 @@ namespace SlowCheetah.JDT
         public override string Verb { get; } = "remove";
 
         /// <inheritdoc/>
-        protected override bool ProcessCore(JObject source, JToken transformValue, JsonTransformContext context)
+        protected override bool ProcessCore(JObject source, JToken transformValue, JsonTransformationContextLogger logger)
         {
             switch (transformValue.Type)
             {
@@ -36,7 +36,7 @@ namespace SlowCheetah.JDT
                     // If the value is just a string, remove that node
                     if (!source.Remove(transformValue.ToString()))
                     {
-                        // Log a warning
+                        logger.LogWarning("Unable to remove node", ErrorLocation.Transform, transformValue);
                     }
 
                     break;
@@ -52,7 +52,7 @@ namespace SlowCheetah.JDT
                     // If the value is an object, verify the attributes within and perform the remove
                     return this.RemoveWithAttributes(source, (JObject)transformValue);
                 default:
-                    throw new JdtException(transformValue.Type.ToString() + " is not a valid transform value for Remove");
+                    throw JdtException.FromLineInfo($"{transformValue.Type.ToString()} is not a valid transform value for Remove", ErrorLocation.Transform, transformValue);
             }
 
             // If nothing indicates a halt, continue with transforms
@@ -100,12 +100,12 @@ namespace SlowCheetah.JDT
                 }
                 else
                 {
-                    throw new JdtException("Path attribute must be a string");
+                    throw JdtException.FromLineInfo("Path attribute must be a string", ErrorLocation.Transform, pathToken);
                 }
             }
             else
             {
-                throw new JdtException("Remove transformation requires the path attribute");
+                throw JdtException.FromLineInfo("Remove transformation requires the path attribute", ErrorLocation.Transform, removeObject);
             }
 
             // If nothing indicates a halt, continue transforms

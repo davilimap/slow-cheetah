@@ -19,7 +19,7 @@
         public override string Verb { get; } = null;
 
         /// <inheritdoc/>
-        internal override void Process(JObject source, JObject transform, JsonTransformContext context)
+        internal override void Process(JObject source, JObject transform, JsonTransformationContextLogger logger)
         {
             if (source == null)
             {
@@ -39,12 +39,12 @@
                 {
                     if (!this.ValidVerbs.Contains(verb))
                     {
-                        throw new JdtException(verb + " is not a valid JDT verb");
+                        throw JdtException.FromLineInfo($"{verb} is not a valid JDT verb", ErrorLocation.Transform, transformNode);
                     }
                 }
             }
 
-            this.Successor.Process(source, transform, context);
+            this.Successor.Process(source, transform, logger);
         }
     }
 }

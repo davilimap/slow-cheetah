@@ -1,4 +1,7 @@
-﻿namespace SlowCheetah.JDT
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See  License.md file in the project root for full license information.
+
+namespace SlowCheetah.JDT
 {
     using System.Linq;
     using Newtonsoft.Json.Linq;
@@ -56,7 +59,7 @@
                 {
                     if (pathToken.Type != JTokenType.String)
                     {
-                        throw new JdtException("Path attribute must be a string");
+                        throw JdtException.FromLineInfo("Path attribute must be a string", ErrorLocation.Transform, mergeObject);
                     }
 
                     foreach (JToken tokenToMerge in source.SelectTokens(pathToken.ToString()).ToList())
@@ -84,7 +87,7 @@
                 else
                 {
                     // If either is not present, throw
-                    throw new JdtException("Merge requires both path and value");
+                    throw JdtException.FromLineInfo("Merge requires both path and value", ErrorLocation.Transform, mergeObject);
                 }
             }
             else
