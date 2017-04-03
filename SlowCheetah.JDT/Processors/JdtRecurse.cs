@@ -14,7 +14,7 @@
         public override string Verb { get; } = null;
 
         /// <inheritdoc/>
-        internal override void Process(JObject source, JObject transform, JsonTransformContext context)
+        internal override void Process(JObject source, JObject transform, JsonTransformationContextLogger logger)
         {
             if (source == null)
             {
@@ -36,7 +36,7 @@
                 JToken sourceChild;
                 if (source.TryGetValue(transformNode.Name, out sourceChild) && sourceChild.Type == JTokenType.Object)
                 {
-                    ProcessTransform((JObject)sourceChild, (JObject)transformNode.Value, context);
+                    ProcessTransform((JObject)sourceChild, (JObject)transformNode.Value, logger);
 
                     // If we have already recursed into that node, it should be removed from the transform
                     nodesToRemove.Add(transformNode.Name);
@@ -48,7 +48,7 @@
             nodesToRemove.ForEach(node => transform.Remove(node));
 
             // Continue to next transformation
-            this.Successor.Process(source, transform, context);
+            this.Successor.Process(source, transform, logger);
         }
     }
 }

@@ -53,8 +53,8 @@
         /// </summary>
         /// <param name="source">Object to be transformed</param>
         /// <param name="transform">Object that specifies the transformation</param>
-        /// <param name="context">The context of the transformation</param>
-        internal static void ProcessTransform(JObject source, JObject transform, JsonTransformContext context)
+        /// <param name="logger">The logger for the transformation</param>
+        internal static void ProcessTransform(JObject source, JObject transform, JsonTransformationContextLogger logger)
         {
             if (source == null)
             {
@@ -67,7 +67,7 @@
             }
 
             // Passes in a clone of the transform object because it can be altered during the transformation process
-            ProcessorChain.Start(source, (JObject)transform.DeepClone(), context);
+            ProcessorChain.Start(source, (JObject)transform.DeepClone(), logger);
         }
 
         /// <summary>
@@ -75,7 +75,7 @@
         /// </summary>
         /// <param name="source">Object to be transformed</param>
         /// <param name="transform">Object specifying the transformation</param>
-        /// <param name="context">The context of the transformation</param>
-        internal abstract void Process(JObject source, JObject transform, JsonTransformContext context);
+        /// <param name="logger">The logger for the transformation</param>
+        internal abstract void Process(JObject source, JObject transform, JsonTransformationContextLogger logger);
     }
 }

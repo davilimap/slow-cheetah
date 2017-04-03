@@ -9,7 +9,7 @@
     internal abstract class JdtArrayProcessor : JdtProcessor
     {
         /// <inheritdoc/>
-        internal override void Process(JObject source, JObject transform, JsonTransformContext context)
+        internal override void Process(JObject source, JObject transform, JsonTransformationContextLogger logger)
         {
             if (source == null)
             {
@@ -24,7 +24,7 @@
             JToken transformValue;
             if (transform.TryGetValue(this.FullVerb, out transformValue))
             {
-                if (!this.Transform(source, transformValue, context))
+                if (!this.Transform(source, transformValue, logger))
                 {
                     // If the transformation returns false,
                     // it performed an operation that halts transforms
@@ -32,7 +32,7 @@
                 }
             }
 
-            this.Successor.Process(source, transform, context);
+            this.Successor.Process(source, transform, logger);
         }
 
         /// <summary>
@@ -40,9 +40,9 @@
         /// </summary>
         /// <param name="source">Object to be transformed</param>
         /// <param name="transformValue">Value of the transform</param>
-        /// <param name="context">The transformation context</param>
+        /// <param name="logger">The transformation context logger</param>
         /// <returns>True if transforms should continue</returns>
-        protected abstract bool ProcessCore(JObject source, JToken transformValue, JsonTransformContext context);
+        protected abstract bool ProcessCore(JObject source, JToken transformValue, JsonTransformationContextLogger logger);
 
         /// <summary>
         /// Performs the initial logic of processing arrays.
@@ -50,9 +50,9 @@
         /// </summary>
         /// <param name="source">Object to be transformed</param>
         /// <param name="transformValue">Value of the transform</param>
-        /// <param name="context">The transformation context</param>
+        /// <param name="logger">The transformation context logger</param>
         /// <returns>True if transforms should continue</returns>
-        private bool Transform(JObject source, JToken transformValue, JsonTransformContext context)
+        private bool Transform(JObject source, JToken transformValue, JsonTransformationContextLogger logger)
         {
             if (transformValue.Type == JTokenType.Array)
             {
@@ -60,7 +60,7 @@
                 // From here, arrays are handled as the transformation value
                 foreach (JToken arrayValue in (JArray)transformValue)
                 {
-                    if (!this.ProcessCore(source, arrayValue, context))
+                    if (!this.ProcessCore(source, arrayValue, logger))
                     {
                         // If the core transformation indicates a halt, we halt
                         return true;
@@ -73,7 +73,7 @@
             else
             {
                 // If it is not an array, perform the transformation as normal
-                return this.ProcessCore(source, transformValue, context);
+                return this.ProcessCore(source, transformValue, logger);
             }
         }
     }

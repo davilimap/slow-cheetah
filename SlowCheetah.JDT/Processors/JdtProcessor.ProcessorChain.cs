@@ -50,7 +50,7 @@
                 }
             }
 
-            public void Start(JObject source, JObject transform, JsonTransformContext context)
+            public void Start(JObject source, JObject transform, JsonTransformationContextLogger logger)
             {
                 if (source == null)
                 {
@@ -62,7 +62,7 @@
                     throw new ArgumentNullException(nameof(transform));
                 }
 
-                this.processors.First().Process(source, transform, context);
+                this.processors.First().Process(source, transform, logger);
             }
         }
 
@@ -79,7 +79,7 @@
 
             public override string Verb { get; } = null;
 
-            internal override void Process(JObject source, JObject transform, JsonTransformContext context)
+            internal override void Process(JObject source, JObject transform, JsonTransformationContextLogger logger)
             {
                 // Do nothing, the chain is done
             }

@@ -23,13 +23,13 @@
         public override string Verb { get; } = "merge";
 
         /// <inheritdoc/>
-        protected override bool ProcessCore(JObject source, JToken transformValue, JsonTransformContext context)
+        protected override bool ProcessCore(JObject source, JToken transformValue, JsonTransformationContextLogger logger)
         {
             if (transformValue.Type == JTokenType.Object)
             {
                 // If both source and transform are objects,
                 // analyze the contents and perform the appropriate transforms
-                this.MergeWithObject(source, (JObject)transformValue, context);
+                this.MergeWithObject(source, (JObject)transformValue, logger);
             }
             else
             {
@@ -42,7 +42,7 @@
             return true;
         }
 
-        private void MergeWithObject(JObject source, JObject mergeObject, JsonTransformContext context)
+        private void MergeWithObject(JObject source, JObject mergeObject, JsonTransformationContextLogger logger)
         {
             var attributes = this.attributeValidator.ValidateAndReturnAttributes(mergeObject);
 
@@ -65,7 +65,7 @@
                         if (tokenToMerge.Type == JTokenType.Object && valueToken.Type == JTokenType.Object)
                         {
                             // If they are both objects, start a new transformation
-                            ProcessTransform((JObject)tokenToMerge, (JObject)valueToken, context);
+                            ProcessTransform((JObject)tokenToMerge, (JObject)valueToken, logger);
                         }
                         else if (tokenToMerge.Type == JTokenType.Array && valueToken.Type == JTokenType.Array)
                         {
@@ -91,7 +91,7 @@
             {
                 // If the merge object does not contain attributes,
                 // simply execute the transform with that object
-                ProcessTransform(source, mergeObject, context);
+                ProcessTransform(source, mergeObject, logger);
             }
         }
     }

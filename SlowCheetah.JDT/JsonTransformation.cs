@@ -127,7 +127,7 @@ namespace SlowCheetah.JDT
                     sourceObject = JObject.Load(sourceReader, loadSettings);
 
                     // Execute the transforms
-                    JdtProcessor.ProcessTransform(sourceObject, this.transformObject, this.context);
+                    JdtProcessor.ProcessTransform(sourceObject, this.transformObject, this.logger);
                 }
                 catch (Exception ex)
                 {
