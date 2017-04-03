@@ -86,7 +86,9 @@
     <None Include="Build\readme.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="SlowCheetah.nuspec" />
   </ItemGroup>
   <ItemGroup>
@@ -99,6 +101,7 @@
       <Link>stylecop.json</Link>
     </AdditionalFiles>
   </ItemGroup>
+  <ItemGroup />
   <Target Name="PackOnBuild" AfterTargets="Build" Condition="'$(Package)'=='true'">
     <CallTarget Targets="Pack" />
   </Target>
