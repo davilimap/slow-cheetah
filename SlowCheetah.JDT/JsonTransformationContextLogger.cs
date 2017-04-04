@@ -35,9 +35,9 @@ namespace SlowCheetah.JDT
         }
 
         /// <summary>
-        /// Gets or sets the source file of the current transformation
+        /// Gets the source file of the current transformation
         /// </summary>
-        internal string SourceFile { get; set; } = "Source";
+        internal string SourceFile { get; } = "Source";
 
         /// <summary>
         /// Gets the transformation file of the current transformation
