@@ -11,7 +11,7 @@ namespace SlowCheetah.JDT
     /// <summary>
     /// Implements extensions for <see cref="JdtAttributes"/>
     /// </summary>
-    internal static class AttributeExtensions
+    internal static class JdtAttributeExtensions
     {
         /// <summary>
         /// Gets the description (name) of the attribute

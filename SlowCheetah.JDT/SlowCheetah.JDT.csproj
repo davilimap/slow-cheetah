@@ -51,7 +51,7 @@
     <Compile Include="JsonTransformationContextLogger.cs" />
     <Compile Include="JsonTransformContext.cs" />
     <Compile Include="JsonUtilities.cs" />
-    <Compile Include="Processors\Attributes\AttributeExtensions.cs" />
+    <Compile Include="Processors\Attributes\JdtAttributeExtensions.cs" />
     <Compile Include="Processors\JdtArrayProcessor.cs" />
     <Compile Include="Processors\Attributes\JdtAttributeValidator.cs" />
     <Compile Include="Processors\JdtDefault.cs" />

@@ -11,7 +11,7 @@ namespace SlowCheetah.JDT
     /// </summary>
     internal class JdtMerge : JdtArrayProcessor
     {
-        private JdtAttributeValidator attributeValidator;
+        private readonly JdtAttributeValidator attributeValidator;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="JdtMerge"/> class.
