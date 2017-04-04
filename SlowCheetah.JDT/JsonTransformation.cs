@@ -108,6 +108,8 @@ namespace SlowCheetah.JDT
                 throw new ArgumentNullException(nameof(source));
             }
 
+            this.logger.SourceFile = null;
+
             using (StreamReader sourceStreamReader = new StreamReader(source))
             using (JsonTextReader sourceReader = new JsonTextReader(sourceStreamReader))
             {

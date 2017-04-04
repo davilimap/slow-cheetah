@@ -14,6 +14,8 @@ namespace SlowCheetah.JDT
     {
         private readonly IJsonTransformationLogger externalLogger = null;
 
+        private string sourceFile = null;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="JsonTransformationContextLogger"/> class.
         /// </summary>
@@ -29,15 +31,31 @@ namespace SlowCheetah.JDT
         /// <param name="transformationFile">The file that specifies the transformations</param>
         /// <param name="extLogger">External logger to be used. Can be null.</param>
         internal JsonTransformationContextLogger(string transformationFile, IJsonTransformationLogger extLogger)
+            : this(extLogger)
         {
-            this.externalLogger = extLogger;
+            if (string.IsNullOrEmpty(transformationFile))
+            {
+                throw new ArgumentNullException(nameof(transformationFile));
+            }
+
             this.TransformFile = transformationFile;
         }
 
         /// <summary>
-        /// Gets the source file of the current transformation
+        /// Gets or sets the source file of the current transformation
         /// </summary>
-        internal string SourceFile { get; } = "Source";
+        internal string SourceFile
+        {
+            get
+            {
+                return this.sourceFile ?? "Source";
+            }
+
+            set
+            {
+                this.sourceFile = value;
+            }
+        }
 
         /// <summary>
         /// Gets the transformation file of the current transformation
