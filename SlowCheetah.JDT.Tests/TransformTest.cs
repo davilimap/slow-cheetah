@@ -168,6 +168,8 @@ namespace SlowCheetah.Tests.JDT
         /// </summary>
         /// <param name="testFileName">Name of the test being performed.
         /// Corresponds to a group of files in the input folder</param>
+        [Theory]
+        [MemberData(nameof(GetTransformInputs))]
         public void Transform(string testFileName)
         {
             BaseTransformTest(TransformTestDirectory, testFileName);

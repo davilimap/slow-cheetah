@@ -151,6 +151,8 @@
     <None Include="Inputs\Replace\Object.WithObject.Transform.json" />
     <None Include="Inputs\Replace\Object.WithPrimitive.Expected.json" />
     <None Include="Inputs\Replace\Object.WithPrimitive.Transform.json" />
+    <None Include="Inputs\Transform\Primitive.RemoveRename.Expected.json" />
+    <None Include="Inputs\Transform\Primitive.RemoveRename.Transform.json" />
     <None Include="Inputs\Transform\Primitive.Source.json" />
     <None Include="packages.config" />
   </ItemGroup>

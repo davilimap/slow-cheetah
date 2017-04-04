@@ -1,0 +1,6 @@
+﻿{
+  "@jdt.remove": "D",
+  "@jdt.rename": {
+    "D": "Dstar"
+  }
+}
