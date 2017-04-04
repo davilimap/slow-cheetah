@@ -4,6 +4,7 @@
 namespace SlowCheetah.JDT
 {
     using System;
+    using System.Runtime.ExceptionServices;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -11,7 +12,9 @@ namespace SlowCheetah.JDT
     /// </summary>
     internal class JsonTransformationContextLogger
     {
-        private IJsonTransformationLogger externalLogger = null;
+        private readonly IJsonTransformationLogger externalLogger = null;
+
+        private string sourceFile = null;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="JsonTransformationContextLogger"/> class.
@@ -28,32 +31,47 @@ namespace SlowCheetah.JDT
         /// <param name="transformationFile">The file that specifies the transformations</param>
         /// <param name="extLogger">External logger to be used. Can be null.</param>
         internal JsonTransformationContextLogger(string transformationFile, IJsonTransformationLogger extLogger)
+            : this(extLogger)
         {
-            this.externalLogger = extLogger;
+            if (string.IsNullOrEmpty(transformationFile))
+            {
+                throw new ArgumentNullException(nameof(transformationFile));
+            }
+
             this.TransformFile = transformationFile;
         }
 
         /// <summary>
         /// Gets or sets the source file of the current transformation
         /// </summary>
-        internal string SourceFile { get; set; } = "Source";
+        internal string SourceFile
+        {
+            get
+            {
+                return this.sourceFile ?? "Source";
+            }
+
+            set
+            {
+                this.sourceFile = value;
+            }
+        }
 
         /// <summary>
-        /// Gets or sets the transformation file of the current transformation
+        /// Gets the transformation file of the current transformation
         /// </summary>
-        internal string TransformFile { get; set; } = "Transform";
+        internal string TransformFile { get; } = "Transform";
 
         /// <summary>
-        /// Gets or sets a value indicating whether the logger has logged errrors
+        /// Gets a value indicating whether the logger has logged errrors
         /// </summary>
-        internal bool HasLoggedErrors { get; set; }
+        internal bool HasLoggedErrors { get; private set; }
 
         /// <summary>
         /// Logs an error from an internal exception
         /// </summary>
         /// <param name="exception">The exception to log</param>
-        /// <returns>True if the exception was logged</returns>
-        internal bool LogErrorFromException(Exception exception)
+        internal void LogErrorFromException(Exception exception)
         {
             if (exception == null)
             {
@@ -85,14 +103,10 @@ namespace SlowCheetah.JDT
                         this.externalLogger.LogErrorFromException(exception);
                     }
                 }
-
-                // The exception has been logged
-                return true;
             }
             else
             {
-                // The exception has not been logged
-                return false;
+                ExceptionDispatchInfo.Capture(exception).Throw();
             }
         }
 

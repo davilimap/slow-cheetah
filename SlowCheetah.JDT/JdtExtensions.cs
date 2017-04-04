@@ -20,7 +20,27 @@ namespace SlowCheetah.JDT
         /// <returns>An enumerable of properties that start with the JDT prefix</returns>
         internal static IEnumerable<JProperty> GetJdtProperties(this JObject objectToSearch)
         {
+            if (objectToSearch == null)
+            {
+                throw new ArgumentNullException(nameof(objectToSearch));
+            }
+
             return objectToSearch.Properties().Where(p => JsonUtilities.IsJdtSyntax(p.Name));
+        }
+
+        /// <summary>
+        /// Checks if an exception is critical
+        /// </summary>
+        /// <param name="ex">The exception to check</param>
+        /// <returns>True if the exception is critical and should not be caught</returns>
+        internal static bool IsCriticalException(this Exception ex)
+        {
+            return ex is NullReferenceException
+                    || ex is StackOverflowException
+                    || ex is OutOfMemoryException
+                    || ex is System.Threading.ThreadAbortException
+                    || ex is IndexOutOfRangeException
+                    || ex is AccessViolationException;
         }
     }
 }
