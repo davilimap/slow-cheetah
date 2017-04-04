@@ -1,4 +1,7 @@
-﻿namespace SlowCheetah.JDT
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See  License.md file in the project root for full license information.
+
+namespace SlowCheetah.JDT
 {
     using System.Linq;
     using Newtonsoft.Json.Linq;
