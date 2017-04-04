@@ -123,13 +123,16 @@ namespace SlowCheetah.JDT
                 throw new ArgumentNullException(nameof(message));
             }
 
-            if (lineInfo != null && lineInfo.HasLineInfo())
+            if (this.externalLogger != null)
             {
-                this.externalLogger.LogWarning(message, this.LocationPath(location), lineInfo.LineNumber, lineInfo.LinePosition);
-            }
-            else
-            {
-                this.externalLogger.LogWarning(message, this.LocationPath(location));
+                if (lineInfo != null && lineInfo.HasLineInfo())
+                {
+                    this.externalLogger.LogWarning(message, this.LocationPath(location), lineInfo.LineNumber, lineInfo.LinePosition);
+                }
+                else
+                {
+                    this.externalLogger.LogWarning(message, this.LocationPath(location));
+                }
             }
         }
 
