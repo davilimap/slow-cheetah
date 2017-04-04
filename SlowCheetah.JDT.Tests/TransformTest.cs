@@ -33,6 +33,9 @@ namespace SlowCheetah.Tests.JDT
         // Directory for Merge transformation test
         private static readonly string MergeTestDirectory = TestInputDirectory + "Merge\\";
 
+        // Directory for transformation tests
+        private static readonly string TransformTestDirectory = TestInputDirectory + "Transform\\";
+
         /// <summary>
         /// Gets inputs for the Default transformation
         /// </summary>
@@ -86,6 +89,17 @@ namespace SlowCheetah.Tests.JDT
             get
             {
                 return GetInputs(MergeTestDirectory);
+            }
+        }
+
+        /// <summary>
+        /// Gets inputs for the Merge transformation
+        /// </summary>
+        public static IEnumerable<object[]> GetTransformInputs
+        {
+            get
+            {
+                return GetInputs(TransformTestDirectory);
             }
         }
 
@@ -147,6 +161,16 @@ namespace SlowCheetah.Tests.JDT
         public void Merge(string testFileName)
         {
             BaseTransformTest(MergeTestDirectory, testFileName);
+        }
+
+        /// <summary>
+        /// Tests multiple transformations
+        /// </summary>
+        /// <param name="testFileName">Name of the test being performed.
+        /// Corresponds to a group of files in the input folder</param>
+        public void Transform(string testFileName)
+        {
+            BaseTransformTest(TransformTestDirectory, testFileName);
         }
 
         private static IEnumerable<object[]> GetInputs(string testDirectory)

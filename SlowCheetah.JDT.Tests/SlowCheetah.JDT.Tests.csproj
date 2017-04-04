@@ -151,6 +151,7 @@
     <None Include="Inputs\Replace\Object.WithObject.Transform.json" />
     <None Include="Inputs\Replace\Object.WithPrimitive.Expected.json" />
     <None Include="Inputs\Replace\Object.WithPrimitive.Transform.json" />
+    <None Include="Inputs\Transform\Primitive.Source.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -167,5 +168,6 @@
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
