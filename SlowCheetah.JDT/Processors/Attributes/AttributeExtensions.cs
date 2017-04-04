@@ -53,6 +53,7 @@ namespace SlowCheetah.JDT
         /// <returns>The attribute with that name of <see cref="JdtAttributes.None"/> if no attribute was found</returns>
         internal static JdtAttributes GetByName(this IEnumerable<JdtAttributes> collection, string name)
         {
+            // The default value for the enum is 0, which is None
             return collection.SingleOrDefault(a => a.FullName().Equals(name));
         }
     }

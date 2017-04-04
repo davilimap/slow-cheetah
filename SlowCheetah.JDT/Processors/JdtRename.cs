@@ -56,7 +56,10 @@
                         // If the values are correct, rename each token found with the given path
                         foreach (JToken nodeToRename in source.SelectTokens(pathToken.ToString()).ToList())
                         {
-                            this.RenameNode(nodeToRename, valueToken.ToString());
+                            if (!this.RenameNode(nodeToRename, valueToken.ToString()))
+                            {
+                                throw JdtException.FromLineInfo("Cannot rename node", ErrorLocation.Transform, renameObject);
+                            }
                         }
                     }
                     else
@@ -80,7 +83,10 @@
                         JToken nodeToRename;
                         if (source.TryGetValue(renameOperation.Name, out nodeToRename))
                         {
-                            this.RenameNode(nodeToRename, renameOperation.Value.ToString());
+                            if (!this.RenameNode(nodeToRename, renameOperation.Value.ToString()))
+                            {
+                                throw JdtException.FromLineInfo("Cannot rename node", ErrorLocation.Transform, renameOperation);
+                            }
                         }
                         else
                         {
@@ -94,7 +100,7 @@
             return true;
         }
 
-        private void RenameNode(JToken nodeToRename, string newName)
+        private bool RenameNode(JToken nodeToRename, string newName)
         {
             // We can only rename tokens belonging to a property
             // This excludes objects from arrays and the root object
@@ -102,11 +108,12 @@
 
             if (parent == null)
             {
-                throw new JdtException("Cannot rename node");
+                return false;
             }
 
             // Replace with a new property of identical value and new name
             parent.Replace(new JProperty(newName, nodeToRename));
+            return true;
         }
     }
 }

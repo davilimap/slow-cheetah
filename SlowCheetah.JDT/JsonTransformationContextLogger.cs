@@ -55,44 +55,81 @@ namespace SlowCheetah.JDT
         /// <returns>True if the exception was logged</returns>
         internal bool LogErrorFromException(Exception exception)
         {
+            if (exception == null)
+            {
+                throw new ArgumentNullException(nameof(exception));
+            }
+
+            // Only log if an external logger has been provided
             if (this.externalLogger != null)
             {
                 this.HasLoggedErrors = true;
+
+                // First, attempt to convert to a JdtException that contains lineinfo and error location
                 JdtException jdtException = exception as JdtException;
                 if (jdtException != null)
                 {
-                    this.externalLogger.LogErrorFromException(jdtException, this.TransformFile, jdtException.LineNumber, jdtException.LinePosition);
+                    this.externalLogger.LogErrorFromException(jdtException, this.LocationPath(jdtException.Location), jdtException.LineNumber, jdtException.LinePosition);
                 }
                 else
                 {
+                    // JsonReader exceptions are caused by loading errors and contain file and line info
                     JsonReaderException readerException = exception as JsonReaderException;
-                    if (readerException == null)
-                    {
-                        this.externalLogger.LogErrorFromException(exception);
-                    }
-                    else
+                    if (readerException != null)
                     {
                         this.externalLogger.LogErrorFromException(readerException, readerException.Path, readerException.LineNumber, readerException.LinePosition);
                     }
+                    else
+                    {
+                        // If the exception does not have any additional info on it
+                        this.externalLogger.LogErrorFromException(exception);
+                    }
                 }
 
+                // The exception has been logged
                 return true;
             }
             else
             {
+                // The exception has not been logged
                 return false;
             }
         }
 
         /// <summary>
-        /// Logs a warning according to the lineinfo
+        /// Logs a warning according to the line info
         /// </summary>
         /// <param name="message">The warning message</param>
         /// <param name="location">The file that caused the warning</param>
         /// <param name="lineInfo">The information of the line that caused the warning</param>
         internal void LogWarning(string message, ErrorLocation location, IJsonLineInfo lineInfo)
         {
+            if (string.IsNullOrEmpty(message))
+            {
+                throw new ArgumentNullException(nameof(message));
+            }
 
+            if (lineInfo != null && lineInfo.HasLineInfo())
+            {
+                this.externalLogger.LogWarning(message, this.LocationPath(location), lineInfo.LineNumber, lineInfo.LinePosition);
+            }
+            else
+            {
+                this.externalLogger.LogWarning(message, this.LocationPath(location));
+            }
+        }
+
+        private string LocationPath(ErrorLocation location)
+        {
+            switch (location)
+            {
+                case ErrorLocation.Source:
+                    return this.SourceFile;
+                case ErrorLocation.Transform:
+                    return this.TransformFile;
+                default:
+                    return null;
+            }
         }
     }
 }

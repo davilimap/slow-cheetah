@@ -20,7 +20,7 @@ namespace SlowCheetah.JDT
         /// Logs a message
         /// </summary>
         /// <param name="message">The message</param>
-        /// <param name="fileName">The full path to the file that caused the message</param>
+        /// <param name="fileName">The full path to the file that caused the message. Can be null</param>
         /// <param name="lineNumber">The line that caused the message</param>
         /// <param name="linePosition">The position in the line that caused the message</param>
         void LogMessage(string message, string fileName, int lineNumber, int linePosition);
@@ -35,7 +35,14 @@ namespace SlowCheetah.JDT
         /// Logs a warning
         /// </summary>
         /// <param name="message">The warning message</param>
-        /// <param name="fileName">The full path to the file that caused the warning</param>
+        /// <param name="fileName">The full path to the file that caused the warning. Can be null</param>
+        void LogWarning(string message, string fileName);
+
+        /// <summary>
+        /// Logs a warning
+        /// </summary>
+        /// <param name="message">The warning message</param>
+        /// <param name="fileName">The full path to the file that caused the warning. Can be null</param>
         /// <param name="lineNumber">The line that caused the warning</param>
         /// <param name="linePosition">The position in the line that caused the warning</param>
         void LogWarning(string message, string fileName, int lineNumber, int linePosition);
@@ -50,7 +57,7 @@ namespace SlowCheetah.JDT
         /// Logs an error
         /// </summary>
         /// <param name="message">The error message</param>
-        /// <param name="fileName">The full path to the file that caused the exception</param>
+        /// <param name="fileName">The full path to the file that caused the exception. Can be null</param>
         /// <param name="lineNumber">The line that caused the exception</param>
         /// <param name="linePosition">The position in the line that caused the exception</param>
         void LogError(string message, string fileName, int lineNumber, int linePosition);
@@ -65,7 +72,7 @@ namespace SlowCheetah.JDT
         /// Logs an error from an exception
         /// </summary>
         /// <param name="ex">The exception that caused the error</param>
-        /// <param name="fileName">The full path to the file that caused the exception</param>
+        /// <param name="fileName">The full path to the file that caused the exception. Can be null</param>
         /// <param name="lineNumber">The line that caused the exception</param>
         /// <param name="linePosition">The position in the line that caused the exception</param>
         void LogErrorFromException(Exception ex, string fileName, int lineNumber, int linePosition);

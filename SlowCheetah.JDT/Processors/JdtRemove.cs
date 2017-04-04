@@ -32,7 +32,6 @@ namespace SlowCheetah.JDT
             switch (transformValue.Type)
             {
                 case JTokenType.String:
-                    // TO DO: warning if unable to remove
                     // If the value is just a string, remove that node
                     if (!source.Remove(transformValue.ToString()))
                     {
@@ -43,14 +42,19 @@ namespace SlowCheetah.JDT
                 case JTokenType.Boolean:
                     if ((bool)transformValue)
                     {
+                        if (source.Root.Equals(source))
+                        {
+                            throw JdtException.FromLineInfo("Cannot remove root", ErrorLocation.Transform, transformValue);
+                        }
+
                         // If the transform value is true, remove the entire node
-                        return this.RemoveThisNode(source);
+                        return this.RemoveThisNode(source, logger);
                     }
 
                     break;
                 case JTokenType.Object:
                     // If the value is an object, verify the attributes within and perform the remove
-                    return this.RemoveWithAttributes(source, (JObject)transformValue);
+                    return this.RemoveWithAttributes(source, (JObject)transformValue, logger);
                 default:
                     throw JdtException.FromLineInfo($"{transformValue.Type.ToString()} is not a valid transform value for Remove", ErrorLocation.Transform, transformValue);
             }
@@ -59,7 +63,7 @@ namespace SlowCheetah.JDT
             return true;
         }
 
-        private bool RemoveWithAttributes(JObject source, JObject removeObject)
+        private bool RemoveWithAttributes(JObject source, JObject removeObject, JsonTransformationContextLogger logger)
         {
             var attributes = this.attributeValidator.ValidateAndReturnAttributes(removeObject);
 
@@ -74,8 +78,13 @@ namespace SlowCheetah.JDT
                     {
                         if (token.Equals(source))
                         {
+                            if (source.Root.Equals(source))
+                            {
+                                throw JdtException.FromLineInfo("Cannot remove root", ErrorLocation.Transform, removeObject);
+                            }
+
                             // If the path specifies the current node
-                            if (!this.RemoveThisNode(source))
+                            if (!this.RemoveThisNode(source, logger))
                             {
                                 // Halt transformations
                                 return false;
@@ -112,24 +121,21 @@ namespace SlowCheetah.JDT
             return true;
         }
 
-        private bool RemoveThisNode(JObject nodeToRemove)
+        private bool RemoveThisNode(JObject nodeToRemove, JsonTransformationContextLogger logger)
         {
-            // Removes the give node
-            nodeToRemove.ThrowIfRoot("You cannot remove the root");
-
             var parent = (JProperty)nodeToRemove.Parent;
             if (parent == null)
             {
-                // TO DO: Potentially log a warning and continue with transformations
-                throw new JdtException("Could not perform remove");
+                // If the node can't be removed, log a warning pointing to the node in the source
+                logger.LogWarning("Could not remove node", ErrorLocation.Source, nodeToRemove);
+                return true;
             }
             else
             {
+                // If the node is removed, transformations should be halted
                 parent.Value = null;
+                return false;
             }
-
-            // Informs not to perform any more transformations on this node
-            return false;
         }
     }
 }

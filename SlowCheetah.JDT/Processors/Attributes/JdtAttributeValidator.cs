@@ -37,7 +37,7 @@ namespace SlowCheetah.JDT
     /// </summary>
     internal class JdtAttributeValidator
     {
-        private List<JdtAttributes> validAttributes;
+        private readonly List<JdtAttributes> validAttributes;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="JdtAttributeValidator"/> class.

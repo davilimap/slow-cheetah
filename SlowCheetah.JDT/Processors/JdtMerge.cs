@@ -36,8 +36,13 @@ namespace SlowCheetah.JDT
             }
             else
             {
-                // If the transform value is not an object, then simply replace it with
-                source.ThrowIfRoot("Cannot replace root");
+                // If the transformation is trying to replace the root, throw
+                if (source.Root.Equals(source))
+                {
+                    throw JdtException.FromLineInfo("Cannot replace root", ErrorLocation.Transform, transformValue);
+                }
+
+                // If the transform value is not an object, then simply replace it with the new token
                 source.Replace(transformValue);
             }
 
@@ -77,9 +82,13 @@ namespace SlowCheetah.JDT
                         }
                         else
                         {
-                            // If they are primitives or have different values,
-                            // perform a replace
-                            tokenToMerge.ThrowIfRoot("Cannot replace root");
+                            // If the transformation is trying to replace the root, throw
+                            if (tokenToMerge.Root.Equals(tokenToMerge))
+                            {
+                                throw JdtException.FromLineInfo("Cannot replace root", ErrorLocation.Transform, mergeObject);
+                            }
+
+                            // If they are primitives or have different values, perform a replace
                             tokenToMerge.Replace(valueToken);
                         }
                     }
