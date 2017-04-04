@@ -22,5 +22,16 @@ namespace SlowCheetah.JDT
         {
             return objectToSearch.Properties().Where(p => JsonUtilities.IsJdtSyntax(p.Name));
         }
+
+        internal static bool IsCriticalException(this Exception ex)
+        {
+            return ex is NullReferenceException
+                    || ex is StackOverflowException
+                    || ex is OutOfMemoryException
+                    || ex is System.Threading.ThreadAbortException
+                    || ex is IndexOutOfRangeException
+                    || ex is AccessViolationException;
+
+        }
     }
 }

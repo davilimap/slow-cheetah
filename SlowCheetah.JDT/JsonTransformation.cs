@@ -121,26 +121,31 @@ namespace SlowCheetah.JDT
 
                     // Execute the transforms
                     JdtProcessor.ProcessTransform(sourceObject, this.transformObject, this.logger);
-
-                    // Save the result to a memory stream
-                    // Don't close the stream of the streamwriter so data isn't lost
-                    // User should handle the close
-                    result = new MemoryStream();
-                    StreamWriter streamWriter = new StreamWriter(result);
-                    JsonTextWriter jsonWriter = new JsonTextWriter(streamWriter);
-
-                    // Writes the changes in the source object to the stream
-                    // and resets it so the user can read the stream
-                    sourceObject.WriteTo(jsonWriter);
-                    streamWriter.Flush();
-                    result.Position = 0;
                 }
-                catch (JdtException)
+                catch (Exception ex) when (!ex.IsCriticalException())
                 {
-                    return false;
+                    this.logger.LogErrorFromException(ex);
+                }
+                finally
+                {
+                    if (!this.logger.HasLoggedErrors)
+                    {
+                        // Save the result to a memory stream
+                        // Don't close the stream of the streamwriter so data isn't lost
+                        // User should handle the close
+                        result = new MemoryStream();
+                        StreamWriter streamWriter = new StreamWriter(result);
+                        JsonTextWriter jsonWriter = new JsonTextWriter(streamWriter);
+
+                        // Writes the changes in the source object to the stream
+                        // and resets it so the user can read the stream
+                        sourceObject.WriteTo(jsonWriter);
+                        streamWriter.Flush();
+                        result.Position = 0;
+                    }
                 }
 
-                return true;
+                return this.logger.HasLoggedErrors;
             }
         }
 

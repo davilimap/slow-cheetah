@@ -70,17 +70,17 @@ namespace SlowCheetah.JDT
         /// <summary>
         /// Gets the line number of the exception
         /// </summary>
-        public int LineNumber { get; private set; }
+        public int LineNumber { get; }
 
         /// <summary>
         /// Gets the line position of the exception
         /// </summary>
-        public int LinePosition { get; private set; }
+        public int LinePosition { get; }
 
         /// <summary>
         /// Gets the name of the file that generated the exception
         /// </summary>
-        public ErrorLocation Location { get; private set; } = ErrorLocation.None;
+        public ErrorLocation Location { get; } = ErrorLocation.None;
 
         /// <summary>
         /// Returns a <see cref="JdtException"/> with line info

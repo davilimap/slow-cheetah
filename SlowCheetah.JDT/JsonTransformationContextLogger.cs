@@ -4,6 +4,7 @@
 namespace SlowCheetah.JDT
 {
     using System;
+    using System.Runtime.ExceptionServices;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -52,8 +53,7 @@ namespace SlowCheetah.JDT
         /// Logs an error from an internal exception
         /// </summary>
         /// <param name="exception">The exception to log</param>
-        /// <returns>True if the exception was logged</returns>
-        internal bool LogErrorFromException(Exception exception)
+        internal void LogErrorFromException(Exception exception)
         {
             if (exception == null)
             {
@@ -85,14 +85,10 @@ namespace SlowCheetah.JDT
                         this.externalLogger.LogErrorFromException(exception);
                     }
                 }
-
-                // The exception has been logged
-                return true;
             }
             else
             {
-                // The exception has not been logged
-                return false;
+                ExceptionDispatchInfo.Capture(exception).Throw();
             }
         }
 
