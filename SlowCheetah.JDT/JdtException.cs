@@ -9,7 +9,7 @@ namespace SlowCheetah.JDT
     /// <summary>
     /// The file that caused the exception
     /// </summary>
-    internal enum ErrorLocation
+    public enum ErrorLocation
     {
         /// <summary>
         /// Represents no location set
@@ -47,7 +47,7 @@ namespace SlowCheetah.JDT
         /// </summary>
         /// <param name="message">The exception message</param>
         /// <param name="location">The file that generated the exception</param>
-        internal JdtException(string message, ErrorLocation location)
+        public JdtException(string message, ErrorLocation location)
             : this(message)
         {
             this.Location = location;
@@ -60,7 +60,7 @@ namespace SlowCheetah.JDT
         /// <param name="location">The file that generated the exception</param>
         /// <param name="lineNumber">The line that caused the error</param>
         /// <param name="linePosition">The position in the lite that caused the error</param>
-        internal JdtException(string message, ErrorLocation location, int lineNumber, int linePosition)
+        public JdtException(string message, ErrorLocation location, int lineNumber, int linePosition)
             : this(message, location)
         {
             this.LineNumber = lineNumber;
@@ -80,7 +80,7 @@ namespace SlowCheetah.JDT
         /// <summary>
         /// Gets the name of the file that generated the exception
         /// </summary>
-        internal ErrorLocation Location { get; private set; } = ErrorLocation.None;
+        public ErrorLocation Location { get; private set; } = ErrorLocation.None;
 
         /// <summary>
         /// Returns a <see cref="JdtException"/> with line info

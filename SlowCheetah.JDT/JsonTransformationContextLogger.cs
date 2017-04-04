@@ -11,7 +11,7 @@ namespace SlowCheetah.JDT
     /// </summary>
     internal class JsonTransformationContextLogger
     {
-        private IJsonTransformationLogger externalLogger = null;
+        private readonly IJsonTransformationLogger externalLogger = null;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="JsonTransformationContextLogger"/> class.
@@ -39,14 +39,14 @@ namespace SlowCheetah.JDT
         internal string SourceFile { get; set; } = "Source";
 
         /// <summary>
-        /// Gets or sets the transformation file of the current transformation
+        /// Gets the transformation file of the current transformation
         /// </summary>
-        internal string TransformFile { get; set; } = "Transform";
+        internal string TransformFile { get; } = "Transform";
 
         /// <summary>
-        /// Gets or sets a value indicating whether the logger has logged errrors
+        /// Gets a value indicating whether the logger has logged errrors
         /// </summary>
-        internal bool HasLoggedErrors { get; set; }
+        internal bool HasLoggedErrors { get; private set; }
 
         /// <summary>
         /// Logs an error from an internal exception

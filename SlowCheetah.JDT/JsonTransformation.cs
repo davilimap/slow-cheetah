@@ -13,10 +13,10 @@ namespace SlowCheetah.JDT
     /// </summary>
     public class JsonTransformation
     {
+        private readonly JsonTransformationContextLogger logger;
+
         private JObject transformObject;
         private JsonLoadSettings loadSettings;
-
-        private JsonTransformationContextLogger logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="JsonTransformation"/> class.
@@ -79,7 +79,7 @@ namespace SlowCheetah.JDT
         /// <param name="sourceFile">The path to the json file to be transformed</param>
         /// <param name="result">The stream to write the result into</param>
         /// <returns>True if the transformations were completed</returns>
-        public bool Apply(string sourceFile, out Stream result)
+        public bool TryApply(string sourceFile, out Stream result)
         {
             if (string.IsNullOrEmpty(sourceFile))
             {
@@ -89,8 +89,10 @@ namespace SlowCheetah.JDT
             this.logger.SourceFile = sourceFile;
 
             // Open the file as streams and apply the transforms
-            Stream sourceStream = File.Open(sourceFile, FileMode.Open);
-            return this.Apply(sourceStream, out result);
+            using (Stream sourceStream = File.Open(sourceFile, FileMode.Open))
+            {
+                return this.TryApply(sourceStream, out result);
+            }
         }
 
         /// <summary>
@@ -99,7 +101,7 @@ namespace SlowCheetah.JDT
         /// <param name="source">The object to be transformed</param>
         /// <param name="result">The stream to write the result into</param>
         /// <returns>True if the transformations were completed</returns>
-        public bool Apply(Stream source, out Stream result)
+        public bool TryApply(Stream source, out Stream result)
         {
             if (source == null)
             {
@@ -109,53 +111,36 @@ namespace SlowCheetah.JDT
             using (StreamReader sourceStreamReader = new StreamReader(source))
             using (JsonTextReader sourceReader = new JsonTextReader(sourceStreamReader))
             {
-                JsonLoadSettings loadSettings = new JsonLoadSettings()
-                {
-                    CommentHandling = CommentHandling.Ignore,
-
-                    // Obs: LineInfo is handled on Ignore and not Load
-                    // See https://github.com/JamesNK/Newtonsoft.Json/issues/1249
-                    LineInfoHandling = LineInfoHandling.Ignore
-                };
-
                 result = null;
                 JObject sourceObject = null;
 
                 try
                 {
                     // The JObject corresponding to the streams with line info
-                    sourceObject = JObject.Load(sourceReader, loadSettings);
+                    sourceObject = JObject.Load(sourceReader, this.loadSettings);
 
                     // Execute the transforms
                     JdtProcessor.ProcessTransform(sourceObject, this.transformObject, this.logger);
-                }
-                catch (Exception ex)
-                {
-                    if (!this.logger.LogErrorFromException(ex))
-                    {
-                        throw;
-                    }
-                }
-                finally
-                {
-                    if (!this.logger.HasLoggedErrors)
-                    {
-                        // Save the result to a memory stream
-                        // Don't close the stream of the streamwriter so data isn't lost
-                        // User should handle the close
-                        result = new MemoryStream();
-                        StreamWriter streamWriter = new StreamWriter(result);
-                        JsonTextWriter jsonWriter = new JsonTextWriter(streamWriter);
 
-                        // Writes the changes in the source object to the stream
-                        // and resets it so the user can read the stream
-                        sourceObject.WriteTo(jsonWriter);
-                        streamWriter.Flush();
-                        result.Position = 0;
-                    }
+                    // Save the result to a memory stream
+                    // Don't close the stream of the streamwriter so data isn't lost
+                    // User should handle the close
+                    result = new MemoryStream();
+                    StreamWriter streamWriter = new StreamWriter(result);
+                    JsonTextWriter jsonWriter = new JsonTextWriter(streamWriter);
+
+                    // Writes the changes in the source object to the stream
+                    // and resets it so the user can read the stream
+                    sourceObject.WriteTo(jsonWriter);
+                    streamWriter.Flush();
+                    result.Position = 0;
+                }
+                catch (JdtException)
+                {
+                    return false;
                 }
 
-                return this.logger.HasLoggedErrors;
+                return true;
             }
         }
 
