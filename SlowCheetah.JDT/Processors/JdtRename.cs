@@ -31,7 +31,7 @@ namespace SlowCheetah.JDT
             if (transformValue.Type != JTokenType.Object)
             {
                 // Rename only accepts objects, either with properties or direct renames
-                throw JdtException.FromLineInfo($"{transformValue.Type.ToString()} is not a valid transform value for Rename", ErrorLocation.Transform, transformValue);
+                throw JdtException.FromLineInfo(string.Format(Resources.ErrorMessage_InvalidRenameValue, transformValue.Type.ToString()), ErrorLocation.Transform, transformValue);
             }
             else
             {
@@ -48,12 +48,12 @@ namespace SlowCheetah.JDT
                     {
                         if (pathToken.Type != JTokenType.String)
                         {
-                            throw JdtException.FromLineInfo("Path attribute must be a string", ErrorLocation.Transform, pathToken);
+                            throw JdtException.FromLineInfo(Resources.ErrorMessage_PathContents, ErrorLocation.Transform, pathToken);
                         }
 
                         if (valueToken.Type != JTokenType.String)
                         {
-                            throw JdtException.FromLineInfo("Value attribute must be a string", ErrorLocation.Transform, valueToken);
+                            throw JdtException.FromLineInfo(Resources.ErrorMessage_ValueContents, ErrorLocation.Transform, valueToken);
                         }
 
                         // If the values are correct, rename each token found with the given path
@@ -61,14 +61,14 @@ namespace SlowCheetah.JDT
                         {
                             if (!this.RenameNode(nodeToRename, valueToken.ToString()))
                             {
-                                throw JdtException.FromLineInfo("Cannot rename node", ErrorLocation.Transform, renameObject);
+                                throw JdtException.FromLineInfo(Resources.ErrorMessage_RenameNode, ErrorLocation.Transform, renameObject);
                             }
                         }
                     }
                     else
                     {
                         // If either is not present, throw
-                        throw JdtException.FromLineInfo("Rename requires both path and value", ErrorLocation.Transform, renameObject);
+                        throw JdtException.FromLineInfo(Resources.ErrorMessage_RenameAttributes, ErrorLocation.Transform, renameObject);
                     }
                 }
                 else
@@ -79,7 +79,7 @@ namespace SlowCheetah.JDT
                     {
                         if (renameOperation.Value.Type != JTokenType.String)
                         {
-                            throw JdtException.FromLineInfo("Rename value must be a string", ErrorLocation.Transform, renameOperation);
+                            throw JdtException.FromLineInfo(Resources.ErrorMessage_ValueContents, ErrorLocation.Transform, renameOperation);
                         }
 
                         // TO DO: Warning if the node is not found
@@ -88,12 +88,12 @@ namespace SlowCheetah.JDT
                         {
                             if (!this.RenameNode(nodeToRename, renameOperation.Value.ToString()))
                             {
-                                throw JdtException.FromLineInfo("Cannot rename node", ErrorLocation.Transform, renameOperation);
+                                throw JdtException.FromLineInfo(Resources.ErrorMessage_RenameNode, ErrorLocation.Transform, renameOperation);
                             }
                         }
                         else
                         {
-                            logger.LogWarning($"Node {renameOperation.Name} was not found", ErrorLocation.Transform, renameOperation);
+                            logger.LogWarning(string.Format(Resources.WarningMessage_NodeNotFound, renameOperation.Name), ErrorLocation.Transform, renameOperation);
                         }
                     }
                 }
