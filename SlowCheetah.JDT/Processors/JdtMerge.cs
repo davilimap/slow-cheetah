@@ -39,7 +39,7 @@ namespace SlowCheetah.JDT
                 // If the transformation is trying to replace the root, throw
                 if (source.Root.Equals(source))
                 {
-                    throw JdtException.FromLineInfo("Cannot replace root", ErrorLocation.Transform, transformValue);
+                    throw JdtException.FromLineInfo(Resources.ErrorMessage_ReplaceRoot, ErrorLocation.Transform, transformValue);
                 }
 
                 // If the transform value is not an object, then simply replace it with the new token
@@ -64,7 +64,7 @@ namespace SlowCheetah.JDT
                 {
                     if (pathToken.Type != JTokenType.String)
                     {
-                        throw JdtException.FromLineInfo("Path attribute must be a string", ErrorLocation.Transform, mergeObject);
+                        throw JdtException.FromLineInfo(Resources.ErrorMessage_PathContents, ErrorLocation.Transform, mergeObject);
                     }
 
                     foreach (JToken tokenToMerge in source.SelectTokens(pathToken.ToString()).ToList())
@@ -85,7 +85,7 @@ namespace SlowCheetah.JDT
                             // If the transformation is trying to replace the root, throw
                             if (tokenToMerge.Root.Equals(tokenToMerge))
                             {
-                                throw JdtException.FromLineInfo("Cannot replace root", ErrorLocation.Transform, mergeObject);
+                                throw JdtException.FromLineInfo(Resources.ErrorMessage_ReplaceRoot, ErrorLocation.Transform, mergeObject);
                             }
 
                             // If they are primitives or have different values, perform a replace
@@ -96,7 +96,7 @@ namespace SlowCheetah.JDT
                 else
                 {
                     // If either is not present, throw
-                    throw JdtException.FromLineInfo("Merge requires both path and value", ErrorLocation.Transform, mergeObject);
+                    throw JdtException.FromLineInfo(Resources.ErrorMessage_MergeAttributes, ErrorLocation.Transform, mergeObject);
                 }
             }
             else

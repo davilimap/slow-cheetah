@@ -55,7 +55,7 @@ namespace SlowCheetah.JDT
                 {
                     if (pathToken.Type != JTokenType.String)
                     {
-                        throw JdtException.FromLineInfo("Path attribute must be a string", ErrorLocation.Transform, pathToken);
+                        throw JdtException.FromLineInfo(Resources.ErrorMessage_PathContents, ErrorLocation.Transform, pathToken);
                     }
 
                     foreach (JToken nodeToReplace in source.SelectTokens(pathToken.ToString()).ToList())
@@ -80,7 +80,7 @@ namespace SlowCheetah.JDT
                 else
                 {
                     // If either is not present, throw
-                    throw JdtException.FromLineInfo("Replace requires both path and value", ErrorLocation.Transform, replaceObject);
+                    throw JdtException.FromLineInfo(Resources.ErrorMessage_ReplaceAttributes, ErrorLocation.Transform, replaceObject);
                 }
 
                 // If we got here, transformations should continue

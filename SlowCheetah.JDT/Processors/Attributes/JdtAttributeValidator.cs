@@ -73,7 +73,7 @@ namespace SlowCheetah.JDT
                 {
                     // TO DO: Specify the transformation in the error
                     // If the attribute is not supported in this transformation, throw
-                    throw JdtException.FromLineInfo($"{property.Name} is not a valid attribute for this transformation", ErrorLocation.Transform, property);
+                    throw JdtException.FromLineInfo(string.Format(Resources.ErrorMessage_InvalidAttribute, property.Name), ErrorLocation.Transform, property);
                 }
                 else
                 {
@@ -85,7 +85,7 @@ namespace SlowCheetah.JDT
             // If the object has attributes, it should not have any other properties in it
             if (attributes.Count > 0 && attributes.Count != transformObject.Properties().Count())
             {
-                throw JdtException.FromLineInfo("Invalid transformation attributes", ErrorLocation.Transform, transformObject);
+                throw JdtException.FromLineInfo(Resources.ErrorMessage_InvalidAttributes, ErrorLocation.Transform, transformObject);
             }
 
             return attributes;

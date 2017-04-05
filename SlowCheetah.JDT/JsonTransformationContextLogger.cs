@@ -48,7 +48,7 @@ namespace SlowCheetah.JDT
         {
             get
             {
-                return this.sourceFile ?? "Source";
+                return this.sourceFile ?? Resources.DefaultSourceFileName;
             }
 
             set
@@ -60,7 +60,7 @@ namespace SlowCheetah.JDT
         /// <summary>
         /// Gets the transformation file of the current transformation
         /// </summary>
-        internal string TransformFile { get; } = "Transform";
+        internal string TransformFile { get; } = Resources.DefaultTransformFileName;
 
         /// <summary>
         /// Gets a value indicating whether the logger has logged errrors

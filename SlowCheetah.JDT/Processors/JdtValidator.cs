@@ -42,7 +42,7 @@ namespace SlowCheetah.JDT
                 {
                     if (!this.ValidVerbs.Contains(verb))
                     {
-                        throw JdtException.FromLineInfo($"{verb} is not a valid JDT verb", ErrorLocation.Transform, transformNode);
+                        throw JdtException.FromLineInfo(string.Format(Resources.ErrorMessage_InvalidVerb, verb), ErrorLocation.Transform, transformNode);
                     }
                 }
             }
