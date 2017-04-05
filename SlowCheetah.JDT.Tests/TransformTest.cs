@@ -206,7 +206,7 @@ namespace SlowCheetah.Tests.JDT
 
                 var transformed = JObject.Load(jsonReader);
 
-                Assert.True(JObject.DeepEquals(expected, transformed));
+                Assert.Equal(expected, transformed, new JTokenEqualityComparer());
             }
         }
     }

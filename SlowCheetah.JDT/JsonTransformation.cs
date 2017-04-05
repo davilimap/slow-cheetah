@@ -147,7 +147,7 @@ namespace SlowCheetah.JDT
                     }
                 }
 
-                return this.logger.HasLoggedErrors;
+                return !this.logger.HasLoggedErrors;
             }
         }
 
