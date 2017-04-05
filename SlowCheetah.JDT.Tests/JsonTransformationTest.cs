@@ -17,7 +17,26 @@ namespace SlowCheetah.JDT.Tests
         public void InvalidVerb()
         {
             string sourceString = @"{ 'A': 1 }";
-            string transformString = @"{ '@jdt.invalid': false }";
+            string transformString = @"{ 
+                                        '@jdt.invalid': false 
+                                        }";
+            string errorLogContent = "Exception: invalid is not a valid JDT verb Transform 0 0\r\n";
+
+            this.TransformFailTest(sourceString, transformString, errorLogContent, string.Empty, string.Empty);
+        }
+
+        [Fact]
+        public void InvalidAttribute()
+        {
+            string sourceString = @"{ 'A': 1 }";
+            string transformString = @"{ '@jdt.replace': { '@jdt.invalid': false } }";
+            string errorLogContent = "Exception: @jdt.invalid is not a valid attribute for this transformation Transform 0 0\r\n";
+
+            this.TransformFailTest(sourceString, transformString, errorLogContent, string.Empty, string.Empty);
+        }
+
+        private void TransformFailTest(string sourceString, string transformString, string errorLogContent, string warningLogContent, string messageLogContent)
+        {
             using (var transformStream = this.GetStreamFromString(transformString))
             using (var sourceStream = this.GetStreamFromString(sourceString))
             {
@@ -26,7 +45,9 @@ namespace SlowCheetah.JDT.Tests
                 Assert.False(transform.TryApply(sourceStream, out result));
                 Assert.Null(result);
 
-                // TO DO: Compare logger contents
+                Assert.Equal(this.logger.ErrorLogText, errorLogContent);
+                Assert.Equal(this.logger.WarningLogText, warningLogContent);
+                Assert.Equal(this.logger.MessageLogText, messageLogContent);
             }
         }
 

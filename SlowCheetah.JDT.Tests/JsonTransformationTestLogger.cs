@@ -11,50 +11,74 @@ namespace SlowCheetah.JDT.Tests
     /// </summary>
     public class JsonTransformationTestLogger : IJsonTransformationLogger
     {
-        public StringBuilder ErrorLog { get; } = new StringBuilder();
+        private StringBuilder errorLog = new StringBuilder();
 
-        public StringBuilder WarningLog { get; } = new StringBuilder();
+        private StringBuilder warningLog = new StringBuilder();
 
-        public StringBuilder MessageLog { get; } = new StringBuilder();
+        private StringBuilder messageLog = new StringBuilder();
+
+        public string ErrorLogText
+        {
+            get
+            {
+                return this.errorLog.ToString();
+            }
+        }
+
+        public string WarningLogText
+        {
+            get
+            {
+                return this.warningLog.ToString();
+            }
+        }
+
+        public string MessageLogText
+        {
+            get
+            {
+                return this.messageLog.ToString();
+            }
+        }
 
         public void LogError(string message)
         {
-            this.ErrorLog.AppendLine(message);
+            this.errorLog.AppendLine(message);
         }
 
         public void LogError(string message, string fileName, int lineNumber, int linePosition)
         {
-            this.ErrorLog.AppendLine(this.BuildLine(message, fileName, lineNumber, linePosition));
+            this.errorLog.AppendLine(this.BuildLine(message, fileName, lineNumber, linePosition));
         }
 
         public void LogErrorFromException(Exception ex)
         {
-            this.ErrorLog.AppendLine($"Exception: {ex.Message}");
+            this.errorLog.AppendLine($"Exception: {ex.Message}");
         }
 
         public void LogErrorFromException(Exception ex, string fileName, int lineNumber, int linePosition)
         {
-            this.ErrorLog.AppendLine(this.BuildLine($"Exception: {ex.Message}", fileName, lineNumber, linePosition));
+            this.errorLog.AppendLine(this.BuildLine($"Exception: {ex.Message}", fileName, lineNumber, linePosition));
         }
 
         public void LogMessage(string message)
         {
-            this.MessageLog.AppendLine(message);
+            this.messageLog.AppendLine(message);
         }
 
         public void LogWarning(string message)
         {
-            this.WarningLog.AppendLine(message);
+            this.warningLog.AppendLine(message);
         }
 
         public void LogWarning(string message, string fileName)
         {
-            this.WarningLog.AppendLine($"{message} {fileName}");
+            this.warningLog.AppendLine($"{message} {fileName}");
         }
 
         public void LogWarning(string message, string fileName, int lineNumber, int linePosition)
         {
-            this.WarningLog.AppendLine(this.BuildLine(message, fileName, lineNumber, linePosition));
+            this.warningLog.AppendLine(this.BuildLine(message, fileName, lineNumber, linePosition));
         }
 
         private string BuildLine(string message, string fileName, int lineNumber, int linePosition)
