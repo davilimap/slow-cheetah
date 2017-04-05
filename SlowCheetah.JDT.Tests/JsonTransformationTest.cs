@@ -4,6 +4,7 @@
 namespace SlowCheetah.JDT.Tests
 {
     using System.IO;
+    using System.Text;
     using Xunit;
 
     /// <summary>
@@ -20,9 +21,10 @@ namespace SlowCheetah.JDT.Tests
             string transformString = @"{ 
                                         '@jdt.invalid': false 
                                         }";
-            string errorLogContent = "Exception: invalid is not a valid JDT verb Transform 0 0\r\n";
+            StringBuilder errorLogContent = new StringBuilder();
+            errorLogContent.AppendLine($"Exception: {string.Format(Resources.ErrorMessage_InvalidVerb, "invalid")} Transform 0 0");
 
-            this.TransformFailTest(sourceString, transformString, errorLogContent, string.Empty, string.Empty);
+            this.TransformFailTest(sourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
         }
 
         [Fact]
@@ -30,9 +32,10 @@ namespace SlowCheetah.JDT.Tests
         {
             string sourceString = @"{ 'A': 1 }";
             string transformString = @"{ '@jdt.replace': { '@jdt.invalid': false } }";
-            string errorLogContent = "Exception: @jdt.invalid is not a valid attribute for this transformation Transform 0 0\r\n";
+            StringBuilder errorLogContent = new StringBuilder();
+            errorLogContent.AppendLine($"Exception: {string.Format(Resources.ErrorMessage_InvalidAttribute, "invalid")} Transform 0 0");
 
-            this.TransformFailTest(sourceString, transformString, errorLogContent, string.Empty, string.Empty);
+            this.TransformFailTest(sourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
         }
 
         private void TransformFailTest(string sourceString, string transformString, string errorLogContent, string warningLogContent, string messageLogContent)

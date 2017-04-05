@@ -73,7 +73,7 @@ namespace SlowCheetah.JDT
                 {
                     // TO DO: Specify the transformation in the error
                     // If the attribute is not supported in this transformation, throw
-                    throw JdtException.FromLineInfo(string.Format(Resources.ErrorMessage_InvalidAttribute, property.Name), ErrorLocation.Transform, property);
+                    throw JdtException.FromLineInfo(string.Format(Resources.ErrorMessage_InvalidAttribute, JsonUtilities.GetJdtSyntax(property.Name)), ErrorLocation.Transform, property);
                 }
                 else
                 {
