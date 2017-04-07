@@ -156,10 +156,7 @@ namespace SlowCheetah.JDT
             this.loadSettings = new JsonLoadSettings()
             {
                 CommentHandling = CommentHandling.Ignore,
-
-                // Obs: LineInfo is handled on Ignore and not Load
-                // See https://github.com/JamesNK/Newtonsoft.Json/issues/1249
-                LineInfoHandling = LineInfoHandling.Ignore
+                LineInfoHandling = LineInfoHandling.Load
             };
 
             using (StreamReader transformStreamReader = new StreamReader(transformStream))

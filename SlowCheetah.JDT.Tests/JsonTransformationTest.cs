@@ -18,11 +18,9 @@ namespace SlowCheetah.JDT.Tests
         public void InvalidVerb()
         {
             string sourceString = @"{ 'A': 1 }";
-            string transformString = @"{ 
-                                        '@jdt.invalid': false 
-                                        }";
+            string transformString = @"{ '@jdt.invalid': false }";
             StringBuilder errorLogContent = new StringBuilder();
-            errorLogContent.AppendLine($"Exception: {string.Format(Resources.ErrorMessage_InvalidVerb, "invalid")} Transform 0 0");
+            errorLogContent.AppendLine($"Exception: {string.Format(Resources.ErrorMessage_InvalidVerb, "invalid")} Transform 1 17");
 
             this.TransformFailTest(sourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
         }
@@ -33,7 +31,7 @@ namespace SlowCheetah.JDT.Tests
             string sourceString = @"{ 'A': 1 }";
             string transformString = @"{ '@jdt.replace': { '@jdt.invalid': false } }";
             StringBuilder errorLogContent = new StringBuilder();
-            errorLogContent.AppendLine($"Exception: {string.Format(Resources.ErrorMessage_InvalidAttribute, "invalid")} Transform 0 0");
+            errorLogContent.AppendLine($"Exception: {string.Format(Resources.ErrorMessage_InvalidAttribute, "invalid")} Transform 1 35");
 
             this.TransformFailTest(sourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
         }
@@ -48,9 +46,9 @@ namespace SlowCheetah.JDT.Tests
                 Assert.False(transform.TryApply(sourceStream, out result));
                 Assert.Null(result);
 
-                Assert.Equal(this.logger.ErrorLogText, errorLogContent);
-                Assert.Equal(this.logger.WarningLogText, warningLogContent);
-                Assert.Equal(this.logger.MessageLogText, messageLogContent);
+                Assert.Equal(errorLogContent, this.logger.ErrorLogText);
+                Assert.Equal(warningLogContent, this.logger.WarningLogText);
+                Assert.Equal(messageLogContent, this.logger.MessageLogText);
             }
         }
 
