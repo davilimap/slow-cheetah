@@ -36,6 +36,21 @@ namespace SlowCheetah.JDT.Tests
             this.TransformFailTest(sourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
         }
 
+        public void MixedAttributes()
+        {
+        }
+
+        public void MissingAttribute()
+        {
+        }
+
+        public void WrongAttribute()
+        {
+            string sourceString = @"{ 'A': 1 }";
+            string transformString = @"{ '@jdt.remove': { '@jdt.path': false } }";
+            StringBuilder errorLogContent = new StringBuilder();
+        }
+
         private void TransformFailTest(string sourceString, string transformString, string errorLogContent, string warningLogContent, string messageLogContent)
         {
             using (var transformStream = this.GetStreamFromString(transformString))
