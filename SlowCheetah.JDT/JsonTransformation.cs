@@ -137,7 +137,10 @@ namespace SlowCheetah.JDT
                         // User should handle the close
                         result = new MemoryStream();
                         StreamWriter streamWriter = new StreamWriter(result);
-                        JsonTextWriter jsonWriter = new JsonTextWriter(streamWriter);
+                        JsonTextWriter jsonWriter = new JsonTextWriter(streamWriter)
+                        {
+                            Formatting = Formatting.Indented
+                        };
 
                         // Writes the changes in the source object to the stream
                         // and resets it so the user can read the stream
