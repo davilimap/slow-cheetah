@@ -71,7 +71,7 @@ namespace SlowCheetah.JDT.Tests
         }
 
         /// <summary>
-        /// Tests the failiure when
+        /// Tests the failiure when a required attribute is not found
         /// </summary>
         [Fact]
         public void MissingAttribute()
@@ -90,6 +90,9 @@ namespace SlowCheetah.JDT.Tests
             this.TransformFailTest(sourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
         }
 
+        /// <summary>
+        /// Tests the failiure when an attribute has an incorrect value
+        /// </summary>
         [Fact]
         public void WrongAttributeValue()
         {
