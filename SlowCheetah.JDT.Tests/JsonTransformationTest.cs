@@ -128,6 +128,10 @@ namespace SlowCheetah.JDT.Tests
             this.TryTransformTest(this.simpleSourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
         }
 
+        /// <summary>
+        /// Tests the error caused when a path attribute returns no result
+        /// </summary>
+        [Fact]
         public void RemoveNonExistantNode()
         {
             string transformString = @"{
@@ -138,6 +142,7 @@ namespace SlowCheetah.JDT.Tests
 
             // This should log a warning that the path has not been found
             StringBuilder warningLogContent = new StringBuilder();
+            warningLogContent.AppendLine($"{Resources.WarningMessage_NoResults} Transform 3 59");
 
             this.TryTransformTest(this.simpleSourceString, transformString, string.Empty, warningLogContent.ToString(), string.Empty);
         }
@@ -244,19 +249,23 @@ namespace SlowCheetah.JDT.Tests
             using (var sourceStream = this.GetStreamFromString(sourceString))
             {
                 JsonTransformation transform = new JsonTransformation(transformStream, this.logger);
-                Stream result;
+                Stream result = null;
 
                 // If there should be errors, the transform should fail
                 bool shouldTransformSucceed = string.IsNullOrEmpty(errorLogContent);
 
-                Assert.Equal(shouldTransformSucceed, transform.TryApply(sourceStream, out result));
+                var exception = Record.Exception(() => result = transform.Apply(sourceStream));
+
                 if (shouldTransformSucceed)
                 {
                     Assert.NotNull(result);
+                    Assert.Null(exception);
                 }
                 else
                 {
                     Assert.Null(result);
+                    Assert.NotNull(exception);
+                    Assert.IsType<JdtException>(exception);
                 }
 
                 Assert.Equal(errorLogContent, this.logger.ErrorLogText);
