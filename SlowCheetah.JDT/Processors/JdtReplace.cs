@@ -30,10 +30,16 @@ namespace SlowCheetah.JDT
             if (transformValue.Type == JTokenType.Object)
             {
                 // If the value is an object, analyze the contents and perform the appropriate transform
-                return this.ReplaceWithProperties(source, (JObject)transformValue);
+                return this.ReplaceWithProperties(source, (JObject)transformValue, logger);
             }
             else
             {
+                if (source.Root.Equals(source))
+                {
+                    // If trying to replace the root with a non-object token, throw
+                    throw JdtException.FromLineInfo(Resources.ErrorMessage_ReplaceRoot, ErrorLocation.Transform, transformValue);
+                }
+
                 // If the value is not an object, simply replace the original node with the new value
                 source.Replace(transformValue);
 
@@ -42,7 +48,7 @@ namespace SlowCheetah.JDT
             }
         }
 
-        private bool ReplaceWithProperties(JObject source, JObject replaceObject)
+        private bool ReplaceWithProperties(JObject source, JObject replaceObject, JsonTransformationContextLogger logger)
         {
             var attributes = this.attributeValidator.ValidateAndReturnAttributes(replaceObject);
 
@@ -58,17 +64,29 @@ namespace SlowCheetah.JDT
                         throw JdtException.FromLineInfo(Resources.ErrorMessage_PathContents, ErrorLocation.Transform, pathToken);
                     }
 
-                    foreach (JToken nodeToReplace in source.SelectTokens(pathToken.ToString()).ToList())
+                    var tokensToReplace = source.SelectTokens(pathToken.ToString()).ToList();
+                    if (!tokensToReplace.Any())
+                    {
+                        logger.LogWarning(Resources.WarningMessage_NoResults, ErrorLocation.Transform, pathToken);
+                    }
+
+                    foreach (JToken token in tokensToReplace)
                     {
                         bool replacedThisNode = false;
 
-                        if (nodeToReplace.Equals(source))
+                        if (token.Root.Equals(token) && valueToken.Type != JTokenType.Object)
+                        {
+                            // If trying to replace the root object with a token that is not another object, throw
+                            throw JdtException.FromLineInfo(Resources.ErrorMessage_ReplaceRoot, ErrorLocation.Transform, pathToken);
+                        }
+
+                        if (token.Equals(source))
                         {
                             // If the specified path is to the current node
                             replacedThisNode = true;
                         }
 
-                        nodeToReplace.Replace(valueToken);
+                        token.Replace(valueToken);
 
                         if (replacedThisNode)
                         {
@@ -89,6 +107,7 @@ namespace SlowCheetah.JDT
             else
             {
                 // If there are no attributes, replace the current object with the given object
+                // Here, the root can be replaced as the replace value is an object
                 source.Replace(replaceObject);
 
                 // If the node is replaced, stop transformations on it
