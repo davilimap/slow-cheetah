@@ -14,41 +14,97 @@ namespace SlowCheetah.JDT.Tests
     {
         private JsonTransformationTestLogger logger = new JsonTransformationTestLogger();
 
+        /// <summary>
+        /// Tests the failiure caused when an invalid verb is found
+        /// </summary>
         [Fact]
         public void InvalidVerb()
         {
             string sourceString = @"{ 'A': 1 }";
-            string transformString = @"{ '@jdt.invalid': false }";
+            string transformString = @"{ 
+                                         '@jdt.invalid': false 
+                                       }";
+
+            // The error position should be the end of the invalid property key
             StringBuilder errorLogContent = new StringBuilder();
-            errorLogContent.AppendLine($"Exception: {string.Format(Resources.ErrorMessage_InvalidVerb, "invalid")} Transform 1 17");
+            errorLogContent.AppendLine($"Exception: {string.Format(Resources.ErrorMessage_InvalidVerb, "invalid")} Transform 2 56");
+
+            this.TransformFailTest(sourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
+        }
+
+        /// <summary>
+        /// Tests the failiure caused by a verb having an invalid value
+        /// </summary>
+        [Fact]
+        public void InvalidVerbValue()
+        {
+            string sourceString = @"{ 'A': 1 }";
+            string transformString = @"{ 
+                                         '@jdt.remove': 10 
+                                       }";
+
+            // The error position should be the end of the invalid token
+            StringBuilder errorLogContent = new StringBuilder();
+            errorLogContent.AppendLine($"Exception: {string.Format(Resources.ErrorMessage_InvalidRemoveValue, "Integer")} Transform 2 58");
+
+            this.TransformFailTest(sourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
+        }
+
+        /// <summary>
+        /// Tests the failiure when an invalid attribute is found within a verb
+        /// </summary>
+        [Fact]
+        public void InvalidAttribute()
+        {
+            string sourceString = @"{ 'A': 1 }";
+            string transformString = @"{ 
+                                         '@jdt.replace': { 
+                                           '@jdt.invalid': false 
+                                         } 
+                                       }";
+
+            // The error position should be at the end of the invalid attribute key
+            StringBuilder errorLogContent = new StringBuilder();
+            errorLogContent.AppendLine($"Exception: {string.Format(Resources.ErrorMessage_InvalidAttribute, "invalid")} Transform 3 58");
+
+            this.TransformFailTest(sourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
+        }
+
+        /// <summary>
+        /// Tests the failiure when
+        /// </summary>
+        [Fact]
+        public void MissingAttribute()
+        {
+            string sourceString = @"{ 'A': 1 }";
+            string transformString = @"{ 
+                                         '@jdt.rename': { 
+                                           '@jdt.path': 'A' 
+                                         } 
+                                       }";
+
+            // The error should point to the beginning of the verb object
+            StringBuilder errorLogContent = new StringBuilder();
+            errorLogContent.AppendLine($"Exception: {Resources.ErrorMessage_RenameAttributes} Transform 2 57");
 
             this.TransformFailTest(sourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
         }
 
         [Fact]
-        public void InvalidAttribute()
+        public void WrongAttributeValue()
         {
             string sourceString = @"{ 'A': 1 }";
-            string transformString = @"{ '@jdt.replace': { '@jdt.invalid': false } }";
+            string transformString = @"{
+                                         '@jdt.remove': { 
+                                           '@jdt.path': false
+                                         } 
+                                       }";
+
+            // The error should point to the end of the invalid token
             StringBuilder errorLogContent = new StringBuilder();
-            errorLogContent.AppendLine($"Exception: {string.Format(Resources.ErrorMessage_InvalidAttribute, "invalid")} Transform 1 35");
+            errorLogContent.AppendLine($"Exception: {Resources.ErrorMessage_PathContents} Transform 3 61");
 
             this.TransformFailTest(sourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
-        }
-
-        public void MixedAttributes()
-        {
-        }
-
-        public void MissingAttribute()
-        {
-        }
-
-        public void WrongAttribute()
-        {
-            string sourceString = @"{ 'A': 1 }";
-            string transformString = @"{ '@jdt.remove': { '@jdt.path': false } }";
-            StringBuilder errorLogContent = new StringBuilder();
         }
 
         private void TransformFailTest(string sourceString, string transformString, string errorLogContent, string warningLogContent, string messageLogContent)
