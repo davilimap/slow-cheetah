@@ -86,12 +86,10 @@ namespace SlowCheetah.JDT
                 throw new ArgumentNullException(nameof(sourceFile));
             }
 
-            this.logger.SourceFile = sourceFile;
-
             // Open the file as streams and apply the transforms
             using (Stream sourceStream = File.Open(sourceFile, FileMode.Open))
             {
-                return this.TryApply(sourceStream, out result);
+                return this.TryApplyWithSourceName(sourceStream, sourceFile, out result);
             }
         }
 
@@ -103,12 +101,69 @@ namespace SlowCheetah.JDT
         /// <returns>True if the transformations were completed</returns>
         public bool TryApply(Stream source, out Stream result)
         {
+            return this.TryApplyWithSourceName(source, null, out result);
+        }
+
+        /// <summary>
+        /// Transforms a JSON object
+        /// </summary>
+        /// <param name="sourceFile">The object to be transformed</param>
+        /// <returns>The stream with the result of the transform</returns>
+        public Stream Apply(string sourceFile)
+        {
+            if (string.IsNullOrEmpty(sourceFile))
+            {
+                throw new ArgumentNullException(nameof(sourceFile));
+            }
+
+            // Open the file as streams and apply the transforms
+            using (Stream sourceStream = File.Open(sourceFile, FileMode.Open))
+            {
+                return this.ApplyWithSourceName(sourceStream, sourceFile);
+            }
+        }
+
+        /// <summary>
+        /// Transforms a JSON object
+        /// </summary>
+        /// <param name="source">The object to be transformed</param>
+        /// <returns>The stream with the result of the transform</returns>
+        public Stream Apply(Stream source)
+        {
+            return this.ApplyWithSourceName(source, null);
+        }
+
+        private bool TryApplyWithSourceName(Stream source, string sourceName, out Stream result)
+        {
             if (source == null)
             {
                 throw new ArgumentNullException(nameof(source));
             }
 
-            this.logger.SourceFile = null;
+            bool success = true;
+            result = null;
+
+            try
+            {
+                result = this.ApplyWithSourceName(source, sourceName);
+            }
+            catch (Exception ex) when (!ex.IsCriticalException())
+            {
+                success = false;
+            }
+
+            return success;
+        }
+
+        private Stream ApplyWithSourceName(Stream source, string sourceName)
+        {
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            this.logger.SourceFile = sourceName;
+            Stream result;
 
             using (StreamReader sourceStreamReader = new StreamReader(source))
             using (JsonTextReader sourceReader = new JsonTextReader(sourceStreamReader))
@@ -123,34 +178,30 @@ namespace SlowCheetah.JDT
 
                     // Execute the transforms
                     JdtProcessor.ProcessTransform(sourceObject, this.transformObject, this.logger);
+
+                    // Save the result to a memory stream
+                    // Don't close the stream of the streamwriter so data isn't lost
+                    // User should handle the close
+                    result = new MemoryStream();
+                    StreamWriter streamWriter = new StreamWriter(result);
+                    JsonTextWriter jsonWriter = new JsonTextWriter(streamWriter)
+                    {
+                        Formatting = Formatting.Indented
+                    };
+
+                    // Writes the changes in the source object to the stream
+                    // and resets it so the user can read the stream
+                    sourceObject.WriteTo(jsonWriter);
+                    streamWriter.Flush();
+                    result.Position = 0;
+
+                    return result;
                 }
                 catch (Exception ex) when (!ex.IsCriticalException())
                 {
                     this.logger.LogErrorFromException(ex);
+                    throw;
                 }
-                finally
-                {
-                    if (!this.logger.HasLoggedErrors)
-                    {
-                        // Save the result to a memory stream
-                        // Don't close the stream of the streamwriter so data isn't lost
-                        // User should handle the close
-                        result = new MemoryStream();
-                        StreamWriter streamWriter = new StreamWriter(result);
-                        JsonTextWriter jsonWriter = new JsonTextWriter(streamWriter)
-                        {
-                            Formatting = Formatting.Indented
-                        };
-
-                        // Writes the changes in the source object to the stream
-                        // and resets it so the user can read the stream
-                        sourceObject.WriteTo(jsonWriter);
-                        streamWriter.Flush();
-                        result.Position = 0;
-                    }
-                }
-
-                return !this.logger.HasLoggedErrors;
             }
         }
 
