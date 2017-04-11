@@ -26,7 +26,12 @@ using System.Runtime.InteropServices;
 [assembly: Guid("6354d859-e629-49fc-b154-fc0ba42d71b0")]
 
 // Allow the test to see the internals of this class
-[assembly: InternalsVisibleTo("SlowCheetah.Tests")]
+[assembly: InternalsVisibleTo("SlowCheetah.Tests,PublicKey=" +
+    "002400000480000094000000060200000024000052534131000400000100010043e40c8468566d" +
+    "f38867670979c59e69c3d4faaadbeba044fe2e229ff5774da7b9a7a4d0329213f81005d4077ae4" +
+    "c0c031e8d31ec54725d6ff577fd822321b4de2044375881fa262f3fd3a4e102a968b47be75bb61" +
+    "e87de8363ea3d5de75e2f80d5361abc686506d4bb2174a3ee967b1708e5ed7e02e0b1e7f900e34" +
+    "50321aa7")]
 
 // Version information for an assembly consists of the following four values:
 //

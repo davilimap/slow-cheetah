@@ -1,4 +1,7 @@
-﻿namespace SlowCheetah.JDT
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See  License.md file in the project root for full license information.
+
+namespace SlowCheetah.JDT
 {
     using System.Linq;
     using Newtonsoft.Json.Linq;
@@ -23,12 +26,12 @@
         public override string Verb { get; } = "rename";
 
         /// <inheritdoc/>
-        protected override bool ProcessCore(JObject source, JToken transformValue)
+        protected override bool ProcessCore(JObject source, JToken transformValue, JsonTransformationContextLogger logger)
         {
             if (transformValue.Type != JTokenType.Object)
             {
                 // Rename only accepts objects, either with properties or direct renames
-                throw new JdtException(transformValue.Type.ToString() + " is not a valid transform value for Rename");
+                throw JdtException.FromLineInfo(string.Format(Resources.ErrorMessage_InvalidRenameValue, transformValue.Type.ToString()), ErrorLocation.Transform, transformValue);
             }
             else
             {
@@ -45,24 +48,33 @@
                     {
                         if (pathToken.Type != JTokenType.String)
                         {
-                            throw new JdtException("Path attribute must be a string");
+                            throw JdtException.FromLineInfo(Resources.ErrorMessage_PathContents, ErrorLocation.Transform, pathToken);
                         }
 
                         if (valueToken.Type != JTokenType.String)
                         {
-                            throw new JdtException("Value attribute must be a string");
+                            throw JdtException.FromLineInfo(Resources.ErrorMessage_ValueContents, ErrorLocation.Transform, valueToken);
+                        }
+
+                        var tokensToRename = source.SelectTokens(pathToken.ToString()).ToList();
+                        if (!tokensToRename.Any())
+                        {
+                            logger.LogWarning(Resources.WarningMessage_NoResults, ErrorLocation.Transform, pathToken);
                         }
 
                         // If the values are correct, rename each token found with the given path
-                        foreach (JToken nodeToRename in source.SelectTokens(pathToken.ToString()).ToList())
+                        foreach (JToken token in tokensToRename)
                         {
-                            this.RenameNode(nodeToRename, valueToken.ToString());
+                            if (!this.RenameNode(token, valueToken.ToString()))
+                            {
+                                throw JdtException.FromLineInfo(Resources.ErrorMessage_RenameNode, ErrorLocation.Transform, renameObject);
+                            }
                         }
                     }
                     else
                     {
                         // If either is not present, throw
-                        throw new JdtException("Rename requires both path and value");
+                        throw JdtException.FromLineInfo(Resources.ErrorMessage_RenameAttributes, ErrorLocation.Transform, renameObject);
                     }
                 }
                 else
@@ -73,14 +85,21 @@
                     {
                         if (renameOperation.Value.Type != JTokenType.String)
                         {
-                            throw new JdtException("Rename value must be a string");
+                            throw JdtException.FromLineInfo(Resources.ErrorMessage_ValueContents, ErrorLocation.Transform, renameOperation);
                         }
 
                         // TO DO: Warning if the node is not found
                         JToken nodeToRename;
                         if (source.TryGetValue(renameOperation.Name, out nodeToRename))
                         {
-                            this.RenameNode(nodeToRename, renameOperation.Value.ToString());
+                            if (!this.RenameNode(nodeToRename, renameOperation.Value.ToString()))
+                            {
+                                throw JdtException.FromLineInfo(Resources.ErrorMessage_RenameNode, ErrorLocation.Transform, renameOperation);
+                            }
+                        }
+                        else
+                        {
+                            logger.LogWarning(string.Format(Resources.WarningMessage_NodeNotFound, renameOperation.Name), ErrorLocation.Transform, renameOperation);
                         }
                     }
                 }
@@ -90,7 +109,7 @@
             return true;
         }
 
-        private void RenameNode(JToken nodeToRename, string newName)
+        private bool RenameNode(JToken nodeToRename, string newName)
         {
             // We can only rename tokens belonging to a property
             // This excludes objects from arrays and the root object
@@ -98,11 +117,12 @@
 
             if (parent == null)
             {
-                throw new JdtException("Cannot rename node");
+                return false;
             }
 
             // Replace with a new property of identical value and new name
             parent.Replace(new JProperty(newName, nodeToRename));
+            return true;
         }
     }
 }

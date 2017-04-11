@@ -1,4 +1,7 @@
-﻿namespace SlowCheetah.JDT
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See  License.md file in the project root for full license information.
+
+namespace SlowCheetah.JDT
 {
     using System.Linq;
     using Newtonsoft.Json.Linq;
@@ -22,15 +25,21 @@
         public override string Verb { get; } = "replace";
 
         /// <inheritdoc/>
-        protected override bool ProcessCore(JObject source, JToken transformValue)
+        protected override bool ProcessCore(JObject source, JToken transformValue, JsonTransformationContextLogger logger)
         {
             if (transformValue.Type == JTokenType.Object)
             {
                 // If the value is an object, analyze the contents and perform the appropriate transform
-                return this.ReplaceWithProperties(source, (JObject)transformValue);
+                return this.ReplaceWithProperties(source, (JObject)transformValue, logger);
             }
             else
             {
+                if (source.Root.Equals(source))
+                {
+                    // If trying to replace the root with a non-object token, throw
+                    throw JdtException.FromLineInfo(Resources.ErrorMessage_ReplaceRoot, ErrorLocation.Transform, transformValue);
+                }
+
                 // If the value is not an object, simply replace the original node with the new value
                 source.Replace(transformValue);
 
@@ -39,7 +48,7 @@
             }
         }
 
-        private bool ReplaceWithProperties(JObject source, JObject replaceObject)
+        private bool ReplaceWithProperties(JObject source, JObject replaceObject, JsonTransformationContextLogger logger)
         {
             var attributes = this.attributeValidator.ValidateAndReturnAttributes(replaceObject);
 
@@ -52,20 +61,32 @@
                 {
                     if (pathToken.Type != JTokenType.String)
                     {
-                        throw new JdtException("Path attribute must be a string");
+                        throw JdtException.FromLineInfo(Resources.ErrorMessage_PathContents, ErrorLocation.Transform, pathToken);
                     }
 
-                    foreach (JToken nodeToReplace in source.SelectTokens(pathToken.ToString()).ToList())
+                    var tokensToReplace = source.SelectTokens(pathToken.ToString()).ToList();
+                    if (!tokensToReplace.Any())
+                    {
+                        logger.LogWarning(Resources.WarningMessage_NoResults, ErrorLocation.Transform, pathToken);
+                    }
+
+                    foreach (JToken token in tokensToReplace)
                     {
                         bool replacedThisNode = false;
 
-                        if (nodeToReplace.Equals(source))
+                        if (token.Root.Equals(token) && valueToken.Type != JTokenType.Object)
+                        {
+                            // If trying to replace the root object with a token that is not another object, throw
+                            throw JdtException.FromLineInfo(Resources.ErrorMessage_ReplaceRoot, ErrorLocation.Transform, pathToken);
+                        }
+
+                        if (token.Equals(source))
                         {
                             // If the specified path is to the current node
                             replacedThisNode = true;
                         }
 
-                        nodeToReplace.Replace(valueToken);
+                        token.Replace(valueToken);
 
                         if (replacedThisNode)
                         {
@@ -77,7 +98,7 @@
                 else
                 {
                     // If either is not present, throw
-                    throw new JdtException("Replace requires both path and value");
+                    throw JdtException.FromLineInfo(Resources.ErrorMessage_ReplaceAttributes, ErrorLocation.Transform, replaceObject);
                 }
 
                 // If we got here, transformations should continue
@@ -86,6 +107,7 @@
             else
             {
                 // If there are no attributes, replace the current object with the given object
+                // Here, the root can be replaced as the replace value is an object
                 source.Replace(replaceObject);
 
                 // If the node is replaced, stop transformations on it

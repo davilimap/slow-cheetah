@@ -1,4 +1,7 @@
-﻿namespace SlowCheetah.JDT
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See  License.md file in the project root for full license information.
+
+namespace SlowCheetah.JDT
 {
     using System;
     using System.Collections.Generic;
@@ -70,7 +73,7 @@
                 {
                     // TO DO: Specify the transformation in the error
                     // If the attribute is not supported in this transformation, throw
-                    throw new JdtException($"{property.Name} is not a valid attribute for this transformation");
+                    throw JdtException.FromLineInfo(string.Format(Resources.ErrorMessage_InvalidAttribute, property.Name), ErrorLocation.Transform, property);
                 }
                 else
                 {
@@ -82,7 +85,7 @@
             // If the object has attributes, it should not have any other properties in it
             if (attributes.Count > 0 && attributes.Count != transformObject.Properties().Count())
             {
-                throw new JdtException("Invalid transformation attributes");
+                throw JdtException.FromLineInfo(Resources.ErrorMessage_InvalidAttributes, ErrorLocation.Transform, transformObject);
             }
 
             return attributes;

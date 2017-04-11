@@ -1,4 +1,7 @@
-﻿namespace SlowCheetah.JDT
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See  License.md file in the project root for full license information.
+
+namespace SlowCheetah.JDT
 {
     using System;
     using System.Collections.Generic;
@@ -11,31 +14,33 @@
     internal static class JdtExtensions
     {
         /// <summary>
-        /// Throws a <see cref="JdtException"/> if the given node is the root
-        /// </summary>
-        /// <param name="token">The token to verify</param>
-        /// <param name="errorMessage">Error message</param>
-        internal static void ThrowIfRoot(this JToken token, string errorMessage)
-        {
-            if (token == null)
-            {
-                throw new ArgumentNullException(nameof(token));
-            }
-
-            if (token.Root.Equals(token))
-            {
-                throw new JdtException(errorMessage);
-            }
-        }
-
-        /// <summary>
         /// Gets all the properties within the object that correspond to JDT syntax
         /// </summary>
         /// <param name="objectToSearch">The object to search</param>
         /// <returns>An enumerable of properties that start with the JDT prefix</returns>
         internal static IEnumerable<JProperty> GetJdtProperties(this JObject objectToSearch)
         {
+            if (objectToSearch == null)
+            {
+                throw new ArgumentNullException(nameof(objectToSearch));
+            }
+
             return objectToSearch.Properties().Where(p => JsonUtilities.IsJdtSyntax(p.Name));
+        }
+
+        /// <summary>
+        /// Checks if an exception is critical
+        /// </summary>
+        /// <param name="ex">The exception to check</param>
+        /// <returns>True if the exception is critical and should not be caught</returns>
+        internal static bool IsCriticalException(this Exception ex)
+        {
+            return ex is NullReferenceException
+                    || ex is StackOverflowException
+                    || ex is OutOfMemoryException
+                    || ex is System.Threading.ThreadAbortException
+                    || ex is IndexOutOfRangeException
+                    || ex is AccessViolationException;
         }
     }
 }

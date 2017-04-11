@@ -1,4 +1,7 @@
-﻿namespace SlowCheetah.JDT
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See  License.md file in the project root for full license information.
+
+namespace SlowCheetah.JDT
 {
     using System;
     using System.Collections.Generic;
@@ -14,7 +17,7 @@
         public override string Verb { get; } = null;
 
         /// <inheritdoc/>
-        public override void Process(JObject source, JObject transform)
+        internal override void Process(JObject source, JObject transform, JsonTransformationContextLogger logger)
         {
             if (source == null)
             {
@@ -36,7 +39,7 @@
                 JToken sourceChild;
                 if (source.TryGetValue(transformNode.Name, out sourceChild) && sourceChild.Type == JTokenType.Object)
                 {
-                    ProcessTransform((JObject)sourceChild, (JObject)transformNode.Value);
+                    ProcessTransform((JObject)sourceChild, (JObject)transformNode.Value, logger);
 
                     // If we have already recursed into that node, it should be removed from the transform
                     nodesToRemove.Add(transformNode.Name);
@@ -48,7 +51,7 @@
             nodesToRemove.ForEach(node => transform.Remove(node));
 
             // Continue to next transformation
-            this.Successor.Process(source, transform);
+            this.Successor.Process(source, transform, logger);
         }
     }
 }

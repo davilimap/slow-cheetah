@@ -1,4 +1,7 @@
-﻿namespace SlowCheetah.JDT
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See  License.md file in the project root for full license information.
+
+namespace SlowCheetah.JDT
 {
     using System;
     using System.Collections.Generic;
@@ -50,7 +53,7 @@
                 }
             }
 
-            public void Start(JObject source, JObject transform)
+            public void Start(JObject source, JObject transform, JsonTransformationContextLogger logger)
             {
                 if (source == null)
                 {
@@ -62,7 +65,7 @@
                     throw new ArgumentNullException(nameof(transform));
                 }
 
-                this.processors.First().Process(source, transform);
+                this.processors.First().Process(source, transform, logger);
             }
         }
 
@@ -79,7 +82,7 @@
 
             public override string Verb { get; } = null;
 
-            public override void Process(JObject source, JObject transform)
+            internal override void Process(JObject source, JObject transform, JsonTransformationContextLogger logger)
             {
                 // Do nothing, the chain is done
             }

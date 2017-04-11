@@ -1,4 +1,7 @@
-﻿namespace SlowCheetah.JDT
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See  License.md file in the project root for full license information.
+
+namespace SlowCheetah.JDT
 {
     using System.Linq;
     using Newtonsoft.Json.Linq;
@@ -23,18 +26,23 @@
         public override string Verb { get; } = "merge";
 
         /// <inheritdoc/>
-        protected override bool ProcessCore(JObject source, JToken transformValue)
+        protected override bool ProcessCore(JObject source, JToken transformValue, JsonTransformationContextLogger logger)
         {
             if (transformValue.Type == JTokenType.Object)
             {
                 // If both source and transform are objects,
                 // analyze the contents and perform the appropriate transforms
-                this.MergeWithObject(source, (JObject)transformValue);
+                this.MergeWithObject(source, (JObject)transformValue, logger);
             }
             else
             {
-                // If the transform value is not an object, then simply replace it with
-                source.ThrowIfRoot("Cannot replace root");
+                // If the transformation is trying to replace the root, throw
+                if (source.Root.Equals(source))
+                {
+                    throw JdtException.FromLineInfo(Resources.ErrorMessage_ReplaceRoot, ErrorLocation.Transform, transformValue);
+                }
+
+                // If the transform value is not an object, then simply replace it with the new token
                 source.Replace(transformValue);
             }
 
@@ -42,7 +50,7 @@
             return true;
         }
 
-        private void MergeWithObject(JObject source, JObject mergeObject)
+        private void MergeWithObject(JObject source, JObject mergeObject, JsonTransformationContextLogger logger)
         {
             var attributes = this.attributeValidator.ValidateAndReturnAttributes(mergeObject);
 
@@ -56,42 +64,52 @@
                 {
                     if (pathToken.Type != JTokenType.String)
                     {
-                        throw new JdtException("Path attribute must be a string");
+                        throw JdtException.FromLineInfo(Resources.ErrorMessage_PathContents, ErrorLocation.Transform, mergeObject);
                     }
 
-                    foreach (JToken tokenToMerge in source.SelectTokens(pathToken.ToString()).ToList())
+                    var tokensToMerge = source.SelectTokens(pathToken.ToString()).ToList();
+                    if (!tokensToMerge.Any())
+                    {
+                        logger.LogWarning(Resources.WarningMessage_NoResults, ErrorLocation.Transform, pathToken);
+                    }
+
+                    foreach (JToken token in tokensToMerge)
                     {
                         // Perform the merge for each element found through the path
-                        if (tokenToMerge.Type == JTokenType.Object && valueToken.Type == JTokenType.Object)
+                        if (token.Type == JTokenType.Object && valueToken.Type == JTokenType.Object)
                         {
                             // If they are both objects, start a new transformation
-                            ProcessTransform((JObject)tokenToMerge, (JObject)valueToken);
+                            ProcessTransform((JObject)token, (JObject)valueToken, logger);
                         }
-                        else if (tokenToMerge.Type == JTokenType.Array && valueToken.Type == JTokenType.Array)
+                        else if (token.Type == JTokenType.Array && valueToken.Type == JTokenType.Array)
                         {
                             // If they are both arrays, add the new values to the original
-                            ((JArray)tokenToMerge).Merge(valueToken.DeepClone());
+                            ((JArray)token).Merge(valueToken.DeepClone());
                         }
                         else
                         {
-                            // If they are primitives or have different values,
-                            // perform a replace
-                            tokenToMerge.ThrowIfRoot("Cannot replace root");
-                            tokenToMerge.Replace(valueToken);
+                            // If the transformation is trying to replace the root, throw
+                            if (token.Root.Equals(token))
+                            {
+                                throw JdtException.FromLineInfo(Resources.ErrorMessage_ReplaceRoot, ErrorLocation.Transform, mergeObject);
+                            }
+
+                            // If they are primitives or have different values, perform a replace
+                            token.Replace(valueToken);
                         }
                     }
                 }
                 else
                 {
                     // If either is not present, throw
-                    throw new JdtException("Merge requires both path and value");
+                    throw JdtException.FromLineInfo(Resources.ErrorMessage_MergeAttributes, ErrorLocation.Transform, mergeObject);
                 }
             }
             else
             {
                 // If the merge object does not contain attributes,
                 // simply execute the transform with that object
-                ProcessTransform(source, mergeObject);
+                ProcessTransform(source, mergeObject, logger);
             }
         }
     }

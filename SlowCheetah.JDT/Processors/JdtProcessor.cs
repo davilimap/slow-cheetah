@@ -1,4 +1,7 @@
-﻿namespace SlowCheetah.JDT
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See  License.md file in the project root for full license information.
+
+namespace SlowCheetah.JDT
 {
     using System;
     using Newtonsoft.Json.Linq;
@@ -53,7 +56,8 @@
         /// </summary>
         /// <param name="source">Object to be transformed</param>
         /// <param name="transform">Object that specifies the transformation</param>
-        public static void ProcessTransform(JObject source, JObject transform)
+        /// <param name="logger">The logger for the transformation</param>
+        internal static void ProcessTransform(JObject source, JObject transform, JsonTransformationContextLogger logger)
         {
             if (source == null)
             {
@@ -66,7 +70,7 @@
             }
 
             // Passes in a clone of the transform object because it can be altered during the transformation process
-            ProcessorChain.Start(source, (JObject)transform.DeepClone());
+            ProcessorChain.Start(source, (JObject)transform.DeepClone(), logger);
         }
 
         /// <summary>
@@ -74,6 +78,7 @@
         /// </summary>
         /// <param name="source">Object to be transformed</param>
         /// <param name="transform">Object specifying the transformation</param>
-        public abstract void Process(JObject source, JObject transform);
+        /// <param name="logger">The logger for the transformation</param>
+        internal abstract void Process(JObject source, JObject transform, JsonTransformationContextLogger logger);
     }
 }

@@ -1,4 +1,7 @@
-﻿namespace SlowCheetah.JDT
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See  License.md file in the project root for full license information.
+
+namespace SlowCheetah.JDT
 {
     using System;
     using System.Collections.Generic;
@@ -19,7 +22,7 @@
         public override string Verb { get; } = null;
 
         /// <inheritdoc/>
-        public override void Process(JObject source, JObject transform)
+        internal override void Process(JObject source, JObject transform, JsonTransformationContextLogger logger)
         {
             if (source == null)
             {
@@ -39,12 +42,12 @@
                 {
                     if (!this.ValidVerbs.Contains(verb))
                     {
-                        throw new JdtException(verb + " is not a valid JDT verb");
+                        throw JdtException.FromLineInfo(string.Format(Resources.ErrorMessage_InvalidVerb, verb), ErrorLocation.Transform, transformNode);
                     }
                 }
             }
 
-            this.Successor.Process(source, transform);
+            this.Successor.Process(source, transform, logger);
         }
     }
 }
