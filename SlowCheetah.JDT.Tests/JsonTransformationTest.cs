@@ -130,7 +130,16 @@ namespace SlowCheetah.JDT.Tests
 
         public void RemoveNonExistantNode()
         {
-            // Should at least give a warning if no nodes found
+            string transformString = @"{
+                                         '@jdt.remove': { 
+                                           '@jdt.path': 'B'
+                                         } 
+                                       }";
+
+            // This should log a warning that the path has not been found
+            StringBuilder warningLogContent = new StringBuilder();
+
+            this.TryTransformTest(this.simpleSourceString, transformString, string.Empty, warningLogContent.ToString(), string.Empty);
         }
 
         /// <summary>
@@ -203,6 +212,30 @@ namespace SlowCheetah.JDT.Tests
             errorLogContent.AppendLine($"Exception: {Resources.ErrorMessage_ReplaceRoot} Transform 2 59");
 
             this.TryTransformTest(this.simpleSourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
+        }
+
+        /// <summary>
+        /// Tests that an exception is thrown when <see cref="JsonTransformation.Apply(Stream)"/> is called
+        /// </summary>
+        [Fact]
+        public void ThrowAndLogException()
+        {
+            string transformString = @"{ 
+                                         '@jdt.invalid': false 
+                                       }";
+            using (var transformStream = this.GetStreamFromString(transformString))
+            using (var sourceStream = this.GetStreamFromString(this.simpleSourceString))
+            {
+                JsonTransformation transform = new JsonTransformation(transformStream, this.logger);
+                var exception = Record.Exception(() => transform.Apply(sourceStream));
+                Assert.NotNull(exception);
+                Assert.IsType<JdtException>(exception);
+                var jdtException = exception as JdtException;
+                Assert.Equal(string.Format(Resources.ErrorMessage_InvalidVerb, "invalid"), jdtException.Message);
+                Assert.Equal(jdtException.Location, ErrorLocation.Transform);
+                Assert.Equal(jdtException.LineNumber, 2);
+                Assert.Equal(jdtException.LinePosition, 56);
+            }
         }
 
         private void TryTransformTest(string sourceString, string transformString, string errorLogContent, string warningLogContent, string messageLogContent)
