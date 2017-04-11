@@ -76,37 +76,6 @@ namespace SlowCheetah.JDT
         /// <summary>
         /// Transforms a JSON object
         /// </summary>
-        /// <param name="sourceFile">The path to the json file to be transformed</param>
-        /// <param name="result">The stream to write the result into</param>
-        /// <returns>True if the transformations were completed</returns>
-        public bool TryApply(string sourceFile, out Stream result)
-        {
-            if (string.IsNullOrEmpty(sourceFile))
-            {
-                throw new ArgumentNullException(nameof(sourceFile));
-            }
-
-            // Open the file as streams and apply the transforms
-            using (Stream sourceStream = File.Open(sourceFile, FileMode.Open))
-            {
-                return this.TryApplyWithSourceName(sourceStream, sourceFile, out result);
-            }
-        }
-
-        /// <summary>
-        /// Transforms a JSON object
-        /// </summary>
-        /// <param name="source">The object to be transformed</param>
-        /// <param name="result">The stream to write the result into</param>
-        /// <returns>True if the transformations were completed</returns>
-        public bool TryApply(Stream source, out Stream result)
-        {
-            return this.TryApplyWithSourceName(source, null, out result);
-        }
-
-        /// <summary>
-        /// Transforms a JSON object
-        /// </summary>
         /// <param name="sourceFile">The object to be transformed</param>
         /// <returns>The stream with the result of the transform</returns>
         public Stream Apply(string sourceFile)
@@ -130,29 +99,12 @@ namespace SlowCheetah.JDT
         /// <returns>The stream with the result of the transform</returns>
         public Stream Apply(Stream source)
         {
-            return this.ApplyWithSourceName(source, null);
-        }
-
-        private bool TryApplyWithSourceName(Stream source, string sourceName, out Stream result)
-        {
             if (source == null)
             {
                 throw new ArgumentNullException(nameof(source));
             }
 
-            bool success = true;
-            result = null;
-
-            try
-            {
-                result = this.ApplyWithSourceName(source, sourceName);
-            }
-            catch (Exception ex) when (!ex.IsCriticalException())
-            {
-                success = false;
-            }
-
-            return success;
+            return this.ApplyWithSourceName(source, null);
         }
 
         private Stream ApplyWithSourceName(Stream source, string sourceName)

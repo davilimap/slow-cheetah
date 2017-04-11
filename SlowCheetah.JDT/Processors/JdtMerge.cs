@@ -67,29 +67,35 @@ namespace SlowCheetah.JDT
                         throw JdtException.FromLineInfo(Resources.ErrorMessage_PathContents, ErrorLocation.Transform, mergeObject);
                     }
 
-                    foreach (JToken tokenToMerge in source.SelectTokens(pathToken.ToString()).ToList())
+                    var tokensToMerge = source.SelectTokens(pathToken.ToString()).ToList();
+                    if (!tokensToMerge.Any())
+                    {
+                        logger.LogWarning(Resources.WarningMessage_NoResults, ErrorLocation.Transform, pathToken);
+                    }
+
+                    foreach (JToken token in tokensToMerge)
                     {
                         // Perform the merge for each element found through the path
-                        if (tokenToMerge.Type == JTokenType.Object && valueToken.Type == JTokenType.Object)
+                        if (token.Type == JTokenType.Object && valueToken.Type == JTokenType.Object)
                         {
                             // If they are both objects, start a new transformation
-                            ProcessTransform((JObject)tokenToMerge, (JObject)valueToken, logger);
+                            ProcessTransform((JObject)token, (JObject)valueToken, logger);
                         }
-                        else if (tokenToMerge.Type == JTokenType.Array && valueToken.Type == JTokenType.Array)
+                        else if (token.Type == JTokenType.Array && valueToken.Type == JTokenType.Array)
                         {
                             // If they are both arrays, add the new values to the original
-                            ((JArray)tokenToMerge).Merge(valueToken.DeepClone());
+                            ((JArray)token).Merge(valueToken.DeepClone());
                         }
                         else
                         {
-                            // If the transformation is trying to replace the root with a non-object, throw
-                            if (tokenToMerge.Root.Equals(tokenToMerge))
+                            // If the transformation is trying to replace the root, throw
+                            if (token.Root.Equals(token))
                             {
                                 throw JdtException.FromLineInfo(Resources.ErrorMessage_ReplaceRoot, ErrorLocation.Transform, mergeObject);
                             }
 
                             // If they are primitives or have different values, perform a replace
-                            tokenToMerge.Replace(valueToken);
+                            token.Replace(valueToken);
                         }
                     }
                 }

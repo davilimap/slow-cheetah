@@ -185,6 +185,10 @@
     <value>Node {0} was not found</value>
     <comment>The error message to be displayed when the specified node is not found</comment>
   </data>
+  <data name="WarningMessage_NoResults" xml:space="preserve">
+    <value>No nodes match the given path</value>
+    <comment>The warning message to be displayed if a path query does not yield any results</comment>
+  </data>
   <data name="WarningMessage_UnableToRemove" xml:space="preserve">
     <value>Unable to remove node</value>
     <comment>The warning message to be displayed if a node is not removed as specified</comment>

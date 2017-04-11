@@ -72,8 +72,14 @@ namespace SlowCheetah.JDT
             {
                 if (pathToken.Type == JTokenType.String)
                 {
+                    var tokensToRemove = source.SelectTokens(pathToken.ToString()).ToList();
+                    if (!tokensToRemove.Any())
+                    {
+                        logger.LogWarning(Resources.WarningMessage_NoResults, ErrorLocation.Transform, pathToken);
+                    }
+
                     // Removes all of the tokens specified by the path
-                    foreach (JToken token in source.SelectTokens(pathToken.ToString()).ToList())
+                    foreach (JToken token in tokensToRemove)
                     {
                         if (token.Equals(source))
                         {

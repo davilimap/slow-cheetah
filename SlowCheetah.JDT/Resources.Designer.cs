@@ -214,6 +214,15 @@ namespace SlowCheetah.JDT {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No nodes match the given path.
+        /// </summary>
+        internal static string WarningMessage_NoResults {
+            get {
+                return ResourceManager.GetString("WarningMessage_NoResults", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unable to remove node.
         /// </summary>
         internal static string WarningMessage_UnableToRemove {

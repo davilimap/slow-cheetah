@@ -56,10 +56,16 @@ namespace SlowCheetah.JDT
                             throw JdtException.FromLineInfo(Resources.ErrorMessage_ValueContents, ErrorLocation.Transform, valueToken);
                         }
 
-                        // If the values are correct, rename each token found with the given path
-                        foreach (JToken nodeToRename in source.SelectTokens(pathToken.ToString()).ToList())
+                        var tokensToRename = source.SelectTokens(pathToken.ToString()).ToList();
+                        if (!tokensToRename.Any())
                         {
-                            if (!this.RenameNode(nodeToRename, valueToken.ToString()))
+                            logger.LogWarning(Resources.WarningMessage_NoResults, ErrorLocation.Transform, pathToken);
+                        }
+
+                        // If the values are correct, rename each token found with the given path
+                        foreach (JToken token in tokensToRename)
+                        {
+                            if (!this.RenameNode(token, valueToken.ToString()))
                             {
                                 throw JdtException.FromLineInfo(Resources.ErrorMessage_RenameNode, ErrorLocation.Transform, renameObject);
                             }
