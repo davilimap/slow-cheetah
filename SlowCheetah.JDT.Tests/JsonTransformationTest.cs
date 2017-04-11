@@ -14,13 +14,14 @@ namespace SlowCheetah.JDT.Tests
     {
         private JsonTransformationTestLogger logger = new JsonTransformationTestLogger();
 
+        private string simpleSourceString = @"{ 'A': 1 }";
+
         /// <summary>
-        /// Tests the failiure caused when an invalid verb is found
+        /// Tests the error caused when an invalid verb is found
         /// </summary>
         [Fact]
         public void InvalidVerb()
         {
-            string sourceString = @"{ 'A': 1 }";
             string transformString = @"{ 
                                          '@jdt.invalid': false 
                                        }";
@@ -29,16 +30,15 @@ namespace SlowCheetah.JDT.Tests
             StringBuilder errorLogContent = new StringBuilder();
             errorLogContent.AppendLine($"Exception: {string.Format(Resources.ErrorMessage_InvalidVerb, "invalid")} Transform 2 56");
 
-            this.TransformFailTest(sourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
+            this.TryTransformTest(this.simpleSourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
         }
 
         /// <summary>
-        /// Tests the failiure caused by a verb having an invalid value
+        /// Tests the error caused by a verb having an invalid value
         /// </summary>
         [Fact]
         public void InvalidVerbValue()
         {
-            string sourceString = @"{ 'A': 1 }";
             string transformString = @"{ 
                                          '@jdt.remove': 10 
                                        }";
@@ -47,16 +47,15 @@ namespace SlowCheetah.JDT.Tests
             StringBuilder errorLogContent = new StringBuilder();
             errorLogContent.AppendLine($"Exception: {string.Format(Resources.ErrorMessage_InvalidRemoveValue, "Integer")} Transform 2 58");
 
-            this.TransformFailTest(sourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
+            this.TryTransformTest(this.simpleSourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
         }
 
         /// <summary>
-        /// Tests the failiure when an invalid attribute is found within a verb
+        /// Tests the error caused when an invalid attribute is found within a verb
         /// </summary>
         [Fact]
         public void InvalidAttribute()
         {
-            string sourceString = @"{ 'A': 1 }";
             string transformString = @"{ 
                                          '@jdt.replace': { 
                                            '@jdt.invalid': false 
@@ -67,16 +66,15 @@ namespace SlowCheetah.JDT.Tests
             StringBuilder errorLogContent = new StringBuilder();
             errorLogContent.AppendLine($"Exception: {string.Format(Resources.ErrorMessage_InvalidAttribute, "invalid")} Transform 3 58");
 
-            this.TransformFailTest(sourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
+            this.TryTransformTest(this.simpleSourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
         }
 
         /// <summary>
-        /// Tests the failiure when a required attribute is not found
+        /// Tests the error caused when a required attribute is not found
         /// </summary>
         [Fact]
         public void MissingAttribute()
         {
-            string sourceString = @"{ 'A': 1 }";
             string transformString = @"{ 
                                          '@jdt.rename': { 
                                            '@jdt.path': 'A' 
@@ -87,16 +85,36 @@ namespace SlowCheetah.JDT.Tests
             StringBuilder errorLogContent = new StringBuilder();
             errorLogContent.AppendLine($"Exception: {Resources.ErrorMessage_RenameAttributes} Transform 2 57");
 
-            this.TransformFailTest(sourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
+            this.TryTransformTest(this.simpleSourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
         }
 
         /// <summary>
-        /// Tests the failiure when an attribute has an incorrect value
+        /// Tests the error caused when a verb object contains attributes and other objects
+        /// </summary>
+        [Fact]
+        public void MixedAttributes()
+        {
+            string transformString = @"{ 
+                                         '@jdt.rename': { 
+                                           '@jdt.path': 'A',
+                                           '@jdt.value': 'Astar',
+                                           'NotAttribute': true
+                                         } 
+                                       }";
+
+            // The error should point to the beginning of the verb object
+            StringBuilder errorLogContent = new StringBuilder();
+            errorLogContent.AppendLine($"Exception: {Resources.ErrorMessage_InvalidAttributes} Transform 2 57");
+
+            this.TryTransformTest(this.simpleSourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
+        }
+
+        /// <summary>
+        /// Tests the error caused when an attribute has an incorrect value
         /// </summary>
         [Fact]
         public void WrongAttributeValue()
         {
-            string sourceString = @"{ 'A': 1 }";
             string transformString = @"{
                                          '@jdt.remove': { 
                                            '@jdt.path': false
@@ -107,18 +125,106 @@ namespace SlowCheetah.JDT.Tests
             StringBuilder errorLogContent = new StringBuilder();
             errorLogContent.AppendLine($"Exception: {Resources.ErrorMessage_PathContents} Transform 3 61");
 
-            this.TransformFailTest(sourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
+            this.TryTransformTest(this.simpleSourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
         }
 
-        private void TransformFailTest(string sourceString, string transformString, string errorLogContent, string warningLogContent, string messageLogContent)
+        public void RemoveNonExistantNode()
+        {
+            // Should at least give a warning if no nodes found
+        }
+
+        /// <summary>
+        /// Tests the error caused when attempting to remove the root node
+        /// </summary>
+        [Fact]
+        public void RemoveRoot()
+        {
+            string transformString = @"{
+                                         '@jdt.remove': true 
+                                       }";
+
+            // The error should point to the end of the invalid token
+            StringBuilder errorLogContent = new StringBuilder();
+            errorLogContent.AppendLine($"Exception: {Resources.ErrorMessage_RemoveRoot} Transform 2 60");
+
+            this.TryTransformTest(this.simpleSourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
+        }
+
+        /// <summary>
+        /// Tests the error when a rename value is invalid
+        /// </summary>
+        [Fact]
+        public void InvalidRenameValue()
+        {
+            string transformString = @"{
+                                         '@jdt.rename': { 
+                                           'A': 10
+                                         } 
+                                       }";
+
+            // The error should point to the end of the invalid token
+            StringBuilder errorLogContent = new StringBuilder();
+            errorLogContent.AppendLine($"Exception: {Resources.ErrorMessage_InvalidRenameValue} Transform 3 50");
+
+            this.TryTransformTest(this.simpleSourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
+        }
+
+        /// <summary>
+        /// Tests the error caused when attempting to rename a non-existant node
+        /// </summary>
+        [Fact]
+        public void RenameNonExistantNode()
+        {
+            string transformString = @"{
+                                         '@jdt.rename': { 
+                                           'B': 'Bstar'
+                                         } 
+                                       }";
+
+            // The error should point to the end of property key
+            StringBuilder warningLogContent = new StringBuilder();
+            warningLogContent.AppendLine($"{string.Format(Resources.WarningMessage_NodeNotFound, "B")} Transform 3 47");
+
+            this.TryTransformTest(this.simpleSourceString, transformString, string.Empty, warningLogContent.ToString(), string.Empty);
+        }
+
+        /// <summary>
+        /// Test the error when attempting to replace the root with a non-object token
+        /// </summary>
+        [Fact]
+        public void ReplaceRoot()
+        {
+            string transformString = @"{
+                                         '@jdt.replace': 10
+                                       }";
+
+            // The error should point to the end of the invalid token
+            StringBuilder errorLogContent = new StringBuilder();
+            errorLogContent.AppendLine($"Exception: {Resources.ErrorMessage_ReplaceRoot} Transform 2 59");
+
+            this.TryTransformTest(this.simpleSourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
+        }
+
+        private void TryTransformTest(string sourceString, string transformString, string errorLogContent, string warningLogContent, string messageLogContent)
         {
             using (var transformStream = this.GetStreamFromString(transformString))
             using (var sourceStream = this.GetStreamFromString(sourceString))
             {
                 JsonTransformation transform = new JsonTransformation(transformStream, this.logger);
                 Stream result;
-                Assert.False(transform.TryApply(sourceStream, out result));
-                Assert.Null(result);
+
+                // If there should be errors, the transform should fail
+                bool shouldTransformSucceed = string.IsNullOrEmpty(errorLogContent);
+
+                Assert.Equal(shouldTransformSucceed, transform.TryApply(sourceStream, out result));
+                if (shouldTransformSucceed)
+                {
+                    Assert.NotNull(result);
+                }
+                else
+                {
+                    Assert.Null(result);
+                }
 
                 Assert.Equal(errorLogContent, this.logger.ErrorLogText);
                 Assert.Equal(warningLogContent, this.logger.WarningLogText);

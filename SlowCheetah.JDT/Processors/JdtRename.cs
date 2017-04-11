@@ -79,7 +79,7 @@ namespace SlowCheetah.JDT
                     {
                         if (renameOperation.Value.Type != JTokenType.String)
                         {
-                            throw JdtException.FromLineInfo(Resources.ErrorMessage_ValueContents, ErrorLocation.Transform, renameOperation);
+                            throw JdtException.FromLineInfo(Resources.ErrorMessage_InvalidRenameValue, ErrorLocation.Transform, renameOperation.Value);
                         }
 
                         // TO DO: Warning if the node is not found

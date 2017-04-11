@@ -36,7 +36,7 @@ namespace SlowCheetah.JDT
             }
             else
             {
-                // If the transformation is trying to replace the root, throw
+                // If the transformation is trying to replace the root with a non-object, throw
                 if (source.Root.Equals(source))
                 {
                     throw JdtException.FromLineInfo(Resources.ErrorMessage_ReplaceRoot, ErrorLocation.Transform, transformValue);
@@ -82,7 +82,7 @@ namespace SlowCheetah.JDT
                         }
                         else
                         {
-                            // If the transformation is trying to replace the root, throw
+                            // If the transformation is trying to replace the root with a non-object, throw
                             if (tokenToMerge.Root.Equals(tokenToMerge))
                             {
                                 throw JdtException.FromLineInfo(Resources.ErrorMessage_ReplaceRoot, ErrorLocation.Transform, mergeObject);

@@ -34,6 +34,12 @@ namespace SlowCheetah.JDT
             }
             else
             {
+                // If the transformation is trying to replace the root with a non-object, throw
+                if (source.Root.Equals(source))
+                {
+                    throw JdtException.FromLineInfo(Resources.ErrorMessage_ReplaceRoot, ErrorLocation.Transform, transformValue);
+                }
+
                 // If the value is not an object, simply replace the original node with the new value
                 source.Replace(transformValue);
 
