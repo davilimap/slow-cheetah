@@ -1,0 +1,9 @@
+﻿{
+  "@jdt.replace": {
+    "@jdt.path": "D",
+    "@jdt.value": {
+      "D1": 41
+    }
+  },
+  "@jdt.remove": "D"
+}

@@ -153,7 +153,16 @@
     <None Include="Inputs\Replace\Object.WithObject.Transform.json" />
     <None Include="Inputs\Replace\Object.WithPrimitive.Expected.json" />
     <None Include="Inputs\Replace\Object.WithPrimitive.Transform.json" />
+    <None Include="Inputs\Transform\Object.Source.json" />
+    <None Include="Inputs\Transform\Primitive.RemoveReplace.Expected.json" />
+    <None Include="Inputs\Transform\Primitive.RemoveReplace.Transform.json" />
+    <None Include="Inputs\Transform\Skipped\Object.DefaultRename.Expected.json" />
+    <None Include="Inputs\Transform\Skipped\Object.DefaultRename.Transform.json" />
+    <None Include="Inputs\Transform\Skipped\Primitive.DefaultReplaceRename.Expected.json" />
     <None Include="Inputs\Transform\Primitive.RemoveRename.Expected.json" />
+    <None Include="Inputs\Transform\Primitive.ReplaceRename.Expected.json" />
+    <None Include="Inputs\Transform\Skipped\Primitive.DefaultReplaceRename.Transform.json" />
+    <None Include="Inputs\Transform\Primitive.ReplaceRename.Transform.json" />
     <None Include="Inputs\Transform\Primitive.RemoveRename.Transform.json" />
     <None Include="Inputs\Transform\Primitive.Source.json" />
     <None Include="packages.config" />
