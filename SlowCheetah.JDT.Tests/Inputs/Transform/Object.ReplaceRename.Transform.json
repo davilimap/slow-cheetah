@@ -1,0 +1,23 @@
+﻿{
+  "@jdt.rename": {
+    "@jdt.path": "B.B1",
+    "@jdt.value": "B1star"
+  },
+  "@jdt.replace": {
+    "@jdt.path": "$.C",
+    "@jdt.value": {
+      "C1": "1",
+      "C2": "2"
+    }
+  },
+  "B": {
+    "@jdt.replace": {
+      "B1": 21
+    }
+  },
+  "C": {
+    "@jdt.rename": {
+      "C1": "C1star"
+    }
+  }
+}

@@ -154,6 +154,8 @@
     <None Include="Inputs\Replace\Object.WithPrimitive.Expected.json" />
     <None Include="Inputs\Replace\Object.WithPrimitive.Transform.json" />
     <None Include="Inputs\Transform\Object.RemoveRename.Expected.json" />
+    <None Include="Inputs\Transform\Object.ReplaceRename.Expected.json" />
+    <None Include="Inputs\Transform\Object.ReplaceRename.Transform.json" />
     <None Include="Inputs\Transform\Object.RemoveReplace.Expected.json" />
     <None Include="Inputs\Transform\Object.RemoveReplace.Transform.json" />
     <None Include="Inputs\Transform\Object.RemoveRename.Transform.json" />
