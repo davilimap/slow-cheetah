@@ -154,6 +154,8 @@
     <None Include="Inputs\Replace\Object.WithPrimitive.Expected.json" />
     <None Include="Inputs\Replace\Object.WithPrimitive.Transform.json" />
     <None Include="Inputs\Transform\Object.RemoveRename.Expected.json" />
+    <None Include="Inputs\Transform\Object.RemoveReplace.Expected.json" />
+    <None Include="Inputs\Transform\Object.RemoveReplace.Transform.json" />
     <None Include="Inputs\Transform\Object.RemoveRename.Transform.json" />
     <None Include="Inputs\Transform\Object.Source.json" />
     <None Include="Inputs\Transform\Primitive.RemoveReplace.Expected.json" />
@@ -183,9 +185,7 @@
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Inputs\Transform\Skipped\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
