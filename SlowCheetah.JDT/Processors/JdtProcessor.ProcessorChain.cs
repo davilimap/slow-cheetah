@@ -23,9 +23,9 @@ namespace SlowCheetah.JDT
                 new JdtRecurse(),
                 new JdtRemove(),
                 new JdtReplace(),
-                new JdtRename(),
                 new JdtMerge(),
-                new JdtDefault()
+                new JdtDefault(),
+                new JdtRename(),
             };
 
             public JdtProcessorChain()

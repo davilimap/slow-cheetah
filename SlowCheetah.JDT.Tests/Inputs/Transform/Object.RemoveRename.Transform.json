@@ -1,0 +1,10 @@
+﻿{
+  "@jdt.remove": {
+    "@jdt.path": "B.B1star"
+  },
+  "B": {
+    "@jdt.rename": {
+      "B1": "B1star"
+    }
+  }
+}

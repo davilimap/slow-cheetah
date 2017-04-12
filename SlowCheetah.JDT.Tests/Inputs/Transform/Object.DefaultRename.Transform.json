@@ -2,7 +2,6 @@
   "@jdt.rename": {
     "B": "Bstar"
   },
-  // Is this B or Bstar?
   "B": {
     "B1": 21,
     "B2": 22
