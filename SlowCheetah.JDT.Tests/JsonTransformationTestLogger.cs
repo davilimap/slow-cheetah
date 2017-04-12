@@ -11,11 +11,11 @@ namespace SlowCheetah.JDT.Tests
     /// </summary>
     public class JsonTransformationTestLogger : IJsonTransformationLogger
     {
-        private StringBuilder errorLog = new StringBuilder();
+        private readonly StringBuilder errorLog = new StringBuilder();
 
-        private StringBuilder warningLog = new StringBuilder();
+        private readonly StringBuilder warningLog = new StringBuilder();
 
-        private StringBuilder messageLog = new StringBuilder();
+        private readonly StringBuilder messageLog = new StringBuilder();
 
         public string ErrorLogText
         {

@@ -12,7 +12,7 @@ namespace SlowCheetah.JDT.Tests
     /// </summary>
     public class JsonTransformationTest
     {
-        private JsonTransformationTestLogger logger = new JsonTransformationTestLogger();
+        private readonly JsonTransformationTestLogger logger = new JsonTransformationTestLogger();
 
         private string simpleSourceString = @"{ 'A': 1 }";
 
