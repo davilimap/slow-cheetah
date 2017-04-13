@@ -18,6 +18,7 @@ namespace SlowCheetah.JDT.Tests
 
         public JsonTransformationTest()
         {
+            // xUnit creates a new instance of the class for each test, so a new logger is created
             this.logger = new JsonTransformationTestLogger();
         }
 
