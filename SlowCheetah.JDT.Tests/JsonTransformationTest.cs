@@ -12,9 +12,14 @@ namespace SlowCheetah.JDT.Tests
     /// </summary>
     public class JsonTransformationTest
     {
-        private readonly JsonTransformationTestLogger logger = new JsonTransformationTestLogger();
+        private static readonly string SimpleSourceString = @"{ 'A': 1 }";
 
-        private string simpleSourceString = @"{ 'A': 1 }";
+        private readonly JsonTransformationTestLogger logger;
+
+        public JsonTransformationTest()
+        {
+            this.logger = new JsonTransformationTestLogger();
+        }
 
         /// <summary>
         /// Tests the error caused when an invalid verb is found
@@ -30,7 +35,7 @@ namespace SlowCheetah.JDT.Tests
             StringBuilder errorLogContent = new StringBuilder();
             errorLogContent.AppendLine($"Exception: {string.Format(Resources.ErrorMessage_InvalidVerb, "invalid")} Transform 2 56");
 
-            this.TryTransformTest(this.simpleSourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
+            this.TryTransformTest(SimpleSourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
         }
 
         /// <summary>
@@ -47,7 +52,7 @@ namespace SlowCheetah.JDT.Tests
             StringBuilder errorLogContent = new StringBuilder();
             errorLogContent.AppendLine($"Exception: {string.Format(Resources.ErrorMessage_InvalidRemoveValue, "Integer")} Transform 2 58");
 
-            this.TryTransformTest(this.simpleSourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
+            this.TryTransformTest(SimpleSourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
         }
 
         /// <summary>
@@ -66,7 +71,7 @@ namespace SlowCheetah.JDT.Tests
             StringBuilder errorLogContent = new StringBuilder();
             errorLogContent.AppendLine($"Exception: {string.Format(Resources.ErrorMessage_InvalidAttribute, "invalid")} Transform 3 58");
 
-            this.TryTransformTest(this.simpleSourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
+            this.TryTransformTest(SimpleSourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
         }
 
         /// <summary>
@@ -85,7 +90,7 @@ namespace SlowCheetah.JDT.Tests
             StringBuilder errorLogContent = new StringBuilder();
             errorLogContent.AppendLine($"Exception: {Resources.ErrorMessage_RenameAttributes} Transform 2 57");
 
-            this.TryTransformTest(this.simpleSourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
+            this.TryTransformTest(SimpleSourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
         }
 
         /// <summary>
@@ -106,7 +111,7 @@ namespace SlowCheetah.JDT.Tests
             StringBuilder errorLogContent = new StringBuilder();
             errorLogContent.AppendLine($"Exception: {Resources.ErrorMessage_InvalidAttributes} Transform 2 57");
 
-            this.TryTransformTest(this.simpleSourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
+            this.TryTransformTest(SimpleSourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
         }
 
         /// <summary>
@@ -125,7 +130,7 @@ namespace SlowCheetah.JDT.Tests
             StringBuilder errorLogContent = new StringBuilder();
             errorLogContent.AppendLine($"Exception: {Resources.ErrorMessage_PathContents} Transform 3 61");
 
-            this.TryTransformTest(this.simpleSourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
+            this.TryTransformTest(SimpleSourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
         }
 
         /// <summary>
@@ -144,7 +149,7 @@ namespace SlowCheetah.JDT.Tests
             StringBuilder warningLogContent = new StringBuilder();
             warningLogContent.AppendLine($"{Resources.WarningMessage_NoResults} Transform 3 59");
 
-            this.TryTransformTest(this.simpleSourceString, transformString, string.Empty, warningLogContent.ToString(), string.Empty);
+            this.TryTransformTest(SimpleSourceString, transformString, string.Empty, warningLogContent.ToString(), string.Empty);
         }
 
         /// <summary>
@@ -161,7 +166,7 @@ namespace SlowCheetah.JDT.Tests
             StringBuilder errorLogContent = new StringBuilder();
             errorLogContent.AppendLine($"Exception: {Resources.ErrorMessage_RemoveRoot} Transform 2 60");
 
-            this.TryTransformTest(this.simpleSourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
+            this.TryTransformTest(SimpleSourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
         }
 
         /// <summary>
@@ -180,7 +185,7 @@ namespace SlowCheetah.JDT.Tests
             StringBuilder errorLogContent = new StringBuilder();
             errorLogContent.AppendLine($"Exception: {Resources.ErrorMessage_InvalidRenameValue} Transform 3 50");
 
-            this.TryTransformTest(this.simpleSourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
+            this.TryTransformTest(SimpleSourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
         }
 
         /// <summary>
@@ -199,7 +204,7 @@ namespace SlowCheetah.JDT.Tests
             StringBuilder warningLogContent = new StringBuilder();
             warningLogContent.AppendLine($"{string.Format(Resources.WarningMessage_NodeNotFound, "B")} Transform 3 47");
 
-            this.TryTransformTest(this.simpleSourceString, transformString, string.Empty, warningLogContent.ToString(), string.Empty);
+            this.TryTransformTest(SimpleSourceString, transformString, string.Empty, warningLogContent.ToString(), string.Empty);
         }
 
         /// <summary>
@@ -216,7 +221,7 @@ namespace SlowCheetah.JDT.Tests
             StringBuilder errorLogContent = new StringBuilder();
             errorLogContent.AppendLine($"Exception: {Resources.ErrorMessage_ReplaceRoot} Transform 2 59");
 
-            this.TryTransformTest(this.simpleSourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
+            this.TryTransformTest(SimpleSourceString, transformString, errorLogContent.ToString(), string.Empty, string.Empty);
         }
 
         /// <summary>
@@ -229,7 +234,7 @@ namespace SlowCheetah.JDT.Tests
                                          '@jdt.invalid': false 
                                        }";
             using (var transformStream = this.GetStreamFromString(transformString))
-            using (var sourceStream = this.GetStreamFromString(this.simpleSourceString))
+            using (var sourceStream = this.GetStreamFromString(SimpleSourceString))
             {
                 JsonTransformation transform = new JsonTransformation(transformStream, this.logger);
                 var exception = Record.Exception(() => transform.Apply(sourceStream));

@@ -189,9 +189,5 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <ProjectExtensions>
-    <VisualStudio>
-      <UserProperties Inputs_4Transform_4Object_1RemoveRename_1Transform_1json__JSONSchema="http://json.schemastore.org/jdt" />
-    </VisualStudio>
-  </ProjectExtensions>
+  <ProjectExtensions />
 </Project>
