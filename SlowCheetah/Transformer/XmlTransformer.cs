@@ -7,7 +7,6 @@ namespace SlowCheetah
     using System.Diagnostics.Contracts;
     using System.IO;
     using Microsoft.Web.XmlTransform;
-    using SlowCheetah.Exceptions;
 
     /// <summary>
     /// Transforms XML files utilizing Microsoft Web XmlTransform library
@@ -49,12 +48,12 @@ namespace SlowCheetah
             // File validation
             if (!File.Exists(source))
             {
-                throw new FileNotFoundException("File to transform not found", source);
+                throw new FileNotFoundException(Resources.ErrorMessage_SourceFileNotFound, source);
             }
 
             if (!File.Exists(transform))
             {
-                throw new FileNotFoundException("Transform file not found", transform);
+                throw new FileNotFoundException(Resources.ErrorMessage_TransformFileNotFound, transform);
             }
 
             using (XmlTransformableDocument document = new XmlTransformableDocument())
