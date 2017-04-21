@@ -75,6 +75,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <Content Include="IconMappings.csv">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
@@ -93,7 +96,12 @@
     </Content>
     <Content Include="Resources\Images\Cheetah-200.jpg" />
     <Content Include="Resources\Images\Cheetah-Medium.jpg" />
-    <Content Include="Resources\Images\Images_32bit.png" />
+    <Content Include="Resources\Images\PreviewTransform_16x.png">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Resources\Images\AddTransform_16x.png">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="Resources\License.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
